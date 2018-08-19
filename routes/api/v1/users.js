@@ -1,4 +1,5 @@
 const router = require('express').Router();
+
 const UserModel = require(`${process.cwd()}/models/user.js`);
 
 /**
@@ -6,7 +7,7 @@ const UserModel = require(`${process.cwd()}/models/user.js`);
  * tags:
  *   - name: users
  *     description: ユーザー関連API
- * 
+ *
  * /users:
  *   get:
  *     tags:
