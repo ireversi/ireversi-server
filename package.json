@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --watch routes --watch models routes/index.js",
+    "lint": "eslint routes models utils --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -20,6 +21,9 @@
     "socket.io": "^2.1.1"
   },
   "devDependencies": {
+    "eslint": "^5.4.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
     "nodemon": "^1.18.3",
     "swagger-jsdoc": "^3.0.2",
     "swagger-ui-express": "^3.0.10"
