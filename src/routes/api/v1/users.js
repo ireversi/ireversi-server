@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-const UserModel = require(`${process.cwd()}/models/user.js`);
+const UserModel = require('../../../models/UserModel.js');
 
 /**
  * @swagger
