@@ -6,7 +6,7 @@ const UserModel = require(`${process.cwd()}/models/user.js`);
  * @swagger
  * tags:
  *   - name: users
- *     description: ユーザー関連API
+ *     description: Users API
  *
  * /users:
  *   get:
