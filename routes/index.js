@@ -7,8 +7,8 @@ const mongoose = require('mongoose');
 const PORT = process.env.PORT || 10000;
 
 if (process.env.NODE_ENV === 'develop') {
+  const klawSync = require('klaw-sync');
   const path = require('path');
-  const listFiles = require('../utils/listFiles.js');
   const swaggerUi = require('swagger-ui-express');
   const swaggerJSDoc = require('swagger-jsdoc');
   const swaggerSpec = swaggerJSDoc({
@@ -23,7 +23,7 @@ if (process.env.NODE_ENV === 'develop') {
       consumes: ['application/x-www-form-urlencoded'],
       produces: ['application/json'],
     },
-    apis: listFiles(path.join(__dirname, 'api')),
+    apis: klawSync(path.join(__dirname, 'api'), { nodir: true }).map(f => f.path),
   });
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
