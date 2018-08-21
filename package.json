@@ -4,12 +4,15 @@
   "description": "",
   "main": "index.js",
   "repository": {
-     "type": "git",
-     "url": "https://github.com/ireversi/ireversi-server.git"
+    "type": "git",
+    "url": "https://github.com/ireversi/ireversi-server.git"
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon --watch src src/server.js",
-    "start": "cross-env NODE_ENV=production node src/server.js",
+    "start": "node src/server.js",
+    "stop": "now remove ireversi",
+    "deploy": "now && now alias",
+    "scale": "now scale ireversi.now.sh 1",
     "lint": "eslint src tests --fix",
     "test": "cross-env NODE_ENV=test jest",
     "test:watch": "cross-env NODE_ENV=test jest --watch"
