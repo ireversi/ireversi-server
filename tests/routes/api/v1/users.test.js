@@ -19,11 +19,12 @@ describe('Request users', () => {
       const name = 'mario';
       const email = 'test@example.com';
       const password = 'password';
-      const User = new UserModel();
+      const User = new UserModel({
+        name,
+        email,
+        password,
+      });
       User.setInitParams();
-      User.name = name;
-      User.email = email;
-      User.password = password;
       await User.save();
 
       // When
