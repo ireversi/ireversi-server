@@ -1,5 +1,4 @@
 const klawSync = require('klaw-sync');
-const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
 
@@ -15,7 +14,7 @@ const swaggerSpec = swaggerJSDoc({
     consumes: ['application/x-www-form-urlencoded'],
     produces: ['application/json'],
   },
-  apis: klawSync(path.join(__dirname, '../routes/api'), { nodir: true }).map(f => f.path),
+  apis: klawSync('./swagger', { nodir: true }).map(f => f.path),
 });
 
 module.exports = {

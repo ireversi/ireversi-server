@@ -6,8 +6,9 @@ const { port, nodeEnv } = require('./config.js');
   await connectDB();
   if (nodeEnv === 'development') {
     const { serve, setup } = require('./utils/swaggerUi.js');
-    app.use('/api-docs', serve, setup);
-    console.log(`API docs: http://localhost:${port}/api-docs`);
+    const docsPath = '/api-docs/v1';
+    app.use(docsPath, serve, setup);
+    console.log(`API docs: http://localhost:${port}${docsPath}`);
   }
   app.listen(port, () => console.log(`Server is running on port ${port}`));
 })();
