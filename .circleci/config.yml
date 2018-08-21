@@ -8,10 +8,7 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:8.11
-      - image: mongo
-        environment:
-          MONGO_INITDB_ROOT_USERNAME: root
-          MONGO_INITDB_ROOT_PASSWORD: root
+      - image: circleci/mongo
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
