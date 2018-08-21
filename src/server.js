@@ -5,6 +5,7 @@ const { port, nodeEnv } = require('./config.js');
 (async () => {
   await connectDB();
   if (nodeEnv === 'development') {
+    // eslint-disable-next-line global-require
     const { serve, setup } = require('./utils/swaggerUi.js');
     const docsPath = '/api-docs/v1';
     app.use(docsPath, serve, setup);
