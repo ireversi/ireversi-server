@@ -2,17 +2,12 @@ const mongoose = require('mongoose');
 
 const {
   nodeEnv,
-  mongoHost,
-  mongoUsername,
-  mongoPassword,
-  mongoDBname,
+  mongoURI,
 } = require('../config.js');
 
 const connect = async () => {
-  await mongoose.connect(`mongodb://${mongoHost}`, {
-    user: mongoUsername,
-    pass: mongoPassword,
-    dbName: mongoDBname,
+  await mongoose.connect(mongoURI, {
+    useNewUrlParser: true,
   });
 
   mongoose.connection.on('error', (err) => {
