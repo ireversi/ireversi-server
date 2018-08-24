@@ -4,9 +4,9 @@ switch (process.env.NODE_ENV) {
   case 'production':
     break;
   case 'test':
-    // dotenv.config({
-    //   path: 'test.env',
-    // });
+    dotenv.config({
+      path: 'test.env',
+    });
     break;
   default:
     dotenv.config();
