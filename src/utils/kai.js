@@ -1,0 +1,1 @@
+module.experts = n => n * 2;
