@@ -6,8 +6,8 @@ describe('Twice number', () => {
     expect(result).toBe(6);
   });
 
-  it('5.5 x 2 = 11', () => {
-    const result = twice(5.5);
-    expect(result).toBe(11);
+  it('10.5 x 2 = 21', () => {
+    const result = twice(10.5);
+    expect(result).toBe(21);
   });
 });
