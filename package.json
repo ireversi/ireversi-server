@@ -8,7 +8,7 @@
     "url": "https://github.com/ireversi/ireversi-server.git"
   },
   "scripts": {
-    "dev": "cross-env NODE_ENV=development nodemon --watch src src/server.js",
+    "dev": "cross-env NODE_ENV=development nodemon --watch src --watch swagger -e js,yml src/server.js",
     "start": "node src/server.js",
     "stop": "now remove ireversi",
     "deploy": "now && now alias",
