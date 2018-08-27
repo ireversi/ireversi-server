@@ -8,7 +8,6 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:8.11
-      - image: circleci/mongo
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -31,6 +30,7 @@ jobs:
 
       - save_cache:
           paths:
+            - ~/.mongodb-binaries
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
         
