@@ -1,4 +1,4 @@
-const twice = require('../../src/utils/twiceMomii.js');
+const twice = require('../../src/utils/twiceMomii');
 
 describe('Twice number', () => {
   it('3 * 2 = 6', () => {
