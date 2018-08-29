@@ -9,4 +9,4 @@ const PlayingSchema = new Schema({
 });
 
 
-module.exports = mongoose.model('Playing', PlayingSchema);
+module.exports = mongoose.model('MomiiPlaying', PlayingSchema);

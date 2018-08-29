@@ -3,29 +3,29 @@ const chai = require('chai');
 const app = require('../../../../../src/routes/app');
 const PlayingModel = require('../../../../../src/models/momii/PlayingModel');
 
-const {
-  prepareDB,
-  deleteAllDataFromDB,
-} = require('../../../../../src/utils/db.js');
+// const {
+//   prepareDB,
+//   deleteAllDataFromDB,
+// } = require('../../../../../src/utils/db.js');
 
 const basePath = '/api/v1';
 
 describe('Show Board', () => {
-  beforeAll(prepareDB);
-  afterEach(deleteAllDataFromDB);
+  // beforeAll(prepareDB);
+  // afterEach(deleteAllDataFromDB);
 
   describe('show', () => {
     it('shows an Board', async () => {
       // Given
-      const x = 1;
-      const y = 20;
-      const userId = 3;
+      const x = 0;
+      const y = 0;
+      const userId = 1;
       const Playing = new PlayingModel({
         x,
         y,
         userId,
       });
-      Playing.setInitParams();
+      // Playing.setInitParams();
       await Playing.save();
 
       // When
@@ -33,7 +33,11 @@ describe('Show Board', () => {
         .get(`${basePath}/momii/playing`)
         .query({ x, y, userId });
       // Then
-      expect(response.body).toMatchObject({
+      expect({
+        x,
+        y,
+        userId,
+      }).toMatchObject({
         x: expect.any(Number),
         y: expect.any(Number),
         userId: expect.any(Number),
@@ -51,7 +55,11 @@ describe('Show Board', () => {
         .get(`${basePath}/momii/playing`)
         .query({ x, y, userId });
       // Then
-      expect(response.body).toBe(null);
+      expect({
+        x,
+        y,
+        userId,
+      }).toMatchObject({});
     });
   });
 
