@@ -14,8 +14,9 @@
     "deploy": "now && now alias",
     "scale": "now scale ireversi.now.sh 1",
     "lint": "eslint src tests --fix",
-    "test": "cross-env NODE_ENV=test jest",
-    "test:watch": "cross-env NODE_ENV=test jest --watch"
+    "test": "cross-env NODE_ENV=test jest --coverage",
+    "test:watch": "cross-env NODE_ENV=test jest --watch",
+    "coverage": "codecov"
   },
   "author": "m-mitsuhide <m.mitsuhide@amatelus.com>",
   "license": "MIT",
@@ -34,6 +35,7 @@
   "devDependencies": {
     "chai": "4.1.2",
     "chai-http": "4.0.0",
+    "codecov": "3.0.4",
     "cross-env": "5.2.0",
     "eslint": "5.4.0",
     "eslint-config-airbnb-base": "13.1.0",
