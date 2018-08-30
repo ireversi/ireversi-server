@@ -3,6 +3,14 @@ tags:
     description: Matsuda's Playing API
 
 /matsuda/playing:
+  get:
+    tags:
+      - matsuda-playing
+    responses:
+      200:
+        description: "pieces on board"
+        schema:
+          type: "string"
   post:
     tags:
       - matsuda-playing

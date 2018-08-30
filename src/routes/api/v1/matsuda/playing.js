@@ -2,35 +2,51 @@ const router = require('express').Router();
 
 const PlayingModel = require('../../../../models/matsuda/PlayingModel.js');
 
-const vectors = [
-  [-1, 1], // [x, y]
-  [0, 1],
-  [1, 1],
+const adjacentVectors = [
+  [0, 1], // [x, y]
   [1, 0],
-  [1, -1],
   [0, -1],
-  [-1, -1],
   [-1, 0],
 ];
 
+const vectors = [
+  ...adjacentVectors,
+  [-1, 1],
+  [1, 1],
+  [1, -1],
+  [-1, -1],
+];
+
 router.route('/')
+  .get(async (req, res) => {
+    const pieces = await PlayingModel.find();
+    const xMin = Math.min(...pieces.map(p => p.x));
+    const xMax = Math.max(...pieces.map(p => p.x));
+    const yMin = Math.min(...pieces.map(p => p.y));
+    const yMax = Math.max(...pieces.map(p => p.y));
+    const width = xMax - xMin + 1;
+    const height = yMax - yMin + 1;
+
+    res.send(`
+  Y
+    ┌${[...Array(width)].map(() => '────').join('┬')}┐
+${[...Array(height)].map((a, rY) => `${`  ${height - rY - 1 + yMin} `.slice(-4)}│${[...Array(width)].map((b, x) => `  ${`${(pieces.find(p => p.x === x + xMin && p.y === height - rY - 1 + yMin) || {}).userId || ' '} `.slice(0, 4)}`.slice(-4)).join('│')}│`).join(`
+    ├${[...Array(width)].map(() => '────').join('┼')}┤
+`)}
+    └${[...Array(width)].map(() => '────').join('┴')}┘
+    ${[...Array(width)].map((c, x) => `   ${x + xMin} `.slice(-5)).join('')}  X
+`.slice(1, -1));
+  })
   .post(async (req, res) => {
     const x = +req.body.x;
     const y = +req.body.y;
     const userId = +req.body.userId;
 
-    const pieces = await PlayingModel.find({});
+    const pieces = await PlayingModel.find();
     if (pieces.find(p => p.x === x && p.y === y)) {
       res.json(pieces);
       return;
     }
-
-    const Playing = new PlayingModel({
-      x,
-      y,
-      userId,
-    });
-    await Playing.save();
 
     const needsUpdatePieces = [];
 
@@ -56,13 +72,43 @@ router.route('/')
       if (turnable) needsUpdatePieces.push(...candidates);
     }
 
-    await Promise.all(needsUpdatePieces.map(p => PlayingModel.updateOne(
-      // eslint-disable-next-line no-underscore-dangle
-      { _id: p._id },
-      { userId },
-    )));
+    if (needsUpdatePieces.length === 0) {
+      if (pieces.find(p => p.userId === userId)) {
+        res.json(pieces);
+        return;
+      }
 
-    res.json(await PlayingModel.find({}));
+      let isAdjacent = false;
+      for (let i = 0; i < adjacentVectors.length; i += 1) {
+        const vector = adjacentVectors[i];
+        if (pieces.find(
+          p => p.x === x + vector[0] && p.y === y + vector[1] && p.userId !== userId,
+        )) {
+          isAdjacent = true;
+          break;
+        }
+      }
+
+      if (pieces.length > 0 && !isAdjacent) {
+        res.json(pieces);
+        return;
+      }
+    }
+
+    await Promise.all([
+      new PlayingModel({
+        x,
+        y,
+        userId,
+      }).save(),
+      ...needsUpdatePieces.map(p => PlayingModel.updateOne(
+        // eslint-disable-next-line no-underscore-dangle
+        { _id: p._id },
+        { userId },
+      )),
+    ]);
+
+    res.json(await PlayingModel.find());
   });
 
 module.exports = router;
