@@ -1,8 +1,5 @@
-const path = require('path');
-
-const cwd = process.cwd();
-const { sum, calc, PracticeModel } = require(path.join(cwd, 'src/models/hi85/PracticeModel.js'));
-const { prepareDB, deleteAllDataFromDB } = require(path.join(cwd, 'src/utils/db.js'));
+const { sum, calc, PracticeModel } = require('../../../../../src/models/hi85/PracticeModel.js');
+const { prepareDB, deleteAllDataFromDB } = require('../../../../../src/utils/db.js');
 
 /**
  * From https://jestjs.io/docs/en/getting-started)
