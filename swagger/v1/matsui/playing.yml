@@ -1,0 +1,44 @@
+tags:
+  - name: playing
+    description: Playing API
+
+/matsui/playing:
+  post:
+    tags:
+      - playing
+    parameters:
+      - name: "x"
+        in: "formData"
+        description: "X position"
+        required: true
+        type: "Number"
+      - name: "y"
+        in: "formData"
+        description: "Y position"
+        required: true
+        type: "Number"
+      - name: "userId"
+        in: "formData"
+        description: "user id"
+        required: true
+        type: "Number"
+    responses:
+      200:
+        description: "play data""
+        schema:
+          type: array
+          items:
+            type: "object"
+            properties:
+              x:
+                type: "integer"
+                format: "int64"
+                example: 1
+              y:
+                type: "integer"
+                example: "doggie"
+                example: 1
+              userId:
+                type: "integer"
+                example: "doggie"
+                example: 1
