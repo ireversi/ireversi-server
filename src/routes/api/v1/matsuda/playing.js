@@ -17,9 +17,24 @@ const vectors = [
   [-1, -1],
 ];
 
-router.route('/')
+const propFilter = '-_id -__v';
+
+router.route('/graph')
   .get(async (req, res) => {
-    const pieces = await PlayingModel.find();
+    const left = +req.query.l;
+    const right = +req.query.r;
+    const bottom = +req.query.b;
+    const top = +req.query.t;
+    const pieces = await PlayingModel.find(
+      Number.isNaN(left + right + bottom + top)
+        ? {}
+        : {
+          x: { $gte: left, $lte: right },
+          y: { $gte: bottom, $lte: top },
+        },
+      propFilter,
+    );
+
     const xMin = Math.min(...pieces.map(p => p.x));
     const xMax = Math.max(...pieces.map(p => p.x));
     const yMin = Math.min(...pieces.map(p => p.y));
@@ -36,13 +51,30 @@ ${[...Array(height)].map((a, rY) => `${`  ${height - rY - 1 + yMin} `.slice(-4)}
     └${[...Array(width)].map(() => '────').join('┴')}┘
     ${[...Array(width)].map((c, x) => `   ${x + xMin} `.slice(-5)).join('')}  X
 `.slice(1, -1));
+  });
+
+router.route('/')
+  .get(async (req, res) => {
+    const xMin = +req.query.l;
+    const xMax = +req.query.r;
+    const yMin = +req.query.b;
+    const yMax = +req.query.t;
+    res.json(await PlayingModel.find(
+      Number.isNaN(xMin + xMax + yMin + yMax)
+        ? {}
+        : {
+          x: { $gte: xMin, $lte: xMax },
+          y: { $gte: yMin, $lte: yMax },
+        },
+      propFilter,
+    ));
   })
   .post(async (req, res) => {
     const x = +req.body.x;
     const y = +req.body.y;
     const userId = +req.body.userId;
 
-    const pieces = await PlayingModel.find();
+    const pieces = await PlayingModel.find({}, propFilter);
     if (pieces.find(p => p.x === x && p.y === y)) {
       res.json(pieces);
       return;
@@ -102,13 +134,12 @@ ${[...Array(height)].map((a, rY) => `${`  ${height - rY - 1 + yMin} `.slice(-4)}
         userId,
       }).save(),
       ...needsUpdatePieces.map(p => PlayingModel.updateOne(
-        // eslint-disable-next-line no-underscore-dangle
-        { _id: p._id },
+        { x: p.x, y: p.y },
         { userId },
       )),
     ]);
 
-    res.json(await PlayingModel.find());
+    res.json(await PlayingModel.find({}, propFilter));
   });
 
 module.exports = router;
