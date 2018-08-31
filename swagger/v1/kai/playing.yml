@@ -1,48 +1,48 @@
 tags:
-  - name: users 
-    description: Users API
+  - name: playing 
+    description: Playing API
 
-#線単位で要素ができている
-# [
-#   {
-#     name: users 
-#     description: Users API
-#   }
-# ]
-/users:
+/kai/playing:
   get:
     tags:
-      - users
+      - playing
     parameters:
-      - name: "name"
+      - name: "x"
         in: "query"
-        description: "user info"
+        description: "x info"
         required: true
-        type: "string"
+        type: "Number"
+      - name: "y"
+        in: "query"
+        description: "y info"
+        required: true
+        type: "Number"
+      - name: "userId"
+        in: "query"
+        description: "your userId"
+        required: true
+        type: "Number"
     responses:
       200: # 404的なやつ
         description: "success"
         schema:
           type: "object"
           properties:
-            user_id:
-              type: "string"
-              example: "aaaaaaaa"
-            name:
-              type: "string"
-              example: "aaaaaaaa"
-            email:
-              type: "string"
-              example: "aaa@aaa.aaa"
-            password:
-              type: "string"
-              example: "aaaaaaaa"
-            created:
-              type: "string"
-              example: "YYYY-MM-DD HH:mm:ss"
+            x:
+              type: "integer"
+              format: "int64"
+              example: 1
+            y:
+              type: "integer"
+              format: "int64"
+              example: 1
+            userId:
+              type: "integer"
+              format: "int64"
+              example: 1
   post:
     tags:
-      - users
+      - playing
     parameters:
       - name: "name"
         in: "formData"
