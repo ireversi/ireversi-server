@@ -22,10 +22,11 @@ module.exports = {
     if (nodeEnv !== 'test') throw new Error('You can drop db on test mode only');
 
     if (!isDBPrepared) {
-      isDBPrepared = true; //一回だけ立てれるように
+      isDBPrepared = true; // 一回だけ立てれるように
 
-      const mongod = new MongoMemoryServer(); //メモリー上で起動するサーバー
-      const conn = mongoose.connect(await mongod.getConnectionString(), { //testのときにMongoDB使うと不安定になるかも
+      const mongod = new MongoMemoryServer(); // メモリー上で起動するサーバー
+      const conn = mongoose.connect(await mongod.getConnectionString(), {
+        // testのときにMongoDB使うと不安定になるかも
         // ローカルで動くMongoDB作ったほうがいい
         // npm installで設定を済ます方法はないか
         // → require('mongodb-memory-server'); [db.js]
