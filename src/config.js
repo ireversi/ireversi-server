@@ -1,4 +1,5 @@
 const dotenv = require('dotenv');
+<<<<<<< HEAD
 
 // 環境変数
 // 環境が変わったら変わるもの
@@ -15,6 +16,9 @@ switch (process.env.NODE_ENV) { // 読み込み先を変える
   default:
     dotenv.config();
 }
+=======
+dotenv.config();
+>>>>>>> 9d731ff8d88a2e6bb34a6564dd04a5b4f331c1ef
 
 module.exports = { //環境変数
   nodeEnv: process.env.NODE_ENV || 'development',
