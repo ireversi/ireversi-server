@@ -2,7 +2,7 @@ const chai = require('chai');
 // module.exports = () => {
 
 // }
-//common js
+// common js
 
 // import chai from 'chai';
 // export default () => {
@@ -13,82 +13,81 @@ const chai = require('chai');
 const app = require('../../../../../src/routes/app.js');
 const PieceModel = require('../../../../../src/models/kido_k/PieceModel.js');
 const {
-    prepareDB,
-    deleteAllDataFromDB,
+  prepareDB,
+  deleteAllDataFromDB,
 } = require('../../../../../src/utils/db.js');
 
 const basePath = '/api/v1';
 
 describe('play', () => {
-    beforeAll(prepareDB);
-    afterEach(deleteAllDataFromDB);
+  beforeAll(prepareDB);
+  afterEach(deleteAllDataFromDB);
 
-    describe('put a piece', () => {
-        it('puts a piece', async () => {
+  describe('put a piece', () => {
+    it('puts a piece', async () => {
+      // Given new
+      const x = 0;
+      const y = 0;
+      const userId = 1;
+      const Piece = new PieceModel({
+        x,
+        y,
+        userId,
+      });
+      await Piece.save();
 
-            // Given new
-            const x = 0;
-            const y = 0;
-            const user_id = 1;
-            const Piece = new PieceModel({
-                x,
-                y,
-                user_id
-            });
-            await Piece.save();
+      // When
+      const response = await chai.request(app)
+        .get(`${basePath}/kido_k/piece`)
+        .query({ userId });
 
-            // When
-            const response = await chai.request(app)
-                .get(`${basePath}/kido_k/piece`)
-                .query({ user_id });
-
-            // Then
-            expect(response.body).toMatchObject({
-                x,
-                y,
-                user_id,
-            });
-        });
-
-        it('return null when the user does not exist', async () => {
-            // Given
-            const user_id = 1;
-
-            // When
-            const response = await chai.request(app)
-                .get(`${basePath}/kido_k/piece`)
-                .query({ user_id });
-
-            // Then
-            expect(response.body).toBe(null);
-        });
+      // Then
+      expect(response.body).toMatchObject({
+        x,
+        y,
+        userId,
+      });
     });
 
-    describe('create', () => {
-        it('creates an user', async () => {
-            // Given
-            const x = 0;
-            const y = 0;
-            const user_id = 1;
+    it('return null when the user does not exist', async () => {
+      // Given
+      const userId = 1;
 
-            // When
-            const pieceMatcher = {
-                x,
-                y,
-                user_id,
-            };
+      // When
+      const response = await chai.request(app)
+        .get(`${basePath}/kido_k/piece`)
+        .query({ userId });
 
-            const response = await chai.request(app)
-                .post(`${basePath}/kido_k/piece`)
-                .set('content-type', 'application/x-www-form-urlencoded')
-                .send(pieceMatcher);
-
-            // Then
-            // expect(response.body).toHaveLength(1);
-
-            expect(response.body).toMatchObject({ status: 'success' });
-            const piece = await PieceModel.findOne({ user_id });
-            expect(piece).toMatchObject(pieceMatcher);
-        });
+      // Then
+      expect(response.body).toBe(null);
     });
+  });
+
+  describe('create', () => {
+    it('creates an user', async () => {
+      // Given
+      const x = 0;
+      const y = 0;
+      const userId = 1;
+
+      // When
+      const pieceMatcher = {
+        x,
+        y,
+        userId,
+      };
+
+      const response = await chai.request(app)
+        .post(`${basePath}/kido_k/piece`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(pieceMatcher);
+
+      // Then
+      // expect(response.body).toHaveLength(1);
+
+      expect(response.body).toMatchObject({ status: 'success' });
+      const piece = await PieceModel.findOne({ userId });
+      expect(piece).toMatchObject(pieceMatcher);
+    });
+  });
 });
