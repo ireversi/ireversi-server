@@ -15,7 +15,7 @@ router.route('/')
         const Playing = new PlayingModel({
             x: 0,
             y: 0,
-            userId: 1
+            userId: 1,
         });
         await Playing.save();
         res.json({ status: 'success' });

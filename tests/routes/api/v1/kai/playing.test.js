@@ -66,27 +66,22 @@ describe('Request piece', () => {
 
       // When
       const response = await chai.request(app)
-        .post(`${basePath}/kai/playing`)
+        .get(`${basePath}/kai/playing`)
         .query({ userId });
 
       // Then
-      expect(response.body).toBeNull;
+      expect(response.body).toBe(null);
     });
   });
 
   describe('create', () => {
     it('creates piece', async () => {
       // Given
-      const x = 0;
-      const y = 0;
-      const userId = 1;
-
-      // When
       const playingMatcher = {
-        x,
-        y,
-        userId
-      };
+        x: 0,
+        y: 0,
+        userId: 1
+      }
 
       const response = await chai.request(app)
         .post(`${basePath}/kai/playing`)
@@ -95,8 +90,8 @@ describe('Request piece', () => {
 
       // Then
       expect(response.body).toMatchObject({ status: 'success' });
-      const playing = await PlayingModel.findOne({ userId });
-      expect(playing).toMatchObject(playingMatcher);
+      const playing = await PlayingModel.find();
+      expect(playing).toMatchObject([playingMatcher]);
     });
   });
 });
