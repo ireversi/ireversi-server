@@ -1,0 +1,44 @@
+tags:
+- name: playing
+  description: Playing API
+
+/momii/playing:
+  post:
+    tags:
+    - playing
+    parameters:
+    - name: "x"
+      in: "formData"
+      description: "x position"
+      required: true
+      type: "number"
+    - name: "y"
+      in: "formData"
+      description: "y position"
+      required: true
+      type: "number"
+    - name: "userID"
+      in: "formData"
+      description: "USER ID"
+      required: true
+      type: "number"
+    responses:
+      200:
+        description: "Piece Data"
+        schema:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              x:
+                type: "integer"
+                format: "int64"
+                example: "1"
+              y:
+                type: "integer"
+                format: "int64"
+                example: "1"
+              userId:
+                type: "integer"
+                format: "int64"
+                example: "1"
