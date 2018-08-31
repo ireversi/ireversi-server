@@ -1,7 +1,14 @@
 tags:
-  - name: users
+  - name: users 
     description: Users API
 
+#線単位で要素ができている
+# [
+#   {
+#     name: users 
+#     description: Users API
+#   }
+# ]
 /users:
   get:
     tags:
@@ -13,7 +20,7 @@ tags:
         required: true
         type: "string"
     responses:
-      200:
+      200: # 404的なやつ
         description: "success"
         schema:
           type: "object"

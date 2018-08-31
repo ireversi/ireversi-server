@@ -4,7 +4,9 @@ const UserModel = require('../../../models/UserModel.js');
 
 router.route('/')
   .get(async (req, res) => {
-    res.json(await UserModel.findOne({ name: req.query.name }));
+    const pass = await UserModel.findOne({ name: req.query.name });
+    // console.log(pass);
+    res.json(pass);
   })
   .post(async (req, res) => {
     const User = new UserModel({
