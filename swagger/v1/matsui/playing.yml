@@ -24,7 +24,7 @@ tags:
         type: "Number"
     responses:
       200:
-        description: "play data""
+        description: "play data"
         schema:
           type: array
           items:
@@ -36,9 +36,9 @@ tags:
                 example: 1
               y:
                 type: "integer"
-                example: "doggie"
+                format: "doggie"
                 example: 1
               userId:
                 type: "integer"
-                example: "doggie"
+                format: "doggie"
                 example: 1
