@@ -1,0 +1,44 @@
+tags:
+  - name: piece
+    description: Piece API
+
+/ando/piece:
+  post:
+    tags:
+      - piece
+    parameters:
+      - name: "x"
+        in: "formData"
+        description: "X position"
+        required: true
+        type: "number"
+      - name: "y"
+        in: "formData"
+        description: "Y position"
+        required: true
+        type: "number"
+      - name: "userId"
+        in: "formData"
+        description: "User ID"
+        required: true
+        type: "number"
+    responses:
+      200:
+        description: "Piece data"
+        schema:
+          type: array
+          items:
+            type: "object"
+            properties:
+              x:
+                type: "integer"
+                format: "int64"
+                example: 1
+              y:
+                type: "integer"
+                format: "int64"
+                example: 1
+              userId:
+                type: "integer"
+                format: "int64"
+                example: 1
