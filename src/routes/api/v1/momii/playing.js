@@ -1,12 +1,18 @@
 const router = require('express').Router();
 
+const PlayingModel = require('../../../../models/UserModel.js');
+
 router.route('/')
-  .post((req, res) => {
-    res.json({
-      x: 0,
-      y: 0,
-      userId: 1,
-    });
+  .post(async (req, res) => {
+    const result = {
+      x: +req.body.x,
+      y: +req.body.y,
+      userId: +req.body.userId,
+    }
+    const Playing = new PlayingModel(result);
+
+    await Playing.save();
+    res.json([result]);
   });
 
 module.exports = router;
