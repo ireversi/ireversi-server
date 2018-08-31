@@ -9,9 +9,9 @@ router.route('/')
             y: +req.body.y,
             userId: +req.body.userId,
         }
-        const Piece = new UserModel([result]);
+        const Piece = new PlayingModel(result);
         await Piece.save();
-        res.json({ status: 'success' });
+        res.json([result]);
     });
 
 module.exports = router;

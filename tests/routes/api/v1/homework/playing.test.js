@@ -20,12 +20,12 @@ describe('play', () => {
         x:0,
         y:0,
         userId: 1,
-      },
+      }
 
       // When
       const response = await chai.request(app)
         // .post(`${basePath}/users`)
-        .post(`${basePath}/homeowork/playing`)
+        .post(`${basePath}/homework/playing`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
 
