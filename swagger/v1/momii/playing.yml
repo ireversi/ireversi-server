@@ -1,11 +1,11 @@
 tags:
-- name: playing
-  description: Playing API
+- name: momiiPlaying
+  description: Momii Playing API
 
 /momii/playing:
   post:
     tags:
-    - Momii - playing
+    - momiiPlaying
     parameters:
     - name: "x"
       in: "formData"
