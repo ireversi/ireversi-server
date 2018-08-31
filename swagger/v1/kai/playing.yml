@@ -1,0 +1,71 @@
+tags:
+  - name: playing 
+    description: Playing API
+
+/kai/playing:
+  get:
+    tags:
+      - playing
+    parameters:
+      - name: "x"
+        in: "query"
+        description: "x info"
+        required: true
+        type: "Number"
+      - name: "y"
+        in: "query"
+        description: "y info"
+        required: true
+        type: "Number"
+      - name: "userId"
+        in: "query"
+        description: "your userId"
+        required: true
+        type: "Number"
+    responses:
+      200: # 404的なやつ
+        description: "success"
+        schema:
+          type: "object"
+          properties:
+            x:
+              type: "integer"
+              format: "int64"
+              example: 1
+            y:
+              type: "integer"
+              format: "int64"
+              example: 1
+            userId:
+              type: "integer"
+              format: "int64"
+              example: 1
+  post:
+    tags:
+      - playing
+    parameters:
+      - name: "name"
+        in: "formData"
+        description: "user name"
+        required: true
+        type: "string"
+      - name: "email"
+        in: "formData"
+        description: "email"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "formData"
+        description: "password"
+        required: true
+        type: "string"
+        format: "password"
+    responses:
+      200:
+        description: "success"
+        schema:
+          type: "object"
+          properties:
+            status:
+              type: "string"
+              example: "success"
