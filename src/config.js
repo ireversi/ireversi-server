@@ -1,16 +1,5 @@
 const dotenv = require('dotenv');
-
-switch (process.env.NODE_ENV) {
-  case 'production':
-    break;
-  case 'test':
-    dotenv.config({
-      path: 'test.env',
-    });
-    break;
-  default:
-    dotenv.config();
-}
+dotenv.config();
 
 module.exports = {
   nodeEnv: process.env.NODE_ENV || 'development',
