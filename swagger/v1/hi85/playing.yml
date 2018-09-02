@@ -1,0 +1,57 @@
+tags:
+  - name: "hi85-Playing"
+    description: "hi85's playing API"
+
+/hi85/playing:
+  get:
+    tags:
+      - "hi85-Playing"
+    parameters:
+      - name: "user_id"
+        in: "query"
+        description: "user id"
+        required: true
+        type: "number"
+    responses:
+      200:
+        description: "success"
+        schema:
+          type: "object"
+          properties:
+            user_id:
+              type: "number"
+              example: 1
+            x:
+              type: "number"
+              example: 0
+            y:
+              type: "number"
+              example: 1
+  post:
+    tags:
+      - "hi85-Playing"
+    parameters:
+      - name: "user_id"
+        in: "formData"
+        description: "user id"
+        required: true
+        type: "number"
+      - name: "x"
+        in: "formData"
+        description: "x coordinate"
+        required: true
+        type: "number"
+      - name: "y"
+        in: "formData"
+        description: "y coordinate"
+        required: true
+        type: "number"
+    responses:
+      200:
+        description: "success"
+        schema:
+          type: "object"
+          properties:
+            status:
+              type: "string"
+              example: "success"
