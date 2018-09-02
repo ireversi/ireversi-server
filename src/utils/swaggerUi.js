@@ -11,13 +11,15 @@ const swaggerSpec = swaggerJSDoc({
       description: 'Document for iReversi API',
     },
     basePath: '/api/v1',
-    consumes: ['application/x-www-form-urlencoded'],
+    consumes: ['application/x-www-form-urlencoded'], // ルールとか
     produces: ['application/json'],
   },
-  apis: klawSync('./swagger', { nodir: true }).map(f => f.path),
+  apis: klawSync('./swagger', { nodir: true }).map(f => f.path), 
+  // ymlファイルを全部登録する必要がある
+  // mapで全部見てる
 });
 
 module.exports = {
-  serve: swaggerUi.serve,
+  serve: swaggerUi.serve, // 結果を返す
   setup: swaggerUi.setup(swaggerSpec),
 };
