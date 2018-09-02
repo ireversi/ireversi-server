@@ -1,4 +1,6 @@
 const chai = require('chai');
+
+const propfilter = '-_id -__v';
 // module.exports = () => {
 
 // }
@@ -9,6 +11,29 @@ const chai = require('chai');
 
 // };
 // ES6 import
+
+function convertPiece(piece) {
+  const convert = { x: piece[0], y: piece[1], userid: piece[2] };
+  return convert;
+}
+
+function convertComparisonResult(result) {
+  // var count = 0;
+  const pieces = [];
+  const bsize = result.size;
+  const bpieces = result.bord;
+  for (let i = 0; i < bpieces.length; i += 1) {
+    if (bpieces[i] !== 0) {
+      const piece = {
+        x: Math.floor(i % bsize),
+        y: Math.floor(i / bsize),
+        userid: bpieces[i],
+      };
+      pieces.push(piece);
+    }
+  }
+  return pieces;
+}
 
 const app = require('../../../../../src/routes/app.js');
 const PieceModel = require('../../../../../src/models/kido_k/PieceModel.js');
@@ -23,71 +48,193 @@ describe('play', () => {
   beforeAll(prepareDB);
   afterEach(deleteAllDataFromDB);
 
-  describe('put a piece', () => {
-    it('puts a piece', async () => {
-      // Given new
-      const x = 0;
-      const y = 0;
-      const userId = 1;
-      const Piece = new PieceModel({
-        x,
-        y,
-        userId,
-      });
-      await Piece.save();
+  it('put a piece', async () => {
+    // Given
+    const pieces = [ // pieces = [x,y,userid]
+      [0, 0, 1],
+    ];
 
-      // When
-      const response = await chai.request(app)
-        .get(`${basePath}/kido_k/piece`)
-        .query({ userId });
+    const result = {
+      size: 2, // set width of bord
+      bord: [ // set correct answer
+        1, 0,
+        0, 0,
+      ],
+    };
 
-      // Then
-      expect(response.body).toMatchObject({
-        x,
-        y,
-        userId,
-      });
-    });
-
-    it('return null when the user does not exist', async () => {
-      // Given
-      const userId = 1;
-
-      // When
-      const response = await chai.request(app)
-        .get(`${basePath}/kido_k/piece`)
-        .query({ userId });
-
-      // Then
-      expect(response.body).toBe(null);
-    });
-  });
-
-  describe('create', () => {
-    it('creates an user', async () => {
-      // Given
-      const x = 0;
-      const y = 0;
-      const userId = 1;
-
-      // When
-      const pieceMatcher = {
-        x,
-        y,
-        userId,
-      };
-
-      const response = await chai.request(app)
+    // When
+    let response;
+    for (let i = 0; i < pieces.length; i += 1) {
+      const piece = convertPiece(pieces[i]);
+      response = await chai.request(app)
         .post(`${basePath}/kido_k/piece`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieceMatcher);
+        .send(piece);
+    }
 
-      // Then
-      // expect(response.body).toHaveLength(1);
+    // Then
+    const rpieces = convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
 
-      expect(response.body).toMatchObject({ status: 'success' });
-      const piece = await PieceModel.findOne({ userId });
-      expect(piece).toMatchObject(pieceMatcher);
-    });
+    const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    expect(pieceData).toHaveLength(rpieces.length);
+    expect(pieceData).toEqual(expect.arrayContaining(rpieces));
+  });
+
+
+  it('sets multi pieces', async () => {
+    // Given
+    const pieces = [ // pieces = [x,y,userid]
+      [0, 0, 1],
+      [1, 0, 2],
+    ];
+
+    const result = {
+      size: 2, // set width of bord
+      bord: [ // set correct answer
+        1, 2,
+        0, 0,
+      ],
+    };
+
+    // When
+    let response;
+    for (let i = 0; i < pieces.length; i += 1) {
+      const piece = convertPiece(pieces[i]);
+      response = await chai.request(app)
+        .post(`${basePath}/kido_k/piece`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(piece);
+    }
+
+    // Then
+    const rpieces = convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+    const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    expect(pieceData).toHaveLength(rpieces.length);
+    expect(pieceData).toEqual(expect.arrayContaining(rpieces));
+  });
+
+  // 同じとFころにおけないテスト
+  it('sets pieces same space', async () => {
+    // Given
+    const pieces = [ // pieces = [x,y,userid]
+      [0, 0, 1],
+      [1, 0, 2],
+      [1, 0, 1],
+    ];
+
+    const result = {
+      size: 2, // set width of bord
+      bord: [ // set correct answer
+        1, 2,
+        0, 0,
+      ],
+    };
+
+    // When
+    for (let i = 0; i < pieces.length; i += 1) {
+      const piece = convertPiece(pieces[i]);
+      response = await chai.request(app)
+        .post(`${basePath}/kido_k/piece`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(piece);
+    }
+
+    // Then
+    // check express result
+    const rpieces = convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+    // check mongoDB result
+    const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    expect(pieceData).toHaveLength(rpieces.length);
+    expect(pieceData).toEqual(expect.arrayContaining(rpieces));
+  });
+
+  // 挟んだらめくれるテスト part1
+  it('turn over piece about right and down', async () => {
+    // Given
+    const pieces = [ // pieces = [x,y,userid]
+      [0, 0, 1],
+      [1, 0, 2],
+      [2, 0, 1],
+      [0, 1, 2],
+      [0, 2, 1],
+    ];
+
+    const result = {
+      size: 3, // set width of bord
+      bord: [ // set correct answer
+        1, 1, 1,
+        1, 0, 0,
+        1, 0, 0,
+      ],
+    };
+
+    // When
+    for (let i = 0; i < pieces.length; i += 1) {
+      const piece = convertPiece(pieces[i]);
+      response = await chai.request(app)
+        .post(`${basePath}/kido_k/piece`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(piece);
+    }
+
+    // Then
+    // check express result
+    const rpieces = convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+    // check mongoDB result
+    const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    expect(pieceData).toHaveLength(rpieces.length);
+    expect(pieceData).toEqual(expect.arrayContaining(rpieces));
+  });
+
+  // 挟んだらめくれるテスト part2
+  it('turn over piece about left and up', async () => {
+    // Given
+    const pieces = [ // pieces = [x,y,userid]
+      [2, 2, 1],
+      [1, 2, 2],
+      [0, 2, 1],
+      [2, 1, 2],
+      [2, 0, 1],
+    ];
+
+    const result = {
+      size: 3, // set width of bord
+      bord: [ // set correct answer
+        0, 0, 1,
+        0, 0, 1,
+        1, 1, 1,
+      ],
+    };
+
+    // When
+    for (let i = 0; i < pieces.length; i += 1) {
+      const piece = convertPiece(pieces[i]);
+      response = await chai.request(app)
+        .post(`${basePath}/kido_k/piece`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(piece);
+    }
+
+    // Then
+    // check express result
+    const rpieces = convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+    // check mongoDB result
+    const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    expect(pieceData).toHaveLength(rpieces.length);
+    expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 });

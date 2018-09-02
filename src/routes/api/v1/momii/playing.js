@@ -8,7 +8,7 @@ router.route('/')
       x: +req.body.x,
       y: +req.body.y,
       userId: +req.body.userId,
-    }
+    };
     const Playing = new PlayingModel(result);
 
     await Playing.save();
