@@ -1,6 +1,16 @@
-const router = require('express').Router();
+// const router = require('express').Router();
+
+// router.use('/users', require('./users.js'));
+
+// module.exports = router;
+
+
+const router = require('express').Router(); //ルーターの役割
 
 router.use('/users', require('./users.js'));
+
+router.use('/homework/playing', require('./homework/playing.js'));
+router.use('/matsui/playing', require('./matsui/playing.js'));
 
 router.use('/matsuda/playing', require('./matsuda/playing.js'));
 router.use('/hi85/playing', require('./hi85/playing.js'));
