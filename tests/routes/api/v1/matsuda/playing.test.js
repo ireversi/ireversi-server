@@ -7,168 +7,259 @@ const {
   deleteAllDataFromDB,
 } = require('../../../../../src/utils/db.js');
 
-const basePath = '/api/v1';
+const basePath = '/api/v1/matsuda/playing';
+const propFilter = '-_id -__v';
 
-describe('Request users', () => {
+const array2Pieces = array => array.map(
+  (p, idx) => (p !== 0 ? (Array.isArray(p) ? p : [p]).map(f => ({
+    n: +f.split(':')[0],
+    piece: {
+      x: idx % Math.sqrt(array.length),
+      y: array.length / Math.sqrt(array.length) - 1 - Math.floor(idx / Math.sqrt(array.length)),
+      userId: +f.split(':')[1],
+    },
+  })) : null),
+)
+  .filter(e => !!e)
+  .reduce((prev, current) => [
+    ...prev,
+    ...Array.isArray(current) ? current : [current],
+  ], [])
+  .sort((a, b) => a.n - b.n)
+  .map(p => p.piece);
+
+const result2Matchers = array => array.map((p, idx) => (p > 0 ? {
+  x: idx % Math.sqrt(array.length),
+  y: array.length / Math.sqrt(array.length) - 1 - Math.floor(idx / Math.sqrt(array.length)),
+  userId: p,
+} : null))
+  .filter(e => !!e);
+
+// expect.extend({
+//   toPut(rec, arg) {
+//     const sameLength = rec.length === arg.length;
+//     const notContaining = arg.find(matcher => !rec.find(p => this.equals(p, matcher)));
+//   },
+// });
+
+const checkSame = (pieces, matchers) => {
+  expect(pieces).toHaveLength(matchers.length);
+  expect(pieces).toEqual(expect.arrayContaining(matchers));
+};
+
+const checkMathces = (array, result) => async () => {
+  // Given
+  const pieces = array2Pieces(array);
+  const matchers = result2Matchers(result);
+
+  // When
+  let response;
+  for (let i = 0; i < pieces.length; i += 1) {
+    response = await chai.request(app)
+      .post(basePath)
+      .set('content-type', 'application/x-www-form-urlencoded')
+      .send(pieces[i]);
+  }
+
+  // Then
+  checkSame(response.body, matchers);
+
+  const allPiece = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
+  checkSame(allPiece, matchers);
+};
+
+const savePieces = array => Promise.all(result2Matchers(array).map(d => new PlayingModel(d).save()));
+
+describe('Board', () => {
   beforeAll(prepareDB);
   afterEach(deleteAllDataFromDB);
 
-  describe('play', () => {
-    it('sets first piece', async () => {
+  describe('preview', () => {
+    it('all pieces', async () => {
       // Given
-      const x = 0;
-      const y = 0;
-      const userId = 1;
+      await savePieces([
+        0, 3, 0, 0,
+        0, 3, 1, 0,
+        0, 3, 0, 0,
+        1, 3, 0, 0,
+      ]);
 
       // When
-      const playingMatcher = {
-        x,
-        y,
-        userId,
+      const response = await chai.request(app).get(`${basePath}/graph`);
+
+      // Then
+      expect(response.text).toBe(`
+  Y
+    ┌────┬────┬────┐
+  3 │    │  3 │    │
+    ├────┼────┼────┤
+  2 │    │  3 │  1 │
+    ├────┼────┼────┤
+  1 │    │  3 │    │
+    ├────┼────┼────┤
+  0 │  1 │  3 │    │
+    └────┴────┴────┘
+       0    1    2   X
+`.slice(1, -1));
+    });
+
+    it('assign range pieces', async () => {
+      // Given
+      await savePieces([
+        0, 3, 0, 0,
+        0, 3, 1, 0,
+        0, 3, 0, 0,
+        1, 3, 0, 0,
+      ]);
+
+      const range = {
+        t: 5,
+        b: 2,
+        l: -1,
+        r: 4,
       };
 
+      // When
       const response = await chai.request(app)
-        .post(`${basePath}/matsuda/playing`)
-        .set('content-type', 'application/x-www-form-urlencoded')
-        .send(playingMatcher);
+        .get(`${basePath}/graph`)
+        .query(range);
 
       // Then
-      expect(response.body).toHaveLength(1);
-      expect(response.body[0]).toMatchObject(playingMatcher);
-
-      const allPiece = await PlayingModel.find({});
-      expect(allPiece).toHaveLength(1);
-      expect(allPiece[0]).toMatchObject(playingMatcher);
+      expect(response.text).toBe(`
+  Y
+    ┌────┬────┐
+  3 │  3 │    │
+    ├────┼────┤
+  2 │  3 │  1 │
+    └────┴────┘
+       1    2   X
+`.slice(1, -1));
     });
+  });
 
-    it('sets multi pieces', async () => {
+  describe('get status', () => {
+    it('get all', async () => {
       // Given
       const pieces = [
-        {
-          x: 0,
-          y: 0,
-          userId: 1,
-        },
-        {
-          x: 1,
-          y: 0,
-          userId: 3,
-        },
-        {
-          x: 2,
-          y: 0,
-          userId: 2,
-        },
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 8,
+        0, 4, 8, 2, 0, 0,
+        0, 2, 0, 0, 3, 0,
+        3, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0,
       ];
-
-      for (let i = 0; i < pieces.length; i += 1) {
-        // When
-        const playingMatcher = pieces[i];
-
-        const response = await chai.request(app)
-          .post(`${basePath}/matsuda/playing`)
-          .set('content-type', 'application/x-www-form-urlencoded')
-          .send(playingMatcher);
-
-        // Then
-        expect(response.body).toHaveLength(i + 1);
-        expect(response.body[i]).toMatchObject(playingMatcher);
-
-        const allPiece = await PlayingModel.find({});
-        expect(allPiece).toHaveLength(i + 1);
-        expect(allPiece[i]).toMatchObject(playingMatcher);
-      }
-    });
-
-    it('cannot set same place', async () => {
-      // Given
-      const pieces = [
-        {
-          x: 0,
-          y: 0,
-          userId: 1,
-        },
-        {
-          x: 1,
-          y: 0,
-          userId: 3,
-        },
-        {
-          x: 0,
-          y: 0,
-          userId: 2,
-        },
-      ];
-
-      let response;
+      const matchers = result2Matchers(pieces);
+      await savePieces(pieces);
 
       // When
-      for (let i = 0; i < pieces.length; i += 1) {
-        response = await chai.request(app)
-          .post(`${basePath}/matsuda/playing`)
-          .set('content-type', 'application/x-www-form-urlencoded')
-          .send(pieces[i]);
-      }
+      const response = await chai.request(app).get(basePath);
 
       // Then
-      const playingMatcher = pieces[0];
-      expect(response.body).toHaveLength(pieces.length - 1);
-      expect(response.body[0]).toMatchObject(playingMatcher);
-
-      const allPiece = await PlayingModel.find({});
-      expect(allPiece).toHaveLength(pieces.length - 1);
-      expect(allPiece[0]).toMatchObject(playingMatcher);
+      checkSame(response.body, matchers);
     });
 
-    it('turns sandwiched pieces', async () => {
+    it('assign range', async () => {
       // Given
-      const pieces = [
-        {
-          x: 0,
-          y: 0,
-          userId: 1,
-        },
-        {
-          x: 1,
-          y: 1,
-          userId: 3,
-        },
-        {
-          x: 2,
-          y: 2,
-          userId: 2,
-        },
-        {
-          x: 3,
-          y: 3,
-          userId: 1,
-        },
-      ];
+      await savePieces([
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 8,
+        0, 4, 8, 2, 0, 0,
+        0, 2, 0, 0, 3, 0,
+        3, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0,
+      ]);
 
-      let response;
+      const range = {
+        t: 5,
+        b: 3,
+        l: -1,
+        r: 2,
+      };
+
+      const matchers = result2Matchers([
+        0, 4, 8, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+      ]);
 
       // When
-      for (let i = 0; i < pieces.length; i += 1) {
-        response = await chai.request(app)
-          .post(`${basePath}/matsuda/playing`)
-          .set('content-type', 'application/x-www-form-urlencoded')
-          .send(pieces[i]);
-      }
+      const response = await chai.request(app).get(basePath).query(range);
 
       // Then
-      const allPiece = await PlayingModel.find({});
-      expect(allPiece).toHaveLength(pieces.length);
-      expect(response.body).toHaveLength(pieces.length);
-
-      for (let i = 0; i < pieces.length; i += 1) {
-        const playingMatcher = {
-          ...pieces[i],
-          userId: 1,
-        };
-
-        expect(response.body[i]).toMatchObject(playingMatcher);
-        expect(allPiece[i]).toMatchObject(playingMatcher);
-      }
+      checkSame(response.body, matchers);
     });
+  });
+
+  describe('play', () => {
+    it('sets first piece', checkMathces(
+      ['1:1'],
+      [1],
+    ));
+
+    it('sets multi pieces', checkMathces(
+      [
+        0, 0, 0,
+        0, 0, 0,
+        '1:1', '2:3', '3:2',
+      ],
+      [
+        0, 0, 0,
+        0, 0, 0,
+        1, 3, 2,
+      ],
+    ));
+
+    it('cannot set same place', checkMathces(
+      [
+        0, 0,
+        ['1:1', '3:2'], '2:3',
+      ],
+      [
+        0, 0,
+        1, 3,
+      ],
+    ));
+
+    it('turns sandwiched pieces', checkMathces(
+      [
+        0, '6:3', 0, 0,
+        0, '5:2', '4:1', 0,
+        0, '3:2', 0, 0,
+        '1:1', '2:3', 0, 0,
+      ],
+      [
+        0, 3, 0, 0,
+        0, 3, 1, 0,
+        0, 3, 0, 0,
+        1, 3, 0, 0,
+      ],
+    ));
+
+    it('cannot set remote cell', checkMathces(
+      [
+        '2:2', 0, 0,
+        0, '3:2', 0,
+        '1:1', '4:3', 0,
+      ],
+      [
+        0, 0, 0,
+        0, 0, 0,
+        1, 3, 0,
+      ],
+    ));
+
+    it('can set only turnable cell when exsisting self pieces', checkMathces(
+      [
+        0, 0, 0,
+        0, '3:1', 0,
+        '1:1', '2:3', '4:1',
+      ],
+      [
+        0, 0, 0,
+        0, 0, 0,
+        1, 1, 1,
+      ],
+    ));
   });
 });
