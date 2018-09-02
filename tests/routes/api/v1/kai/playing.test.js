@@ -25,21 +25,57 @@ const basePath = '/api/v1';
 const propFilter = '-_id -__v';
 
 // 与えたい配列
-const piecesCommon = [
-  0, 0, 0, '1:3',
-  0, 0, '2:2', 0,
-  0, '1:1', 0, '3:4',
-  0, 0, 0, 0,
-];
+const array2Pieces = function(){
+  let array = [];
+  let field = [
+    0, 0, 0, '1:3',
+    0, 0, '2:2', 0,
+    0, '1:1', 0, '3:4',
+    0, 0, 0, 0,
+  ];
+  let fieldExist = field.filter((n) => n !== 0); // コマだけを抽出
+  let playOrder = fieldExist.sort((a, b) => { // 配列をプレイ順で並び替え
+    return (parseInt(a.slice(a.indexOf(':')+1))) - (parseInt(b.slice(b.indexOf(':')+1)));
+  });
+  let n = 0;
+  for (let i = 0; i < field.length; i++) { // x, y, userIdを生成する
+    let elm = {}; //
+    if (field[i] !== 0) { // 打ち手が存在するコマのみ
+      let x = i % 4;
+      let y = Math.floor((15 - i)/4);
+      let userId = parseInt(playOrder[n].slice(playOrder[n].indexOf(':')-1));
+      elm = {x: x, y: y, userId: userId};
+      n++;
+      array.push(elm);
+    }
+  }
+  return array;
+};
 
 // 理想の配列
-const matchesCommon = [
-  0, 0, 0, 1,
-  0, 0, 2, 0,
-  0, 1, 0, 3,
-  0, 0, 0, 0,
-];
-  
+const array2Mathcers = function(){
+  let array = [];
+  let field = [
+    0, 0, 0, 1,
+    0, 0, 1, 0,
+    0, 1, 0, 3,
+    0, 0, 0, 0,
+  ];
+  for (let i = 0; i < field.length; i++) { // x, y, userIdを生成する
+    let elm = {}; //
+    if (field[i] !== 0) { // 打ち手が存在するコマのみ
+      let x = i % 4;
+      let y = Math.floor((15 - i)/4);
+      let userId = field[i];
+      console.log(userId);
+      elm = {x: x, y: y, userId: userId};
+      array.push(elm);
+    }
+  }
+  // console.log(array);
+  return array;
+};
+
 
 describe('Request piece', () => {
   beforeAll(prepareDB);
@@ -53,7 +89,7 @@ describe('Request piece', () => {
     //     y: 0,
     //     userId: 1,
     //   };
-      
+
     //   const response = await chai.request(app)
     //     .post(`${basePath}/kai/playing`)
     //     .set('content-type', 'application/x-www-form-urlencoded')
@@ -82,7 +118,7 @@ describe('Request piece', () => {
     //       userId: 2,
     //     }
     //   ];
-      
+
     //   let response;
     //   for (let i = 0; i < pieces.length; i++) {
     //     response = await chai.request(app)
@@ -107,62 +143,62 @@ describe('Request piece', () => {
       // 座標に何かがあればエラーを返す
       // x, y座標しか使わない
       // 投げる配列（同じ箇所に置こうとする）と、動作後の理想の配列を用意
-    it('cannot put on same cell', async () => {
-      // Given
-      // 与えたい配列
-        // 同じ箇所に置こうとする
-      const pieces = [
-        {
-          x: 0,
-          y: 0,
-          userId: 1,
-        },
-        { // ここで同じ場所に置こうとする
-          x: 0,
-          y: 0,
-          userId: 2, 
-        },
-        {
-          x: 0,
-          y: 1,
-          userId: 2
-        }
-      ];
+    // it('cannot put on same cell', async () => {
+    //   // Given
+    //   // 与えたい配列
+    //     // 同じ箇所に置こうとする
+    //   const pieces = [
+    //     {
+    //       x: 0,
+    //       y: 0,
+    //       userId: 1,
+    //     },
+    //     { // ここで同じ場所に置こうとする
+    //       x: 0,
+    //       y: 0,
+    //       userId: 2,
+    //     },
+    //     {
+    //       x: 0,
+    //       y: 1,
+    //       userId: 2
+    //     }
+    //   ];
 
-      // 理想の配列
-      const matches = [
-        {
-          x: 0,
-          y: 0,
-          userId: 1
-        },
-        {
-          x: 0,
-          y: 1,
-          userId: 2
-        }
-      ];
-      
-      // When
-      let response;
-      for (let i = 0; i < pieces.length; i++) {
-        response = await chai.request(app)
-        .post(`${basePath}/kai/playing`)
-        .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieces[i]);
-      }
+    //   // 理想の配列
+    //   const matches = [
+    //     {
+    //       x: 0,
+    //       y: 0,
+    //       userId: 1
+    //     },
+    //     {
+    //       x: 0,
+    //       y: 1,
+    //       userId: 2
+    //     }
+    //   ];
 
-      // Then
-      // 配列 === 長さ
-      expect(response.body).toHaveLength(matches.length); //expectが希望で、toHaveLengthが現実のデータ
-      // 配列 === 入っているものが一緒かどうか
-      expect(response.body).toEqual(expect.arrayContaining(matches));
+    //   // When
+    //   let response;
+    //   for (let i = 0; i < pieces.length; i++) {
+    //     response = await chai.request(app)
+    //     .post(`${basePath}/kai/playing`)
+    //     .set('content-type', 'application/x-www-form-urlencoded')
+    //     .send(pieces[i]);
+    //   }
 
-      // _id と __v を省いた配列
-      const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
-      expect(pieceData).toHaveLength(matches.length);
-      expect(pieceData).toEqual(expect.arrayContaining(matches));
-    });
+    //   // Then
+    //   // 配列 === 長さ
+    //   expect(response.body).toHaveLength(matches.length); //expectが希望で、toHaveLengthが現実のデータ
+    //   // 配列 === 入っているものが一緒かどうか
+    //   expect(response.body).toEqual(expect.arrayContaining(matches));
+
+    //   // _id と __v を省いた配列
+    //   const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
+    //   expect(pieceData).toHaveLength(matches.length);
+    //   expect(pieceData).toEqual(expect.arrayContaining(matches));
+    // });
 
     // 挟んだらめくれる
     // x: 0, y: 0, userId: a
@@ -171,45 +207,14 @@ describe('Request piece', () => {
     it('can flip', async () => {
       // Given
       // 与えたい配列
-        // はさもうとする
-      const pieces = [
-        {
-          x: 0,
-          y: 0,
-          userId: 1,
-        },
-        { 
-          x: 0,
-          y: 0,
-          userId: 2, 
-        },
-        {
-          x: 0,
-          y: 1,
-          userId: 2
-        }
-      ];
-      // console.log(pieces);
-      
+      const pieces = new array2Pieces;
+      console.log(pieces);
+
       // 理想の配列
-      const matches = [
-        {
-          x: 0,
-          y: 0,
-          userId: 1,
-        },
-        { // ここで同じ場所に置こうとする
-          x: 0,
-          y: 0,
-          userId: 2, 
-        },
-        {
-          x: 0,
-          y: 1,
-          userId: 2
-        }
-      ];;
-      
+      const matches = new array2Mathcers;
+      console.log(matches);
+
+
       // When
       let response;
       for (let i = 0; i < pieces.length; i++) {
@@ -217,6 +222,7 @@ describe('Request piece', () => {
         .post(`${basePath}/kai/playing`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
+        // console.log(pieces[i]);
       }
 
       // Then
@@ -241,4 +247,4 @@ describe('Request piece', () => {
     // 何かしらがあれば置ける
 // ちゃんとめくれるところにしか置けない
   // 縦横斜めの先に自分のコマがあるかをみにいく
-    // 
+    //

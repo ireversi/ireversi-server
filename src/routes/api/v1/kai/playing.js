@@ -27,24 +27,23 @@ router.route('/')
       y: +req.body.y,
       userId: +req.body.userId,
     });
-
     // 同じところに置けない
     if (pieces.find(p => p.x === Playing.x && p.y === Playing.y)){
       res.json(Playing);
       return;
     }
-    
 
-    for (let i = 0; i < dir.length; i++) {
-      if (pieces.find(p => p.x === Playing.x+dir[i][0] && p.y === Playing.y+dir[i][1])) {
-        console.log(Playing.x, Playing.y, Playing.userId);
-      }
-    }
+    // 挟んだらめくれる
+    // for (let i = 0; i < dir.length; i++) {
+    //   if (pieces.find(p => p.x === Playing.x+dir[i][0] && p.y === Playing.y+dir[i][1])) {
+    //     console.log(Playing.x, Playing.y, Playing.userId);
+    //   }
+    // }
 
 
     const Piece = new PlayingModel(Playing); // 今置いたピースのコピー
     await Piece.save();
-    res.json(await PlayingModel.find({},propFilter)); // 全体のデータを取ってくる  
+    res.json(await PlayingModel.find({},propFilter)); // 全体のデータを取ってくる
 
   });
 
