@@ -55,13 +55,13 @@ const array2Pieces = function(){
 
 // 理想の配列
 const array2Mathcers = function(){
-  // let array = [];
-  // let field = [
-  //   0, 0, 0, 1,
-  //   0, 0, 1, 0,
-  //   0, 1, 0, 3,
-  //   0, 0, 0, 0,
-  // ];
+  let array = [];
+  let field = [
+    0, 0, 0, 1,
+    0, 0, 1, 0,
+    0, 1, 0, 3,
+    0, 0, 0, 0,
+  ];
   for (let i = 0; i < field.length; i++) { // x, y, userIdを生成する
     let elm = {}; //
     if (field[i] !== 0) { // 打ち手が存在するコマのみ
