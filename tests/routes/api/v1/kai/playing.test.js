@@ -1,4 +1,4 @@
-const chai = require('chai'); 
+const chai = require('chai');
 
 // vue.jsだと import chai from 'chai':
 // chaiの中は↓のことをしている
@@ -22,76 +22,223 @@ const {
 } = require('../../../../../src/utils/db.js');
 
 const basePath = '/api/v1';
+const propFilter = '-_id -__v';
+
+// 与えたい配列
+const piecesCommon = [
+  0, 0, 0, '1:3',
+  0, 0, '2:2', 0,
+  0, '1:1', 0, '3:4',
+  0, 0, 0, 0,
+];
+
+// 理想の配列
+const matchesCommon = [
+  0, 0, 0, 1,
+  0, 0, 2, 0,
+  0, 1, 0, 3,
+  0, 0, 0, 0,
+];
+  
 
 describe('Request piece', () => {
   beforeAll(prepareDB);
   afterEach(deleteAllDataFromDB);
 
-  describe('show', () => {
-    it('shows piece', async () => {
-      // jestにおいてはitとtestもどちらも変わらない
-      // 文になっていることが好ましい
-
-      // Given テストする上での初期状態
-      // 
-      const x = 0;
-      const y = 0;
-      const userId = 1;
-      const Playing = new PlayingModel({ //データベースに入っている初期状態
-        x,
-        y,
-        userId,
-      });
-      await Playing.save();
-
-      // When アクション内容
-      // appはexpressそのもの
-      // getで取りに行く
-
-      const response = await chai.request(app)
-        .get(`${basePath}/kai/playing`)
-        .query({ userId }); // userId: userId だったら省略できるというES6の文法
-
-      // Then 結果がこうあってほしい
-      expect(response.body).toMatchObject({
-        x,
-        y,
-        userId,
-      });
-    });
-
-    it('return null when the piece does not exist', async () => {
-      // Given
-      const userId = 1;
-
-      // When
-      const response = await chai.request(app)
-        .get(`${basePath}/kai/playing`)
-        .query({ userId });
-
-      // Then
-      expect(response.body).toBe(null);
-    });
-  });
-
   describe('create', () => {
-    it('creates piece', async () => {
-      // Given
-      const playingMatcher = {
-        x: 0,
-        y: 0,
-        userId: 1
-      }
+    // it('creates piece', async () => {
+    //   // Given
+    //   const playingMatcher = {
+    //     x: 0,
+    //     y: 0,
+    //     userId: 1,
+    //   };
+      
+    //   const response = await chai.request(app)
+    //     .post(`${basePath}/kai/playing`)
+    //     .set('content-type', 'application/x-www-form-urlencoded')
+    //     .send(playingMatcher);
 
-      const response = await chai.request(app)
+    //   // Then
+    //   expect(response.body).toHaveLength(1);
+    //   expect(response.body).toMatchObject([playingMatcher]);
+
+    //   const pieces = await PlayingModel.find();
+    //   expect(pieces).toHaveLength(1);
+    //   expect(pieces).toMatchObject({}, propFilter);
+    // });
+
+    // it('creates pieces', async () => {
+    //   // Given
+    //   const pieces = [
+    //     {
+    //       x: 0,
+    //       y: 0,
+    //       userId: 1,
+    //     },
+    //     {
+    //       x: 1,
+    //       y: 0,
+    //       userId: 2,
+    //     }
+    //   ];
+      
+    //   let response;
+    //   for (let i = 0; i < pieces.length; i++) {
+    //     response = await chai.request(app)
+    //     .post(`${basePath}/kai/playing`)
+    //     .set('content-type', 'application/x-www-form-urlencoded')
+    //     .send(pieces[i]);
+    //   }
+
+    //   // Then
+    //   // 配列 === 長さ
+    //   expect(response.body).toHaveLength(pieces.length);
+    //   // 配列 === 入っているものが一緒かどうか
+    //   expect(response.body).toEqual(expect.arrayContaining(pieces));
+
+    //   // _id と __v を省いた配列
+    //   const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
+    //   expect(pieceData).toHaveLength(pieces.length);
+    //   expect(pieceData).toEqual(expect.arrayContaining(pieces));
+    // });
+
+    // 同じところに置けない
+      // 座標に何かがあればエラーを返す
+      // x, y座標しか使わない
+      // 投げる配列（同じ箇所に置こうとする）と、動作後の理想の配列を用意
+    it('cannot put on same cell', async () => {
+      // Given
+      // 与えたい配列
+        // 同じ箇所に置こうとする
+      const pieces = [
+        {
+          x: 0,
+          y: 0,
+          userId: 1,
+        },
+        { // ここで同じ場所に置こうとする
+          x: 0,
+          y: 0,
+          userId: 2, 
+        },
+        {
+          x: 0,
+          y: 1,
+          userId: 2
+        }
+      ];
+
+      // 理想の配列
+      const matches = [
+        {
+          x: 0,
+          y: 0,
+          userId: 1
+        },
+        {
+          x: 0,
+          y: 1,
+          userId: 2
+        }
+      ];
+      
+      // When
+      let response;
+      for (let i = 0; i < pieces.length; i++) {
+        response = await chai.request(app)
         .post(`${basePath}/kai/playing`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(playingMatcher);
+        .send(pieces[i]);
+      }
 
       // Then
-      expect(response.body).toMatchObject({ status: 'success' });
-      const playing = await PlayingModel.find();
-      expect(playing).toMatchObject([playingMatcher]);
+      // 配列 === 長さ
+      expect(response.body).toHaveLength(matches.length); //expectが希望で、toHaveLengthが現実のデータ
+      // 配列 === 入っているものが一緒かどうか
+      expect(response.body).toEqual(expect.arrayContaining(matches));
+
+      // _id と __v を省いた配列
+      const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(matches.length);
+      expect(pieceData).toEqual(expect.arrayContaining(matches));
+    });
+
+    // 挟んだらめくれる
+    // x: 0, y: 0, userId: a
+    // x: 0, y: 1, userId: b → aに変わる
+    // x: 0, y: 2, userId: a
+    it('can flip', async () => {
+      // Given
+      // 与えたい配列
+        // はさもうとする
+      const pieces = [
+        {
+          x: 0,
+          y: 0,
+          userId: 1,
+        },
+        { 
+          x: 0,
+          y: 0,
+          userId: 2, 
+        },
+        {
+          x: 0,
+          y: 1,
+          userId: 2
+        }
+      ];
+      // console.log(pieces);
+      
+      // 理想の配列
+      const matches = [
+        {
+          x: 0,
+          y: 0,
+          userId: 1,
+        },
+        { // ここで同じ場所に置こうとする
+          x: 0,
+          y: 0,
+          userId: 2, 
+        },
+        {
+          x: 0,
+          y: 1,
+          userId: 2
+        }
+      ];;
+      
+      // When
+      let response;
+      for (let i = 0; i < pieces.length; i++) {
+        response = await chai.request(app)
+        .post(`${basePath}/kai/playing`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(pieces[i]);
+      }
+
+      // Then
+      // 配列 === 長さ
+      expect(response.body).toHaveLength(matches.length); //expectが希望で、toHaveLengthが現実のデータ
+      // 配列 === 入っているものが一緒かどうか
+      expect(response.body).toEqual(expect.arrayContaining(matches));
+
+      // _id と __v を省いた配列
+      const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(matches.length);
+      expect(pieceData).toEqual(expect.arrayContaining(matches));
     });
   });
 });
+
+// 離れたところにおけない（上下左右隣接）
+  // 配列に自分のuserIdが存在しないときに置く
+  // 座標上下左右
+    // xがプラスマイナス１
+    // yがプラスマイナス１の場所に
+    // 何かしらがあれば置ける
+// ちゃんとめくれるところにしか置けない
+  // 縦横斜めの先に自分のコマがあるかをみにいく
+    // 
