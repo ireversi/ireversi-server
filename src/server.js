@@ -11,5 +11,5 @@ const { serve, setup } = require('./utils/swaggerUi.js'); // 連想配列の中�
   app.use(docsPath, serve, setup);
   console.log(`API docs: ${origin}${docsPath}`); // 接続できるよ、ってのを書いている
 
-  app.listen(port, () => console.log(`Server is running on ${origin}`));
+  app.listen(port, () => console.log(`Server is running on ${origin}`)); //ポート番号を表示させる
 })();

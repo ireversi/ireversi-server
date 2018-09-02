@@ -6,7 +6,7 @@ const { Schema } = mongoose;
 const PlayingSchema = new Schema({
   x: Number,
   y: Number,
-  userId: Number,
+  userid: Number,
 });
 
 module.exports = mongoose.model('KidoPlaying', PlayingSchema);
