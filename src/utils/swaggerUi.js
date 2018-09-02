@@ -4,7 +4,7 @@ const swaggerJSDoc = require('swagger-jsdoc'); // モジュールに必要な設
 
 const swaggerSpec = swaggerJSDoc({
   swaggerDefinition: {
-    swagger: '2.0', 
+    swagger: '2.0',
     info: { // 基本設定
       title: 'iReversi API',
       version: '0.0.1',
@@ -14,7 +14,7 @@ const swaggerSpec = swaggerJSDoc({
     consumes: ['application/x-www-form-urlencoded'], // ルールとか
     produces: ['application/json'],
   },
-  apis: klawSync('./swagger', { nodir: true }).map(f => f.path), 
+  apis: klawSync('./swagger', { nodir: true }).map(f => f.path),
   // ymlファイルを全部登録する必要がある
   // mapで全部見てる
 });

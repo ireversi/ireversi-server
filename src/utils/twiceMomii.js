@@ -1,3 +1,1 @@
-module.exports = (i) => {
-  return i * 2;
-};
+module.exports = i => i * 2;
