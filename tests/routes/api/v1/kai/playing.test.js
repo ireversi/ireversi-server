@@ -49,7 +49,7 @@ const array2Pieces = function(){
       array.push(elm);
     }
   }
-  // console.log(array);
+  console.log(array);
   return array;
 };
 
