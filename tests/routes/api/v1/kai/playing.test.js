@@ -49,6 +49,7 @@ const array2Pieces = function(){
       array.push(elm);
     }
   }
+  console.log(array);
   return array;
 };
 
@@ -67,12 +68,11 @@ const array2Mathcers = function(){
       let x = i % 4;
       let y = Math.floor((15 - i)/4);
       let userId = field[i];
-      console.log(userId);
       elm = {x: x, y: y, userId: userId};
       array.push(elm);
     }
   }
-  // console.log(array);
+  console.log(array);
   return array;
 };
 
@@ -82,138 +82,102 @@ describe('Request piece', () => {
   afterEach(deleteAllDataFromDB);
 
   describe('create', () => {
-    // it('creates piece', async () => {
-    //   // Given
-    //   const playingMatcher = {
-    //     x: 0,
-    //     y: 0,
-    //     userId: 1,
-    //   };
+    it('creates piece', async () => {
+      // Given
+      const playingMatcher = {
+        x: 0,
+        y: 0,
+        userId: 1,
+      };
 
-    //   const response = await chai.request(app)
-    //     .post(`${basePath}/kai/playing`)
-    //     .set('content-type', 'application/x-www-form-urlencoded')
-    //     .send(playingMatcher);
+      const response = await chai.request(app)
+        .post(`${basePath}/kai/playing`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(playingMatcher);
 
-    //   // Then
-    //   expect(response.body).toHaveLength(1);
-    //   expect(response.body).toMatchObject([playingMatcher]);
+      // Then
+      expect(response.body).toHaveLength(1);
+      expect(response.body).toMatchObject([playingMatcher]);
 
-    //   const pieces = await PlayingModel.find();
-    //   expect(pieces).toHaveLength(1);
-    //   expect(pieces).toMatchObject({}, propFilter);
-    // });
+      const pieces = await PlayingModel.find();
+      expect(pieces).toHaveLength(1);
+      expect(pieces).toMatchObject({}, propFilter);
+    });
 
-    // it('creates pieces', async () => {
-    //   // Given
-    //   const pieces = [
-    //     {
-    //       x: 0,
-    //       y: 0,
-    //       userId: 1,
-    //     },
-    //     {
-    //       x: 1,
-    //       y: 0,
-    //       userId: 2,
-    //     }
-    //   ];
+    it('creates pieces', async () => {
+      // Given
+      const pieces = [
+        {
+          x: 0,
+          y: 0,
+          userId: 1,
+        },
+        {
+          x: 1,
+          y: 0,
+          userId: 2,
+        }
+      ];
 
-    //   let response;
-    //   for (let i = 0; i < pieces.length; i++) {
-    //     response = await chai.request(app)
-    //     .post(`${basePath}/kai/playing`)
-    //     .set('content-type', 'application/x-www-form-urlencoded')
-    //     .send(pieces[i]);
-    //   }
+      let response;
+      for (let i = 0; i < pieces.length; i++) {
+        response = await chai.request(app)
+        .post(`${basePath}/kai/playing`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(pieces[i]);
+      }
 
-    //   // Then
-    //   // 配列 === 長さ
-    //   expect(response.body).toHaveLength(pieces.length);
-    //   // 配列 === 入っているものが一緒かどうか
-    //   expect(response.body).toEqual(expect.arrayContaining(pieces));
+      // Then
+      // 配列 === 長さ
+      expect(response.body).toHaveLength(pieces.length);
+      // 配列 === 入っているものが一緒かどうか
+      expect(response.body).toEqual(expect.arrayContaining(pieces));
 
-    //   // _id と __v を省いた配列
-    //   const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
-    //   expect(pieceData).toHaveLength(pieces.length);
-    //   expect(pieceData).toEqual(expect.arrayContaining(pieces));
-    // });
+      // _id と __v を省いた配列
+      const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(pieces.length);
+      expect(pieceData).toEqual(expect.arrayContaining(pieces));
+    });
 
     // 同じところに置けない
-      // 座標に何かがあればエラーを返す
-      // x, y座標しか使わない
-      // 投げる配列（同じ箇所に置こうとする）と、動作後の理想の配列を用意
-    // it('cannot put on same cell', async () => {
-    //   // Given
-    //   // 与えたい配列
-    //     // 同じ箇所に置こうとする
-    //   const pieces = [
-    //     {
-    //       x: 0,
-    //       y: 0,
-    //       userId: 1,
-    //     },
-    //     { // ここで同じ場所に置こうとする
-    //       x: 0,
-    //       y: 0,
-    //       userId: 2,
-    //     },
-    //     {
-    //       x: 0,
-    //       y: 1,
-    //       userId: 2
-    //     }
-    //   ];
-
-    //   // 理想の配列
-    //   const matches = [
-    //     {
-    //       x: 0,
-    //       y: 0,
-    //       userId: 1
-    //     },
-    //     {
-    //       x: 0,
-    //       y: 1,
-    //       userId: 2
-    //     }
-    //   ];
-
-    //   // When
-    //   let response;
-    //   for (let i = 0; i < pieces.length; i++) {
-    //     response = await chai.request(app)
-    //     .post(`${basePath}/kai/playing`)
-    //     .set('content-type', 'application/x-www-form-urlencoded')
-    //     .send(pieces[i]);
-    //   }
-
-    //   // Then
-    //   // 配列 === 長さ
-    //   expect(response.body).toHaveLength(matches.length); //expectが希望で、toHaveLengthが現実のデータ
-    //   // 配列 === 入っているものが一緒かどうか
-    //   expect(response.body).toEqual(expect.arrayContaining(matches));
-
-    //   // _id と __v を省いた配列
-    //   const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
-    //   expect(pieceData).toHaveLength(matches.length);
-    //   expect(pieceData).toEqual(expect.arrayContaining(matches));
-    // });
-
-    // 挟んだらめくれる
-    // x: 0, y: 0, userId: a
-    // x: 0, y: 1, userId: b → aに変わる
-    // x: 0, y: 2, userId: a
-    it('can flip', async () => {
+    //   座標に何かがあればエラーを返す
+    //   x, y座標しか使わない
+    //   投げる配列（同じ箇所に置こうとする）と、動作後の理想の配列を用意
+    it('cannot put on same cell', async () => {
       // Given
       // 与えたい配列
-      const pieces = new array2Pieces;
-      console.log(pieces);
+        // 同じ箇所に置こうとする
+      const pieces = [
+        {
+          x: 0,
+          y: 0,
+          userId: 1,
+        },
+        { // ここで同じ場所に置こうとする
+          x: 0,
+          y: 0,
+          userId: 2,
+        },
+        {
+          x: 0,
+          y: 1,
+          userId: 2
+        }
+      ];
 
       // 理想の配列
-      const matches = new array2Mathcers;
-      console.log(matches);
-
+      const matches = [
+        {
+          x: 0,
+          y: 0,
+          userId: 1
+        },
+        {
+          x: 0,
+          y: 1,
+          userId: 2
+        }
+      ];
 
       // When
       let response;
@@ -222,7 +186,6 @@ describe('Request piece', () => {
         .post(`${basePath}/kai/playing`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
-        // console.log(pieces[i]);
       }
 
       // Then
@@ -236,6 +199,43 @@ describe('Request piece', () => {
       expect(pieceData).toHaveLength(matches.length);
       expect(pieceData).toEqual(expect.arrayContaining(matches));
     });
+
+    // 挟んだらめくれる
+    // x: 0, y: 0, userId: a
+    // x: 0, y: 1, userId: b → aに変わる
+    // x: 0, y: 2, userId: a
+    // it('can flip', async () => {
+    //   // Given
+    //   // 与えたい配列
+    //   const pieces = new array2Pieces;
+    //   console.log(pieces);
+
+    //   // 理想の配列
+    //   const matches = new array2Mathcers;
+    //   console.log(matches);
+
+
+    //   // When
+    //   let response;
+    //   for (let i = 0; i < pieces.length; i++) {
+    //     response = await chai.request(app)
+    //     .post(`${basePath}/kai/playing`)
+    //     .set('content-type', 'application/x-www-form-urlencoded')
+    //     .send(pieces[i]);
+    //     // console.log(pieces[i]);
+    //   }
+
+    //   // Then
+    //   // 配列 === 長さ
+    //   expect(response.body).toHaveLength(matches.length); //expectが希望で、toHaveLengthが現実のデータ
+    //   // 配列 === 入っているものが一緒かどうか
+    //   expect(response.body).toEqual(expect.arrayContaining(matches));
+
+    //   // _id と __v を省いた配列
+    //   const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
+    //   expect(pieceData).toHaveLength(matches.length);
+    //   expect(pieceData).toEqual(expect.arrayContaining(matches));
+    // });
   });
 });
 
