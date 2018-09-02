@@ -1,12 +1,12 @@
-const klawSync = require('klaw-sync'); // ファイルを読んでいく、一覧をつくる
-const swaggerUi = require('swagger-ui-express'); // オープンAPIのルールを動かす
-const swaggerJSDoc = require('swagger-jsdoc'); // モジュールに必要な設定
+const klawSync = require('klaw-sync');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJSDoc = require('swagger-jsdoc'); //jsのなかに書いて読んで行く機能
 
 const swaggerSpec = swaggerJSDoc({
   swaggerDefinition: {
-    swagger: '2.0', 
-    info: { // 基本設定
-      title: 'iReversi API',
+    swagger: '2.0',
+    info: {
+      title: 'iReversi API', //swaggerにおけるタイトル
       version: '0.0.1',
       description: 'Document for iReversi API',
     },
