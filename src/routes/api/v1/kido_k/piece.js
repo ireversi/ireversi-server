@@ -19,12 +19,6 @@ router.route('/')
       return;
     };
 
-    if (pieces.find(p => p.x === result.x && p.y === result.y)) {
-      res.json(pieces);
-      return;
-    };
-
-
     const Piece = new PieceModel(result);
     await Piece.save();
     res.json(await PieceModel.find({}, propfilter));
