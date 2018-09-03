@@ -25,27 +25,26 @@ const basePath = '/api/v1';
 const propFilter = '-_id -__v';
 
 // 与えたい配列
-const array2Pieces = function(){
-  let array = [];
-  let field = [
+const array2Pieces = function () {
+  const array = [];
+  const field = [
     0, 0, 0, '1:3',
     0, 0, '2:2', 0,
     0, '1:1', 0, '3:4',
     0, 0, 0, 0,
   ];
-  let fieldExist = field.filter((n) => n !== 0); // コマだけを抽出
-  let playOrder = fieldExist.sort((a, b) => { // 配列をプレイ順で並び替え
-    return (parseInt(a.slice(a.indexOf(':')+1))) - (parseInt(b.slice(b.indexOf(':')+1)));
-  });
+  const fieldExist = field.filter(n => n !== 0); // コマだけを抽出
+  // 配列をプレイ順で並び替え
+  const playOrder = fieldExist.sort((a, b) => (parseInt(a.slice(a.indexOf(':') + 1), 10)) - (parseInt(b.slice(b.indexOf(':') + 1), 10)));
   let n = 0;
-  for (let i = 0; i < field.length; i++) { // x, y, userIdを生成する
+  for (let i = 0; i < field.length; i += 1) { // x, y, userIdを生成する
     let elm = {}; //
     if (field[i] !== 0) { // 打ち手が存在するコマのみ
-      let x = i % 4;
-      let y = Math.floor((15 - i)/4);
-      let userId = parseInt(playOrder[n].slice(playOrder[n].indexOf(':')-1));
-      elm = {x: x, y: y, userId: userId};
-      n++;
+      const x = i % 4;
+      const y = Math.floor((15 - i) / 4);
+      const userId = parseInt(playOrder[n].slice(playOrder[n].indexOf(':') - 1), 10);
+      elm = { x, y, userId };
+      n += 1;
       array.push(elm);
     }
   }
@@ -54,21 +53,21 @@ const array2Pieces = function(){
 };
 
 // 理想の配列
-const array2Mathcers = function(){
-  let array = [];
-  let field = [
+const array2Mathcers = function () {
+  const array = [];
+  const field = [
     0, 0, 0, 1,
     0, 0, 1, 0,
     0, 1, 0, 3,
     0, 0, 0, 0,
   ];
-  for (let i = 0; i < field.length; i++) { // x, y, userIdを生成する
+  for (let i = 0; i < field.length; i += 1) { // x, y, userIdを生成する
     let elm = {}; //
     if (field[i] !== 0) { // 打ち手が存在するコマのみ
-      let x = i % 4;
-      let y = Math.floor((15 - i)/4);
-      let userId = field[i];
-      elm = {x: x, y: y, userId: userId};
+      const x = i % 4;
+      const y = Math.floor((15 - i) / 4);
+      const userId = field[i];
+      elm = { x, y, userId };
       array.push(elm);
     }
   }
@@ -112,11 +111,11 @@ describe('Request piece', () => {
 
 
       let response;
-      for (let i = 0; i < pieces.length; i++) {
+      for (let i = 0; i < pieces.length; i += 1) {
         response = await chai.request(app)
-        .post(`${basePath}/kai/playing`)
-        .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieces[i]);
+          .post(`${basePath}/kai/playing`)
+          .set('content-type', 'application/x-www-form-urlencoded')
+          .send(pieces[i]);
       }
 
       // Then
@@ -132,13 +131,13 @@ describe('Request piece', () => {
     });
 
     // 同じところに置けない
-    //   座標に何かがあればエラーを返す
-    //   x, y座標しか使わない
-    //   投げる配列（同じ箇所に置こうとする）と、動作後の理想の配列を用意
+    // 座標に何かがあればエラーを返す
+    // x, y座標しか使わない
+    // 投げる配列（同じ箇所に置こうとする）と、動作後の理想の配列を用意
     it('cannot put on same cell', async () => {
       // Given
       // 与えたい配列
-        // 同じ箇所に置こうとする
+      // 同じ箇所に置こうとする
       const pieces = [
         {
           x: 0,
@@ -153,8 +152,8 @@ describe('Request piece', () => {
         {
           x: 0,
           y: 1,
-          userId: 2
-        }
+          userId: 2,
+        },
       ];
 
       // 理想の配列
@@ -162,27 +161,27 @@ describe('Request piece', () => {
         {
           x: 0,
           y: 0,
-          userId: 1
+          userId: 1,
         },
         {
           x: 0,
           y: 1,
-          userId: 2
-        }
+          userId: 2,
+        },
       ];
 
       // When
       let response;
-      for (let i = 0; i < pieces.length; i++) {
+      for (let i = 0; i < pieces.length; i += 1) {
         response = await chai.request(app)
-        .post(`${basePath}/kai/playing`)
-        .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieces[i]);
+          .post(`${basePath}/kai/playing`)
+          .set('content-type', 'application/x-www-form-urlencoded')
+          .send(pieces[i]);
       }
 
       // Then
       // 配列 === 長さ
-      expect(response.body).toHaveLength(matches.length); //expectが希望で、toHaveLengthが現実のデータ
+      expect(response.body).toHaveLength(matches.length); // expectが希望で、toHaveLengthが現実のデータ
       // 配列 === 入っているものが一緒かどうか
       expect(response.body).toEqual(expect.arrayContaining(matches));
 
@@ -232,11 +231,10 @@ describe('Request piece', () => {
 });
 
 // 離れたところにおけない（上下左右隣接）
-  // 配列に自分のuserIdが存在しないときに置く
-  // 座標上下左右
-    // xがプラスマイナス１
-    // yがプラスマイナス１の場所に
-    // 何かしらがあれば置ける
+// 配列に自分のuserIdが存在しないときに置く
+// 座標上下左右
+// xがプラスマイナス１
+// yがプラスマイナス１の場所に
+// 何かしらがあれば置ける
 // ちゃんとめくれるところにしか置けない
-  // 縦横斜めの先に自分のコマがあるかをみにいく
-    //
+// 縦横斜めの先に自分のコマがあるかをみにいく
