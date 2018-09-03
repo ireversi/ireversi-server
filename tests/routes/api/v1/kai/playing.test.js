@@ -24,34 +24,34 @@ const {
 const basePath = '/api/v1';
 const propFilter = '-_id -__v';
 
-// // 与えたい配列
-// const array2Pieces = function(){
-//   let array = [];
-//   let field = [
-//     0, 0, 0, '1:3',
-//     0, 0, '2:2', 0,
-//     0, '1:1', 0, '3:4',
-//     0, 0, 0, 0,
-//   ];
-//   let fieldExist = field.filter((n) => n !== 0); // コマだけを抽出
-//   let playOrder = fieldExist.sort((a, b) => { // 配列をプレイ順で並び替え
-//     return (parseInt(a.slice(a.indexOf(':')+1))) - (parseInt(b.slice(b.indexOf(':')+1)));
-//   });
-//   let n = 0;
-//   for (let i = 0; i < field.length; i++) { // x, y, userIdを生成する
-//     let elm = {}; //
-//     if (field[i] !== 0) { // 打ち手が存在するコマのみ
-//       let x = i % 4;
-//       let y = Math.floor((15 - i)/4);
-//       let userId = parseInt(playOrder[n].slice(playOrder[n].indexOf(':')-1));
-//       elm = {x: x, y: y, userId: userId};
-//       n++;
-//       array.push(elm);
-//     }
-//   }
-//   console.log(array);
-//   return array;
-// };
+// 与えたい配列
+const array2Pieces = function(){
+  let array = [];
+  let field = [
+    0, 0, 0, '1:3',
+    0, 0, '2:2', 0,
+    0, '1:1', 0, '3:4',
+    0, 0, 0, 0,
+  ];
+  let fieldExist = field.filter((n) => n !== 0); // コマだけを抽出
+  let playOrder = fieldExist.sort((a, b) => { // 配列をプレイ順で並び替え
+    return (parseInt(a.slice(a.indexOf(':')+1))) - (parseInt(b.slice(b.indexOf(':')+1)));
+  });
+  let n = 0;
+  for (let i = 0; i < field.length; i++) { // x, y, userIdを生成する
+    let elm = {}; //
+    if (field[i] !== 0) { // 打ち手が存在するコマのみ
+      let x = i % 4;
+      let y = Math.floor((15 - i)/4);
+      let userId = parseInt(playOrder[n].slice(playOrder[n].indexOf(':')-1));
+      elm = {x: x, y: y, userId: userId};
+      n++;
+      array.push(elm);
+    }
+  }
+  console.log(array);
+  return array;
+};
 
 // 理想の配列
 const array2Mathcers = function(){
