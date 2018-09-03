@@ -1,30 +1,24 @@
 const router = require('express').Router();
-const PlayingModel = require("../../../../models/kohski/PlayingModel.js")
+const PlayingModel = require("../../../../models/kohski/PlayingModel.js");
+const propFilter = '-_id -__v'
 
 
 router.route('/')
-  // .get((req,res) => {
-  //   name = req.query.name
-  //   email = req.query.email
-  //   password = req.query.password
-
-  //   res.json({
-  //     'name':String,
-  //     'email':String,
-  //     'password':String
-  //   });
-  // })
   .post(async(req, res) => {
-    const result ={
-      x:+req.body.x,  //+は数値で返すって意味
+    const pieces = await PlayingModel.find({},propFilter);
+    const result = {
+      x:+req.body.x,
       y:+req.body.y,
       userID:+req.body.userID
     }
 
-    const Playing = new PlayingModel(result);
-
-    await Playing.save();
-    res.json([result]);
+    if(pieces.find(p => p.x ===result.x && p.y === result.y)){
+      res.json(pieces);
+      return;
+    }
+      const Playing = new PlayingModel(result);
+      await Playing.save();
+      res.json(await PlayingModel.find({},propFilter));
   });
 
 module.exports = router;

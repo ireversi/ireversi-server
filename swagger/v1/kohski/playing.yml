@@ -1,0 +1,46 @@
+tags:
+  - name: playing
+    description: Playing API
+
+/kohski/playing:
+  post:
+    tags:
+      - playing
+    parameters:
+      - name: "x"
+        in: "query"
+        description: "x axis"
+        required: true
+        type: "Number"
+      - name: "y"
+        in: "query"
+        description: "y axis"
+        required: true
+        type: "Number"
+      - name: "userID"
+        in: "query"
+        description: "user ID"
+        required: true
+        type: "Number"
+    responses:
+      200:
+        description: "array"
+        schema:
+          type: "object"
+          properties:
+            user_id:
+              type: "string"
+              example: "aaaaaaaa"
+            name:
+              type: "string"
+              example: "aaaaaaaa"
+            email:
+              type: "string"
+              example: "aaa@aaa.aaa"
+            password:
+              type: "string"
+              example: "aaaaaaaa"
+            created:
+              type: "string"
+              example: "YYYY-MM-DD HH:mm:ss"
+  

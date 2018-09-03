@@ -10,5 +10,5 @@ const { serve, setup } = require('./utils/swaggerUi.js');
   app.use(docsPath, serve, setup);
   console.log(`API docs: ${origin}${docsPath}`);
 
-  app.listen(port, () => console.log(`Server is running on ${origin}`));
+  app.listen(port, () => console.log(`Server is running on ${origin}`));  //config.jsで10000番が入っているから。
 })();
