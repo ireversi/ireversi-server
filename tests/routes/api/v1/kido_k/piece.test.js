@@ -27,11 +27,11 @@ function convert2PieceRecord(pieces) {
   for (let i = 0; i < pieces.record.length; i += 1) {
     const piece = pieces.record[i];
     if (piece !== 0 && !Array.isArray(piece)) {
-      let point = piece.indexOf(':');
-      let num = piece.slice(0, point);
-      let userid = piece.slice(point + 1);
-      let x = Math.floor(i % pieces.size);
-      let y = Math.floor(i / pieces.size);
+      const point = piece.indexOf(':');
+      const num = piece.slice(0, point);
+      const userid = piece.slice(point + 1);
+      const x = Math.floor(i % pieces.size);
+      const y = Math.floor(i / pieces.size);
       record.push([num, x, y, userid]);
     } else if (piece !== 0 && Array.isArray(piece)) {
       for (let j = 0; j < piece.length; j += 1) {
