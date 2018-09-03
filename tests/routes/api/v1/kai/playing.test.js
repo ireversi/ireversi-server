@@ -25,7 +25,7 @@ const basePath = '/api/v1';
 const propFilter = '-_id -__v';
 
 // 与えたい配列
-const array2Pieces = function () {
+const array2Pieces = () => {
   const array = [];
   const field = [
     0, 0, 0, '1:3',
@@ -53,7 +53,7 @@ const array2Pieces = function () {
 };
 
 // 理想の配列
-const array2Mathcers = function () {
+const array2Mathcers = () => {
   const array = [];
   const field = [
     0, 0, 0, 1,
