@@ -5,7 +5,7 @@ const PlayingModel = require('../../../../models/kai/PlayingModel.js');
 const propFilter = '-_id -__v';
 
 // var set = new Set();
-// let dir = [
+// const dir = [
 //   [-1, 1],
 //   [0, 1],
 //   [1, 1],
@@ -13,7 +13,7 @@ const propFilter = '-_id -__v';
 //   [1, -1],
 //   [0, -1],
 //   [-1, -1],
-//   [-1, 0]
+//   [-1, 0],
 // ];
 
 // route('/') はルーティングがここまでですよの書き方
@@ -22,12 +22,18 @@ router.route('/')
 // res.jsonでresponse.bodyに返す
   .post(async (req, res) => {
     const pieces = (await PlayingModel.find({}, propFilter)); // 今存在するpiece
+    console.log(pieces);
+
+    // console.log(req.body);
+
     const Playing = new PlayingModel({ // 今置いたpiece
       x: +req.body.x,
       y: +req.body.y,
       userId: +req.body.userId,
     });
     // 同じところに置けない
+    console.log(Playing);
+
     if (pieces.find(p => p.x === Playing.x && p.y === Playing.y)) {
       res.json(Playing);
       return;
@@ -39,7 +45,6 @@ router.route('/')
     //     console.log(Playing.x, Playing.y, Playing.userId);
     //   }
     // }
-
 
     const Piece = new PlayingModel(Playing); // 今置いたピースのコピー
     await Piece.save();
