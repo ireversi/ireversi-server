@@ -106,18 +106,10 @@ describe('Request piece', () => {
 
     it('creates pieces', async () => {
       // Given
-      const pieces = [
-        {
-          x: 0,
-          y: 0,
-          userId: 1,
-        },
-        {
-          x: 1,
-          y: 0,
-          userId: 2,
-        }
-      ];
+      const pieces = array2Pieces();
+      const matcher = array2Mathcers();
+      console.log(matcher);
+
 
       let response;
       for (let i = 0; i < pieces.length; i++) {
