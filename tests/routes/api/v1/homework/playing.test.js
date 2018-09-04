@@ -17,10 +17,10 @@ describe('play', () => {
     it('puts a piece', async () => {
       // Given
       const piece = {
-        x:0,
-        y:0,
+        x: 0,
+        y: 0,
         userId: 1,
-      }
+      };
 
       // When
       const response = await chai.request(app)

@@ -25,7 +25,7 @@ const basePath = '/api/v1';
 function convert2PieceRecord(pieces) {
   const record = [];
   for (let i = 0; i < pieces.length; i += 1) {
-    const size = Math.sqrt(pieces.length)
+    const size = Math.sqrt(pieces.length);
     const piece = pieces[i];
     if (piece !== 0 && !Array.isArray(piece)) {
       const point = piece.indexOf(':');
@@ -61,7 +61,7 @@ function convertPiece(piece) {
 
 function convertComparisonResult(result) {
   const pieces = [];
-  const size = Math.sqrt(result.length)
+  const size = Math.sqrt(result.length);
   for (let i = 0; i < result.length; i += 1) {
     if (result[i] !== 0) {
       const piece = {

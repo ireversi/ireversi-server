@@ -10,5 +10,4 @@ const PlayingSchema = new Schema({
 });
 
 
-
 module.exports = mongoose.model('FujiiPlaying', PlayingSchema);

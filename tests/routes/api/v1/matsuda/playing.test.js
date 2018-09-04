@@ -1,4 +1,5 @@
 const chai = require('chai');
+// eslint-disable-next-line import/no-extraneous-dependencies
 const diff = require('jest-diff');
 
 const app = require('../../../../../src/routes/app.js');
@@ -18,27 +19,26 @@ expect.extend({
     const notContaining = arg.find(matcher => !rec.find(p => this.equals(p, matcher)));
     const pass = sameLength && !notContaining;
     const message = pass
-      ? () =>
-          this.utils.matcherHint('.not.toBe') +
-          '\n\n' +
-          `Expected value to not be (using Object.is):\n` +
-          `  ${this.utils.printExpected(arg)}\n` +
-          `Received:\n` +
-          `  ${this.utils.printReceived(rec)}`
+      ? () => `${this.utils.matcherHint('.not.toBe')
+      }\n\n`
+          + 'Expected value to not be (using Object.is):\n'
+          + `  ${this.utils.printExpected(arg)}\n`
+          + 'Received:\n'
+          + `  ${this.utils.printReceived(rec)}`
       : () => {
-          const diffString = diff(arg, rec, {
-            expand: this.expand,
-          });
-          return (
-            this.utils.matcherHint('.toBe') +
-            '\n\n' +
-            `Expected value to be (using Object.is):\n` +
-            `  ${this.utils.printExpected(arg)}\n` +
-            `Received:\n` +
-            `  ${this.utils.printReceived(rec)}` +
-            (diffString ? `\n\nDifference:\n\n${diffString}` : '')
-          );
-        };
+        const diffString = diff(arg, rec, {
+          expand: this.expand,
+        });
+        return (
+          `${this.utils.matcherHint('.toBe')
+          }\n\n`
+            + 'Expected value to be (using Object.is):\n'
+            + `  ${this.utils.printExpected(arg)}\n`
+            + 'Received:\n'
+            + `  ${this.utils.printReceived(rec)}${
+              diffString ? `\n\nDifference:\n\n${diffString}` : ''}`
+        );
+      };
 
     return { message, pass };
   },
