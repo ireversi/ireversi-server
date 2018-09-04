@@ -2,6 +2,7 @@ const router = require('express').Router();
 const PlayingModel = require("../../../../models/kohski/PlayingModel.js");
 const propFilter = '-_id -__v'
 
+const test ="";
 
 router.route('/')
   .post(async(req, res) => {
