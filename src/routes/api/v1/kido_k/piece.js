@@ -61,12 +61,12 @@ router.route('/')
     }
     // ============================================================
 
-    var firstPiece = false;
+    let firstPiece = false;
     if (pieces.length === 0) {
       firstPiece = true;
     }
 
-    var existPiece = false;
+    let existPiece = false;
     if (pieces.find(p => p.userid === result.userid)) {
       existPiece = true;
     }
@@ -78,10 +78,10 @@ router.route('/')
     const turnlist = {
       n: [], ne: [], e: [], se: [], s: [], sw: [], w: [], nw: [],
     };
-    const needTurn1 = {
+    const existOwnPiece = {
       n: false, ne: false, e: false, se: false, s: false, sw: false, w: false, nw: false,
     };
-    const needTurn2 = {
+    const isOtherPiece = {
       n: false, ne: false, e: false, se: false, s: false, sw: false, w: false, nw: false,
     };
     const contactPiece = {
@@ -94,11 +94,11 @@ router.route('/')
         // console.log('north');
         if ((piece.userid === result.userid
           && piece.x === result.x && piece.y < result.y - 1)) {
-          needTurn1.n = true;
+          existOwnPiece.n = true;
         }
         if ((piece.userid !== result.userid
           && piece.x === result.x && piece.y === result.y - 1)) {
-          needTurn2.n = true;
+          isOtherPiece.n = true;
         }
         if (piece.y === result.y - 1) { contactPiece.n = true; }
         turnlist.n.push(piece);
@@ -106,11 +106,11 @@ router.route('/')
         // console.log('east');
         if (piece.userid === result.userid
           && piece.x > result.x + 1 && piece.y === result.y) {
-          needTurn1.e = true;
+          existOwnPiece.e = true;
         }
         if (piece.userid !== result.userid
           && piece.x === result.x + 1 && piece.y === result.y) {
-          needTurn2.e = true;
+          isOtherPiece.e = true;
         }
         if (piece.x === result.x + 1) { contactPiece.e = true; }
         turnlist.e.push(piece);
@@ -118,11 +118,11 @@ router.route('/')
         // console.log('south');
         if (piece.userid === result.userid
           && piece.x === result.x && piece.y > result.y + 1) {
-          needTurn1.s = true;
+          existOwnPiece.s = true;
         }
         if (piece.userid !== result.userid
           && piece.x === result.x && piece.y === result.y + 1) {
-          needTurn2.s = true;
+          isOtherPiece.s = true;
         }
         if (piece.y === result.y + 1) { contactPiece.s = true; }
         turnlist.s.push(piece);
@@ -130,11 +130,11 @@ router.route('/')
         // console.log('west');
         if (piece.userid === result.userid
           && piece.x < result.x - 1 && piece.y === result.y) {
-          needTurn1.w = true;
+          existOwnPiece.w = true;
         }
         if (piece.userid !== result.userid
           && piece.x === result.x - 1 && piece.y === result.y) {
-          needTurn2.w = true;
+          isOtherPiece.w = true;
         }
         if (piece.x === result.x - 1) { contactPiece.w = true; }
         turnlist.w.push(piece);
@@ -142,11 +142,11 @@ router.route('/')
         && Math.abs(piece.x - result.x) === Math.abs(piece.y - result.y)) {
         // console.log('northeast');
         if (piece.userid === result.userid && Math.abs(piece.x - result.x) > 1) {
-          needTurn1.ne = true;
+          existOwnPiece.ne = true;
         }
         if (piece.userid !== result.userid
           && piece.x === result.x + 1 && piece.y === result.y - 1) {
-          needTurn2.ne = true;
+          isOtherPiece.ne = true;
         }
         if (piece.x === result.x + 1 && piece.y === result.y - 1) {
           contactPiece.ne = true;
@@ -156,11 +156,11 @@ router.route('/')
         && Math.abs(piece.x - result.x) === Math.abs(piece.y - result.y)) {
         // console.log('southeast');
         if (piece.userid === result.userid && Math.abs(piece.x - result.x) > 1) {
-          needTurn1.se = true;
+          existOwnPiece.se = true;
         }
         if (piece.userid !== result.userid
           && piece.x === result.x + 1 && piece.y === result.y + 1) {
-          needTurn2.se = true;
+          isOtherPiece.se = true;
         }
         if (piece.x === result.x + 1 && piece.y === result.y + 1) {
           contactPiece.se = true;
@@ -170,11 +170,11 @@ router.route('/')
         && Math.abs(piece.x - result.x) === Math.abs(piece.y - result.y)) {
         // console.log('southwest');
         if (piece.userid === result.userid && Math.abs(piece.x - result.x) > 1) {
-          needTurn1.sw = true;
+          existOwnPiece.sw = true;
         }
         if (piece.userid !== result.userid
           && piece.x === result.x - 1 && piece.y === result.y + 1) {
-          needTurn2.sw = true;
+          isOtherPiece.sw = true;
         }
         if (piece.x === result.x - 1 && piece.y === result.y + 1) {
           contactPiece.sw = true;
@@ -184,11 +184,11 @@ router.route('/')
         && Math.abs(piece.x - result.x) === Math.abs(piece.y - result.y)) {
         // console.log('northwest');
         if (piece.userid === result.userid && Math.abs(piece.x - result.x) > 1) {
-          needTurn1.nw = true;
+          existOwnPiece.nw = true;
         }
         if (piece.userid !== result.userid
           && piece.x === result.x - 1 && piece.y === result.y - 1) {
-          needTurn2.nw = true;
+          isOtherPiece.nw = true;
         }
         if (piece.x === result.x - 1 && piece.y === result.y - 1) {
           contactPiece.nw = true;
@@ -203,21 +203,21 @@ router.route('/')
     if (firstPiece) {
       const Piece = new PieceModel(result);
       await Piece.save();
-    } else if (!existPiece &&
-      (contactPiece.n || contactPiece.e
+    } else if (!existPiece
+      && (contactPiece.n || contactPiece.e
         || contactPiece.s || contactPiece.w)) {
       const Piece = new PieceModel(result);
       await Piece.save();
-    } else if (existPiece &&
-      ((needTurn1.n && needTurn2.n) || (needTurn1.e && needTurn2.e)
-        || (needTurn1.s && needTurn2.s) || (needTurn1.w && needTurn2.w)
-        || (needTurn1.ne && needTurn2.ne) || (needTurn1.se && needTurn2.se)
-        || (needTurn1.sw && needTurn2.sw) || (needTurn1.nw && needTurn2.nw))) {
+    } else if (existPiece
+      && ((existOwnPiece.n && isOtherPiece.n) || (existOwnPiece.e && isOtherPiece.e)
+        || (existOwnPiece.s && isOtherPiece.s) || (existOwnPiece.w && isOtherPiece.w)
+        || (existOwnPiece.ne && isOtherPiece.ne) || (existOwnPiece.se && isOtherPiece.se)
+        || (existOwnPiece.sw && isOtherPiece.sw) || (existOwnPiece.nw && isOtherPiece.nw))) {
       const Piece = new PieceModel(result);
       await Piece.save();
     }
 
-    if (needTurn1.n && needTurn2.n) {
+    if (existOwnPiece.n && isOtherPiece.n) {
       const sort = { x: 'asc', y: 'desc' };
       turnlist.n = sortList(turnlist.n, sort);
       for (let i = 0; i < turnlist.n.length; i += 1) {
@@ -235,7 +235,7 @@ router.route('/')
       }
     }
 
-    if (needTurn1.e && needTurn2.e) {
+    if (existOwnPiece.e && isOtherPiece.e) {
       const sort = { x: 'asc', y: 'asc' };
       turnlist.e = sortList(turnlist.e, sort);
       for (let i = 0; i < turnlist.e.length; i += 1) {
@@ -253,7 +253,7 @@ router.route('/')
       }
     }
 
-    if (needTurn1.s && needTurn2.s) {
+    if (existOwnPiece.s && isOtherPiece.s) {
       const sort = { x: 'asc', y: 'asc' };
       turnlist.s = sortList(turnlist.s, sort);
       for (let i = 0; i < turnlist.s.length; i += 1) {
@@ -271,7 +271,7 @@ router.route('/')
       }
     }
 
-    if (needTurn1.w && needTurn2.w) {
+    if (existOwnPiece.w && isOtherPiece.w) {
       const sort = { x: 'desc', y: 'asc' };
       turnlist.w = sortList(turnlist.w, sort);
       for (let i = 0; i < turnlist.w.length; i += 1) {
@@ -289,7 +289,7 @@ router.route('/')
       }
     }
 
-    if (needTurn1.ne) {
+    if (existOwnPiece.ne) {
       const sort = { x: 'asc', y: 'desc' };
       turnlist.ne = sortList(turnlist.ne, sort);
       for (let i = 0; i < turnlist.ne.length; i += 1) {
@@ -307,7 +307,7 @@ router.route('/')
       }
     }
 
-    if (needTurn1.se) {
+    if (existOwnPiece.se) {
       const sort = { x: 'asc', y: 'asc' };
       turnlist.se = sortList(turnlist.se, sort);
       for (let i = 0; i < turnlist.se.length; i += 1) {
@@ -325,7 +325,7 @@ router.route('/')
       }
     }
 
-    if (needTurn1.sw) {
+    if (existOwnPiece.sw) {
       const sort = { x: 'desc', y: 'asc' };
       turnlist.sw = sortList(turnlist.sw, sort);
       for (let i = 0; i < turnlist.sw.length; i += 1) {
@@ -343,7 +343,7 @@ router.route('/')
       }
     }
 
-    if (needTurn1.nw) {
+    if (existOwnPiece.nw) {
       const sort = { x: 'desc', y: 'desc' };
       turnlist.nw = sortList(turnlist.nw, sort);
       for (let i = 0; i < turnlist.nw.length; i += 1) {
