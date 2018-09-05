@@ -14,22 +14,23 @@ const propfilter = '-_id -__v';
 function reformPiece(d){
   var arry = [...Array(d.length).fill(0)];
   var r = Math.sqrt(d.length);
+  var obj, order;
   for (var i = 0;i<d.length;i+=1){
     if (d[i] !== 0 && !Array.isArray(d[i])){
-      var obj = {
+      obj = {
         x:i%r,
         y:r-Math.floor(i/r)-1,
         userId: +d[i].split(":")[0]
       }
-      var order = +d[i].split(":")[1]-1
+      order = +d[i].split(":")[1]-1
       arry.splice(order,1,obj);
     } else if (d[i] !== 0 && Array.isArray(d[i])){//配列が入っている場合 = 同じ手がある場合
-      var obj = {
+      obj = {
         x:i%r,
         y:r-Math.floor(i/r)-1,
         userId: +d[i][0].split(":")[0]
       }
-      var order = +d[i][0].split(":")[1]-1
+      order = +d[i][0].split(":")[1]-1
       arry.splice(order,1,obj);
     }
   }
