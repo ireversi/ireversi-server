@@ -14,7 +14,7 @@ const propfilter = '-_id -__v';
 function reformPiece(d){
   var arry = [...Array(d.length).fill(0)];
   var r = Math.sqrt(d.length);
-  for (var i = 0;i<d.length;i++){
+  for (var i = 0;i<d.length;i+= 1){
     if (d[i] !== 0){
       var obj = {
         x:i%r,
@@ -31,7 +31,7 @@ function reformPiece(d){
 function reformMatchers (m){
   var arry = [];
   var r = Math.sqrt(m.length);
-  for (var i = 0;i<m.length;i++){
+  for (var i = 0;i<m.length;i += 1){
     var obj = {
       x:i%r,
       y:r-Math.floor(i/r)-1,
@@ -65,7 +65,6 @@ describe('play', () => {
       var rPiece = reformPiece(piece)
       for (let i = 0; i < rPiece.length; i += 1) {
         response = await chai.request(app)
-        // .post(`${basePath}/users`)
         .post(`${basePath}/homework/playing`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(rPiece[i]);

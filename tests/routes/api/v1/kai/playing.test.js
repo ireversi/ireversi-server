@@ -106,7 +106,7 @@ describe('Request piece', () => {
     it('creates pieces', async () => {
       // Given
       const pieces = array2Pieces();
-      const matcher = array2Mathcers();
+      // const matcher = array2Mathcers();
       // console.log(matcher);
 
 
