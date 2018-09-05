@@ -48,32 +48,32 @@ const array2Pieces = () => {
       array.push(elm);
     }
   }
-  console.log(array);
+  // console.log(array);
   return array;
 };
 
 // 理想の配列
-const array2Mathcers = () => {
-  const array = [];
-  const field = [
-    0, 0, 0, 1,
-    0, 0, 1, 0,
-    0, 1, 0, 3,
-    0, 0, 0, 0,
-  ];
-  for (let i = 0; i < field.length; i += 1) { // x, y, userIdを生成する
-    let elm = {}; //
-    if (field[i] !== 0) { // 打ち手が存在するコマのみ
-      const x = i % 4;
-      const y = Math.floor((15 - i) / 4);
-      const userId = field[i];
-      elm = { x, y, userId };
-      array.push(elm);
-    }
-  }
-  console.log(array);
-  return array;
-};
+// const array2Mathcers = () => {
+//   const array = [];
+//   const field = [
+//     0, 0, 0, 1,
+//     0, 0, 1, 0,
+//     0, 1, 0, 3,
+//     0, 0, 0, 0,
+//   ];
+//   for (let i = 0; i < field.length; i += 1) { // x, y, userIdを生成する
+//     let elm = {}; //
+//     if (field[i] !== 0) { // 打ち手が存在するコマのみ
+//       const x = i % 4;
+//       const y = Math.floor((15 - i) / 4);
+//       const userId = field[i];
+//       elm = { x, y, userId };
+//       array.push(elm);
+//     }
+//   }
+//   // console.log(array);
+//   return array;
+// };
 
 
 describe('Request piece', () => {
@@ -106,8 +106,8 @@ describe('Request piece', () => {
     it('creates pieces', async () => {
       // Given
       const pieces = array2Pieces();
-      const matcher = array2Mathcers();
-      console.log(matcher);
+      // const matcher = array2Mathcers();
+      // console.log(matcher);
 
 
       let response;

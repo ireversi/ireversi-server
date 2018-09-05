@@ -1,5 +1,7 @@
+
 const chai = require('chai');
 
+const ZERO0 = 0;
 const propfilter = '-_id -__v';
 // module.exports = () => {
 
@@ -83,8 +85,8 @@ describe('play', () => {
   it('put a piece', async () => {
     // Given
     const pieces = [
-      0, 0,
-      '1:1', 0,
+      ZERO0, ZERO0,
+      '1:1', ZERO0,
     ];
 
     const result = [ // set correct answer
@@ -120,7 +122,7 @@ describe('play', () => {
     // Given
     const pieces = [
       '1:1', '2:2',
-      0, 0,
+      ZERO0, ZERO0,
     ];
 
     const result = [ // set correct answer
@@ -150,12 +152,12 @@ describe('play', () => {
     expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
-  // 同じとFころにおけないテスト
+  // 同じところにおけないテスト
   it('sets pieces same space', async () => {
     // Given
     const pieces = [
       '1:1', ['2:2', '3:1'],
-      0, 0,
+      ZERO0, ZERO0,
     ];
 
     const result = [ // set correct answer
@@ -187,13 +189,13 @@ describe('play', () => {
     expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
-  // 挟んだらめくれるテスト part1
-  it('turn over piece about right and down', async () => {
+  // 挟んだらめくれるテスト（左方向、上方向） part1
+  it('turn over piece about left and up', async () => {
     // Given
     const pieces = [
       '1:1', '2:2', '3:1',
-      '4:2', 0, 0,
-      '5:1', 0, 0,
+      '4:2', ZERO0, ZERO0,
+      '5:1', ZERO0, ZERO0,
     ];
 
     const result = [
@@ -227,12 +229,12 @@ describe('play', () => {
     expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
-  // // 挟んだらめくれるテスト part2
+  // // 挟んだらめくれるテスト part2（右方向、下方向）
   it('turn over piece about left and up', async () => {
     // Given
     const pieces = [
-      0, 0, '5:1',
-      0, 0, '4:2',
+      ZERO0, ZERO0, '5:1',
+      ZERO0, ZERO0, '4:2',
       '3:1', '2:2', '1:1',
     ];
 
@@ -240,6 +242,90 @@ describe('play', () => {
       0, 0, 1,
       0, 0, 1,
       1, 1, 1,
+    ];
+
+    // When
+    let response;
+    const record = convert2PieceRecord(pieces);
+
+    for (let i = 0; i < record.length; i += 1) {
+      let piece = record[i];
+      piece = convertPiece(piece);
+      response = await chai.request(app)
+        .post(`${basePath}/kido_k/piece`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(piece);
+    }
+
+    // Then
+    // check express result
+    const rpieces = convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+    // check mongoDB result
+    const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    expect(pieceData).toHaveLength(rpieces.length);
+    expect(pieceData).toEqual(expect.arrayContaining(rpieces));
+  });
+
+  // 挟んだらめくれるテスト part3
+  it('turn over piece about upper right and lower right', async () => {
+    // Given
+    const pieces = [
+      ZERO0, ZERO0, '3:1', ZERO0,
+      ZERO0, '2:2', ZERO0, ZERO0,
+      '1:1', ZERO0, '4:2', ZERO0,
+      ZERO0, ZERO0, ZERO0, '5:1',
+    ];
+
+    const result = [
+      0, 0, 1, 0,
+      0, 1, 0, 0,
+      1, 0, 1, 0,
+      0, 0, 0, 1,
+    ];
+
+    // When
+    let response;
+    const record = convert2PieceRecord(pieces);
+
+    for (let i = 0; i < record.length; i += 1) {
+      let piece = record[i];
+      piece = convertPiece(piece);
+      response = await chai.request(app)
+        .post(`${basePath}/kido_k/piece`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(piece);
+    }
+
+    // Then
+    // check express result
+    const rpieces = convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+    // check mongoDB result
+    const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    expect(pieceData).toHaveLength(rpieces.length);
+    expect(pieceData).toEqual(expect.arrayContaining(rpieces));
+  });
+
+  // 挟んだらめくれるテスト part4
+  it('turn over piece about upper left and lower left', async () => {
+    // Given
+    const pieces = [
+      ZERO0, '3:1', ZERO0, ZERO0,
+      ZERO0, ZERO0, '2:2', ZERO0,
+      ZERO0, '4:2', ZERO0, '1:1',
+      '5:1', ZERO0, ZERO0, ZERO0,
+    ];
+
+    const result = [
+      0, 1, 0, 0,
+      0, 0, 1, 0,
+      0, 1, 0, 1,
+      1, 0, 0, 0,
     ];
 
     // When

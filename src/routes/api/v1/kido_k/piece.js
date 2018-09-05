@@ -1,4 +1,6 @@
+
 const router = require('express').Router();
+
 const PieceModel = require('../../../../models/kido_k/PieceModel.js');
 
 const propfilter = '-_id -__v';
@@ -68,84 +70,194 @@ router.route('/')
     const turnlist = {
       n: [], ne: [], e: [], se: [], s: [], sw: [], w: [], nw: [],
     };
+    const needTurn = {
+      n: false, ne: false, e: false, se: false, s: false, sw: false, w: false, nw: false,
+    };
+
     for (let i = 0; i < pieces.length; i += 1) {
       const piece = pieces[i];
-
-      if (piece.x === result.x && piece.y < result.y && piece.userid === result.userid) {
+      if (piece.x === result.x && piece.y < result.y) {
+        // console.log('north');
+        if (piece.userid === result.userid) { needTurn.n = true; }
         turnlist.n.push(piece);
-      } else if (piece.x > result.x && piece.y === result.y && piece.userid === result.userid) {
-        console.log('east');
+      } else if (piece.x > result.x && piece.y === result.y) {
+        // console.log('east');
+        if (piece.userid === result.userid) { needTurn.e = true; }
         turnlist.e.push(piece);
-      } else if (piece.x === result.x && piece.y > result.y && piece.userid === result.userid) {
-        console.log('south');
+      } else if (piece.x === result.x && piece.y > result.y) {
+        // console.log('south');
+        if (piece.userid === result.userid) { needTurn.s = true; }
         turnlist.s.push(piece);
-      } else if (piece.x < result.x && piece.y === result.y && piece.userid === result.userid) {
+      } else if (piece.x < result.x && piece.y === result.y) {
+        // console.log('west');
+        if (piece.userid === result.userid) { needTurn.w = true; }
         turnlist.w.push(piece);
-        // } else if (piece.x > result.x && piece.y < result.y && piece.userid !== 0
-        // && (piece.x - result.x) === (piece.y - result.y)) {
-        //   turnlist.ne.push(piece);
-        // } else if (piece.x > result.x && piece.y > result.y && piece.userid !== 0
-        // && (piece.x - result.x) === (piece.y - result.y)) {
-        //   turnlist.se.push(piece);
-        // } else if (piece.x < result.x && piece.y < result.y && piece.userid !== 0
-        //   && (piece.x - result.x) === (piece.y - result.y)) {
-        //   turnlist.sw.push(piece);
-        // } else if (piece.x < result.x && piece.y > result.y && piece.userid !== 0) {
-        //   turnlist.nw.push(piece);
+      } else if (piece.x > result.x && piece.y < result.y
+        && Math.abs(piece.x - result.x) === Math.abs(piece.y - result.y)) {
+        // console.log('northeast');
+        if (piece.userid === result.userid) { needTurn.ne = true; }
+        turnlist.ne.push(piece);
+      } else if (piece.x > result.x && piece.y > result.y
+        && Math.abs(piece.x - result.x) === Math.abs(piece.y - result.y)) {
+        // console.log('southeast');
+        if (piece.userid === result.userid) { needTurn.se = true; }
+        turnlist.se.push(piece);
+      } else if (piece.x < result.x && piece.y > result.y
+        && Math.abs(piece.x - result.x) === Math.abs(piece.y - result.y)) {
+        // console.log('southwest');
+        if (piece.userid === result.userid) { needTurn.sw = true; }
+        turnlist.sw.push(piece);
+      } else if (piece.x < result.x && piece.y < result.y
+        && Math.abs(piece.x - result.x) === Math.abs(piece.y - result.y)) {
+        // console.log('northwest');
+        if (piece.userid === result.userid) { needTurn.nw = true; }
+        turnlist.nw.push(piece);
       }
     }
 
-    if (turnlist.n.length !== 0) {
+    if (needTurn.n) {
       const sort = { x: 'asc', y: 'desc' };
       turnlist.n = sortList(turnlist.n, sort);
-      for (let i = result.y - 1; i > turnlist.n[0].y; i -= 1) {
-        await PieceModel.remove({ x: +turnlist.n[0].x, y: +i });
-        const PieceN = new PieceModel({ x: turnlist.n[0].x, y: i, userid: result.userid });
-        await PieceN.save();
+      for (let i = 0; i < turnlist.n.length; i += 1) {
+        if (turnlist.n[i].userid !== result.userid
+          && turnlist.n[i].x === result.x
+          && turnlist.n[i].y === result.y - (i + 1)) {
+          await PieceModel.remove({ x: +turnlist.n[i].x, y: +turnlist.n[i].y });
+          const PieceN = new PieceModel(
+            { x: turnlist.n[i].x, y: turnlist.n[i].y, userid: result.userid },
+          );
+          await PieceN.save();
+        } else {
+          break;
+        }
       }
     }
 
-    if (turnlist.e.length !== 0) {
+    if (needTurn.e) {
       const sort = { x: 'asc', y: 'asc' };
       turnlist.e = sortList(turnlist.e, sort);
-      for (let i = result.x + 1; i < turnlist.e[0].x; i += 1) {
-        await PieceModel.remove({ x: +i, y: +turnlist.e[0].y });
-        const PieceE = new PieceModel({ x: i, y: turnlist.e[0].y, userid: result.userid });
-        await PieceE.save();
+      for (let i = 0; i < turnlist.e.length; i += 1) {
+        if (turnlist.e[i].userid !== result.userid
+          && turnlist.e[i].x === result.x + (i + 1)
+          && turnlist.e[i].y === result.y) {
+          await PieceModel.remove({ x: +turnlist.e[i].x, y: +turnlist.e[i].y });
+          const PieceE = new PieceModel(
+            { x: turnlist.e[i].x, y: turnlist.e[i].y, userid: result.userid },
+          );
+          await PieceE.save();
+        } else {
+          break;
+        }
       }
     }
 
-    if (turnlist.s.length !== 0) {
+    if (needTurn.s) {
       const sort = { x: 'asc', y: 'asc' };
       turnlist.s = sortList(turnlist.s, sort);
-      for (let i = result.y + 1; i < turnlist.s[0].y; i += 1) {
-        await PieceModel.remove({ x: +turnlist.s[0].x, y: +i });
-        const PieceS = new PieceModel({ x: turnlist.s[0].x, y: i, userid: result.userid });
-        await PieceS.save();
+      for (let i = 0; i < turnlist.s.length; i += 1) {
+        if (turnlist.s[i].userid !== result.userid
+          && turnlist.s[i].x === result.x
+          && turnlist.s[i].y === result.y + (i + 1)) {
+          await PieceModel.remove({ x: +turnlist.s[i].x, y: +turnlist.s[i].y });
+          const PieceS = new PieceModel(
+            { x: turnlist.s[i].x, y: turnlist.s[i].y, userid: result.userid },
+          );
+          await PieceS.save();
+        } else {
+          break;
+        }
       }
     }
 
-    if (turnlist.w.length !== 0) {
+    if (needTurn.w) {
       const sort = { x: 'desc', y: 'asc' };
       turnlist.w = sortList(turnlist.w, sort);
-      for (let i = result.x - 1; i > turnlist.w[0].x; i -= 1) {
-        await PieceModel.remove({ x: +i, y: +turnlist.w[0].y });
-        const PieceW = new PieceModel({ x: i, y: turnlist.w[0].y, userid: result.userid });
-        await PieceW.save();
+      for (let i = 0; i < turnlist.w.length; i += 1) {
+        if (turnlist.w[i].userid !== result.userid
+          && turnlist.w[i].x === result.x - (i + 1)
+          && turnlist.w[i].y === result.y) {
+          await PieceModel.remove({ x: +turnlist.w[i].x, y: +turnlist.w[i].y });
+          const PieceW = new PieceModel(
+            { x: turnlist.w[i].x, y: turnlist.w[i].y, userid: result.userid },
+          );
+          await PieceW.save();
+        } else {
+          break;
+        }
       }
     }
-    // if (turnlist.ne.length !== 0) {
-    //   turnlist.ne = sortList(turnlist.ne);
-    // }
-    // if (turnlist.se.length !== 0) {
-    //   turnlist.se = sortList(turnlist.se);
-    // }
-    // if (turnlist.sw.length !== 0) {
-    //   turnlist.sw = sortList(turnlist.sw);
-    // }
-    // if (turnlist.nw.length !== 0) {
-    //   turnlist.nw = sortList(turnlist.s);
-    // }
+
+    if (needTurn.ne) {
+      const sort = { x: 'asc', y: 'desc' };
+      turnlist.ne = sortList(turnlist.ne, sort);
+      for (let i = 0; i < turnlist.ne.length; i += 1) {
+        if (turnlist.ne[i].userid !== result.userid
+          && turnlist.ne[i].x === result.x + (i + 1)
+          && turnlist.ne[i].y === result.y - (i + 1)) {
+          await PieceModel.remove({ x: +turnlist.ne[i].x, y: +turnlist.ne[i].y });
+          const PieceNE = new PieceModel(
+            { x: turnlist.ne[i].x, y: turnlist.ne[i].y, userid: result.userid },
+          );
+          await PieceNE.save();
+        } else {
+          break;
+        }
+      }
+    }
+
+    if (needTurn.se) {
+      const sort = { x: 'asc', y: 'asc' };
+      turnlist.se = sortList(turnlist.se, sort);
+      for (let i = 0; i < turnlist.se.length; i += 1) {
+        if (turnlist.se[i].userid !== result.userid
+          && turnlist.se[i].x === result.x + (i + 1)
+          && turnlist.se[i].y === result.y + (i + 1)) {
+          await PieceModel.remove({ x: +turnlist.se[i].x, y: +turnlist.se[i].y });
+          const PieceSE = new PieceModel(
+            { x: turnlist.se[i].x, y: turnlist.se[i].y, userid: result.userid },
+          );
+          await PieceSE.save();
+        } else {
+          break;
+        }
+      }
+    }
+
+    if (needTurn.sw) {
+      const sort = { x: 'desc', y: 'asc' };
+      turnlist.sw = sortList(turnlist.sw, sort);
+      for (let i = 0; i < turnlist.sw.length; i += 1) {
+        if (turnlist.sw[i].userid !== result.userid
+          && turnlist.sw[i].x === result.x - (i + 1)
+          && turnlist.sw[i].y === result.y + (i + 1)) {
+          await PieceModel.remove({ x: +turnlist.sw[i].x, y: +turnlist.sw[i].y });
+          const PieceSW = new PieceModel(
+            { x: turnlist.sw[i].x, y: turnlist.sw[i].y, userid: result.userid },
+          );
+          await PieceSW.save();
+        } else {
+          break;
+        }
+      }
+    }
+
+    if (needTurn.nw) {
+      const sort = { x: 'desc', y: 'desc' };
+      turnlist.nw = sortList(turnlist.nw, sort);
+      for (let i = 0; i < turnlist.nw.length; i += 1) {
+        if (turnlist.nw[i].userid !== result.userid
+          && turnlist.nw[i].x === result.x - (i + 1)
+          && turnlist.nw[i].y === result.y - (i + 1)) {
+          await PieceModel.remove({ x: +turnlist.nw[i].x, y: +turnlist.nw[i].y });
+          const PieceNW = new PieceModel(
+            { x: turnlist.nw[i].x, y: turnlist.nw[i].y, userid: result.userid },
+          );
+          await PieceNW.save();
+        } else {
+          break;
+        }
+      }
+    }
     res.json(await PieceModel.find({}, propfilter));
   });
 
