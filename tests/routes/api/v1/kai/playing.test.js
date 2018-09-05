@@ -48,7 +48,7 @@ const array2Pieces = () => {
       array.push(elm);
     }
   }
-  console.log(array);
+  // console.log(array);
   return array;
 };
 
@@ -71,7 +71,7 @@ const array2Mathcers = () => {
       array.push(elm);
     }
   }
-  console.log(array);
+  // console.log(array);
   return array;
 };
 
@@ -107,7 +107,7 @@ describe('Request piece', () => {
       // Given
       const pieces = array2Pieces();
       const matcher = array2Mathcers();
-      console.log(matcher);
+      // console.log(matcher);
 
 
       let response;
