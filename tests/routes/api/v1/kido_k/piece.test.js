@@ -90,7 +90,7 @@ describe('play', () => {
       '1:1', ZERO0,
     ];
 
-    const result = [ // set correct answer
+    const result = [
       0, 0,
       1, 0,
     ];
@@ -126,7 +126,7 @@ describe('play', () => {
       ZERO0, ZERO0,
     ];
 
-    const result = [ // set correct answer
+    const result = [
       1, 2,
       0, 0,
     ];
@@ -161,7 +161,7 @@ describe('play', () => {
       ZERO0, ZERO0,
     ];
 
-    const result = [ // set correct answer
+    const result = [
       1, 2,
       0, 0,
     ];
@@ -485,21 +485,6 @@ describe('play', () => {
   // 場に駒がある場合の駒置きテスト（斜めの4方向チェック） part2
   it('the case about exist own piece, check to turn over four direction', async () => {
     // Given
-    // const pieces = [
-    //   '20:1', '21:1', '5:1', '6:1', '7:1',
-    //   '19:1', '18:5', ZERO0, '2:2', '8:1',
-    //   '17:1', ZERO0, '1:1', ZERO0, '9:1',
-    //   '16:1', '4:4', ZERO0, '3:3', '10:1',
-    //   '15:1', '14:1', '13:1', '12:1', '11:1',
-    // ];
-
-    // const result = [
-    //   1, 0, 0, 0, 1,
-    //   0, 1, 0, 1, 0,
-    //   0, 0, 1, 0, 0,
-    //   0, 1, 0, 1, 0,
-    //   1, 0, 0, 0, 1,
-    // ];
     const pieces = [
       '18:1', ZERO0, ZERO0, ZERO0, '10:1',
       ZERO0, '9:9', '2:2', '6:6', '11:1',
