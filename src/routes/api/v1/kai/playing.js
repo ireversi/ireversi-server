@@ -22,27 +22,23 @@ router.route('/')
 // res.jsonでresponse.bodyに返す
   .post(async (req, res) => {
     const pieces = (await PlayingModel.find({}, propFilter)); // 今存在するpiece
-    console.log(pieces);
-
-    // console.log(req.body);
-
     const Playing = new PlayingModel({ // 今置いたpiece
       x: +req.body.x,
       y: +req.body.y,
       userId: +req.body.userId,
     });
     // 同じところに置けない
-    console.log(Playing);
-
     if (pieces.find(p => p.x === Playing.x && p.y === Playing.y)) {
       res.json(Playing);
       return;
     }
+    console.log(pieces);
+    console.log(Playing);
 
-    // 挟んだらめくれる
+    // // 挟んだらめくれる
     // for (let i = 0; i < dir.length; i++) {
     //   if (pieces.find(p => p.x === Playing.x+dir[i][0] && p.y === Playing.y+dir[i][1])) {
-    //     console.log(Playing.x, Playing.y, Playing.userId);
+
     //   }
     // }
 

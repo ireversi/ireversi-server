@@ -23,27 +23,28 @@ const {
 
 const basePath = '/api/v1';
 const propFilter = '-_id -__v';
-
+let order = []; //  配列順番
 // 与えたい配列
 const array2Pieces = (field) => {
   const array = [];
-  const sqrt = Math.sqrt(field.length);
+  const sqrt = Math.sqrt(field.length); // 平方根
   const fieldExist = field.filter(n => n !== 0); // コマだけを抽出
 
   // 配列をプレイ順で並び替え
   const playOrder = fieldExist.sort((a, b) => (parseInt(a.slice(a.indexOf(':') + 1), 10)) - (parseInt(b.slice(b.indexOf(':') + 1), 10)));
+  // それぞれが元の配列の何番目か
+  order = playOrder.map(n => field.indexOf(n, 0));
+  console.log(order);
 
   let n = 0;
-  for (let i = 0; i < playOrder.length; i += 1) { // x, y, userIdを生成する
-    let elm = {}; //
-    if (playOrder[i] !== 0) { // 打ち手が存在するコマのみ
-      const x = i % sqrt;
-      const y = Math.floor(((field.length - 1) - i) / sqrt);
-      const userId = parseInt(playOrder[n].slice(playOrder[n].indexOf(':') - 1), 10);
-      elm = { x, y, userId };
-      n += 1;
-      array.push(elm);
-    }
+  let elm = {};
+  for (let i = 0; i < order.length; i += 1) { // x, y, userIdを生成する
+    const x = order[i] % sqrt;
+    const y = Math.floor(((field.length - 1) - order[i]) / sqrt);
+    const userId = parseInt(playOrder[n].slice(playOrder[n].indexOf(':') - 1), 10);
+    elm = { x, y, userId };
+    n += 1;
+    array.push(elm);
   }
   return array; // 打ち手の順で生成した配列をreturn
 };
@@ -52,19 +53,16 @@ const array2Pieces = (field) => {
 const array2Mathcers = (field) => {
   const array = [];
   const sqrt = Math.sqrt(field.length);
-  for (let i = 0; i < field.length; i += 1) { // x, y, userIdを生成する
+  for (let i = 0; i < order.length; i += 1) { // x, y, userIdを生成する
     let elm = {}; //
-    if (field[i] !== 0) { // 打ち手が存在するコマのみ
-      const x = i % 4;
-      const y = Math.floor(((field.length - 1) - i) / sqrt);
-      const userId = field[i];
-      elm = { x, y, userId };
-      array.push(elm);
-    }
+    const x = order[i] % 4;
+    const y = Math.floor(((field.length - 1) - order[i]) / sqrt);
+    const userId = field[order[i]];
+    elm = { x, y, userId };
+    array.push(elm);
   }
   return array;
 };
-
 
 describe('Request piece', () => {
   beforeAll(prepareDB);
@@ -104,9 +102,10 @@ describe('Request piece', () => {
           0, 0, 0, 0,
           0, 0, 0, '1:1',
           0, '1:2', '2:4', '1:3',
-          0, '1:7', '2:6', '4:5',
+          0, '1:7', '2:5', '4:6',
         ],
       );
+      // console.log(pieces);
 
       const matcher = array2Mathcers(
         [
@@ -203,52 +202,52 @@ describe('Request piece', () => {
     // x: 0, y: 0, userId: a
     // x: 0, y: 1, userId: b → aに変わる
     // x: 0, y: 2, userId: a
-    //   it('can flip', async () => {
-    //     // Given
-    //     // 与えたい配列
-    //     const pieces = array2Pieces(
-    //       [
-    //         0, 0, 0, '1:3',
-    //         0, 0, '2:2', 0,
-    //         0, '1:1', 0, '3:4',
-    //         0, 0, 0, 0,
-    //       ]
-    //     );
-    //     console.log(pieces);
+    // it('can flip', async () => {
+    //   // Given
+    //   // 与えたい配列
+    //   const pieces = array2Pieces(
+    //     [
+    //       0, 0, 0, '1:3',
+    //       0, 0, '2:2', 0,
+    //       0, '1:1', 0, '3:4',
+    //       0, 0, 0, 0,
+    //     ]
+    //   );
+    //   console.log(pieces);
 
-    //     // 理想の配列
-    //     const matches = array2Mathcers(
-    //       [
-    //         0, 0, 0, 1,
-    //         0, 0, 1, 0,
-    //         0, 1, 0, 3,
-    //         0, 0, 0, 0,
-    //       ]
-    //     );
-    //     console.log(matches);
+    //   // 理想の配列
+    //   const matches = array2Mathcers(
+    //     [
+    //       0, 0, 0, 1,
+    //       0, 0, 1, 0,
+    //       0, 1, 0, 3,
+    //       0, 0, 0, 0,
+    //     ]
+    //   );
+    //   console.log(matches);
 
 
-    //     // When
-    //     let response;
-    //     for (let i = 0; i < pieces.length; i++) {
-    //       response = await chai.request(app)
-    //       .post(`${basePath}/kai/playing`)
-    //       .set('content-type', 'application/x-www-form-urlencoded')
-    //       .send(pieces[i]);
-    //       // console.log(pieces[i]);
-    //     }
+    //   // When
+    //   let response;
+    //   for (let i = 0; i < pieces.length; i++) {
+    //     response = await chai.request(app)
+    //     .post(`${basePath}/kai/playing`)
+    //     .set('content-type', 'application/x-www-form-urlencoded')
+    //     .send(pieces[i]);
+    //     // console.log(pieces[i]);
+    //   }
 
-    //     // Then
-    //     // 配列 === 長さ
-    //     expect(response.body).toHaveLength(matches.length); //expectが希望で、toHaveLengthが現実のデータ
-    //     // 配列 === 入っているものが一緒かどうか
-    //     expect(response.body).toEqual(expect.arrayContaining(matches));
+    //   // Then
+    //   // 配列 === 長さ
+    //   expect(response.body).toHaveLength(matches.length); //expectが希望で、toHaveLengthが現実のデータ
+    //   // 配列 === 入っているものが一緒かどうか
+    //   expect(response.body).toEqual(expect.arrayContaining(matches));
 
-    //     // _id と __v を省いた配列
-    //     const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
-    //     expect(pieceData).toHaveLength(matches.length);
-    //     expect(pieceData).toEqual(expect.arrayContaining(matches));
-    //   });
+    //   // _id と __v を省いた配列
+    //   const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
+    //   expect(pieceData).toHaveLength(matches.length);
+    //   expect(pieceData).toEqual(expect.arrayContaining(matches));
+    // });
   });
 });
 
