@@ -5,7 +5,7 @@
 // module.exports = router;
 
 
-const router = require('express').Router(); //ルーターの役割
+const router = require('express').Router(); // ルーターの役割
 
 router.use('/users', require('./users.js'));
 

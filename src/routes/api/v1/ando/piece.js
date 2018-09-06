@@ -2,6 +2,8 @@ const router = require('express').Router();
 
 const PieceModel = require('../../../../models/ando/PieceModel.js');
 
+const propFilter = '-_id -__v';
+
 router.route('/')
   .post(async (req, res) => {
     const result = {
@@ -9,9 +11,15 @@ router.route('/')
       y: +req.body.y,
       userId: +req.body.userId,
     };
-    const Piece = new PieceModel(result);
-    await Piece.save();
-    res.json([result]);
+
+    if ((await PieceModel.find({ x: result.x, y: result.y })).length === 0) {
+      const Piece = new PieceModel(result);
+      await Piece.save();
+    }
+
+    const allPieces = await PieceModel.find({}, propFilter);
+
+    res.json(allPieces);
   });
 
 module.exports = router;

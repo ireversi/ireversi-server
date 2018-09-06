@@ -17,6 +17,7 @@ function sortData(d){
 }
 
 router.route('/')
+
     .post(async (req, res) => {
         var data = await PlayingModel.find({}, propfilter);
         const result = {
@@ -61,8 +62,6 @@ function checkTurnOver (result, data) {
                     // checkTurnOver (result, data)
                 }
             }
-
-
 
             // // 隣にオセロがない場合
             // if (target && target["userId"]!==result["userId"]){
