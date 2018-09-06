@@ -48,7 +48,18 @@ jobs:
     steps:
       - checkout
 
-      - run: npm i -g now@11.4.1
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - nowcli-11.4.1
+
+      - run: sudo npm i -g now@11.4.1
+
+      - save_cache:
+          paths:
+            - /usr/local/lib/node_modules
+          key: nowcli-11.4.1
+
       - run: now -t ${NOW_TOKEN} remove ireversi-server -y
       - run: now -t ${NOW_TOKEN} --public -e MONGO_URI=@ireversi-mongo-uri -n ireversi-server
       - run: now -t ${NOW_TOKEN} alias
