@@ -45,9 +45,6 @@ jobs:
 
     working_directory: ~/repo
 
-    environment:
-      PATH: ~/.config/yarn/global/node_modules/:$PATH
-
     steps:
       - checkout
 
@@ -63,6 +60,7 @@ jobs:
             - ~/.config/yarn/global/node_modules
           key: nowcli-11.4.1
 
+      - run: set -x PATH $PATH $HOME/.config/yarn/global/node_modules/.bin
       - run: now -t ${NOW_TOKEN} remove ireversi-server -y
       - run: now -t ${NOW_TOKEN} --public -e MONGO_URI=@ireversi-mongo-uri -n ireversi-server
       - run: now -t ${NOW_TOKEN} alias
