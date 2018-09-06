@@ -171,7 +171,7 @@ describe('play', () => {
       expect(response.body).toEqual(expect.arrayContaining(rMatchers));
 
       const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)))
-      console.log(pieces);
+      // console.log(pieces);
       expect(pieces).toHaveLength(matchers.length);
       expect(pieces).toEqual(expect.arrayContaining(rMatchers));
     });
