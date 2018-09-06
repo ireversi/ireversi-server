@@ -4,6 +4,15 @@ const PlayingModel = require('../../../../models/homework/PlayingModel.js');
 
 const propfilter = '-_id -__v';
 
+
+function findMine (data){
+    return data.find(el => el["x"] === nx && el["y"] === ny && el["userId"] === result["userId"]);
+}
+
+function findTarget (data){
+    return copyData.find(el => el["x"] === nx && el["y"] === ny && el["userId"] !== result["userId"]);
+}
+
 function checkTurnOver (result, data) {
     var arry = [];
         for (var dx = -1; dx <= 1; dx+=1) {//x座標の左右範囲
@@ -11,14 +20,14 @@ function checkTurnOver (result, data) {
                 var nx = result["x"] + dx; //確認するx座標
                 var ny = result["y"] + dy; //確認するy座標
                 var copyData = [...data]; //参照渡し防止
-                var target = copyData.find(el => el["x"] === nx && el["y"] === ny && el["userId"] !== result["userId"])
+                var target = findTarget(copyData);
                 if (dx === 0 && dy === 0) {//中央（自身）はスキップ
                     continue;
                 }
                 if (target){
                     nx += dx;
                     ny += dy;
-                    var mine = data.find(el => el["x"] === nx && el["y"] === ny && el["userId"] === result["userId"])
+                    var mine = findMine(data);
                     if (mine){
                         var flipped = JSON.parse(JSON.stringify(target)); //参照渡し防止
                         flipped["userId"] = result["userId"];
