@@ -142,13 +142,13 @@ describe('play', () => {
       const piece = [
         '1:5','3:6','1:7',
         '2:4','1:3','1:8',
-        '1:1','2:2','2:9'
+        '1:1','3:2','2:9'
       ];
 
       const matchers = [
-        1,3,1,
         1,1,1,
-        1,2,2
+        1,1,1,
+        1,3,2
 
       ];
 
@@ -166,13 +166,14 @@ describe('play', () => {
 
 
       // // Then
-      // var rMatchers = reformMatchers(matchers);
-      // expect(response.body).toHaveLength(matchers.length);
-      // expect(response.body).toEqual(expect.arrayContaining(rMatchers));
+      var rMatchers = reformMatchers(matchers);
+      expect(response.body).toHaveLength(matchers.length);
+      expect(response.body).toEqual(expect.arrayContaining(rMatchers));
 
-      // const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)))
-      // expect(pieces).toHaveLength(matchers.length);
-      // expect(pieces).toEqual(expect.arrayContaining(rMatchers));
+      const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)))
+      console.log(pieces);
+      expect(pieces).toHaveLength(matchers.length);
+      expect(pieces).toEqual(expect.arrayContaining(rMatchers));
     });
 
 
