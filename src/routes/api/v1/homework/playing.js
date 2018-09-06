@@ -4,6 +4,33 @@ const PlayingModel = require('../../../../models/homework/PlayingModel.js');
 
 const propfilter = '-_id -__v';
 
+function checkTurnOver (result, data) {
+    var arry = [];
+        for (var dx = -1; dx <= 1; dx+=1) {//x座標の左右範囲
+            for(var dy = -1; dy <= 1; dy+=1) {//y座標の上下範囲
+                var nx = result["x"] + dx; //確認するx座標
+                var ny = result["y"] + dy; //確認するy座標
+                var copyData = [...data]; //参照渡し防止
+                var target = copyData.find(el => el["x"] === nx && el["y"] === ny && el["userId"] !== result["userId"])
+                if (dx === 0 && dy === 0) {//中央（自身）はスキップ
+                    continue;
+                }
+                if (target){
+                    nx += dx;
+                    ny += dy;
+                    var mine = data.find(el => el["x"] === nx && el["y"] === ny && el["userId"] === result["userId"])
+                    if (mine){
+                        var flipped = JSON.parse(JSON.stringify(target)); //参照渡し防止
+                        flipped["userId"] = result["userId"];
+                        arry.push([target,flipped]);
+                        // console.log(result,flipped, mine, "test");
+                    }
+                }
+            }
+        } 
+    return arry;
+};
+
 router.route('/')
 
     .post(async (req, res) => {
@@ -16,9 +43,9 @@ router.route('/')
 
         //めくる処理
 
-        var flipArry = checkTurnOver(result, data);
-        for (var i =0; i<flipArry.length;i+=1){
-            if (flipArry.length != 0){
+        let flipArry = checkTurnOver(result, data);
+        for (let i =0; i<flipArry.length;i+=1){
+            if (flipArry.length !== 0){
                 // console.log(flipArry[0], "function");
                 const add = {//追加する対象の指定
                     x: flipArry[i][1]["x"],
@@ -48,29 +75,4 @@ router.route('/')
 
 module.exports = router;
 
-function checkTurnOver (result, data) {
-    var arry = [];
-        for (var dx = -1; dx <= 1; dx+=1) {//x座標の左右範囲
-            for(var dy = -1; dy <= 1; dy+=1) {//y座標の上下範囲
-                var nx = result["x"] + dx; //確認するx座標
-                var ny = result["y"] + dy; //確認するy座標
-                var copyData = [...data]; //参照渡し防止
-                var target = copyData.find(el => el["x"] === nx && el["y"] === ny && el["userId"] !== result["userId"])
-                if (dx === 0 && dy === 0) {//中央（自身）はスキップ
-                    continue;
-                }
-                if (target){
-                    nx += dx;
-                    ny += dy;
-                    var mine = data.find(el => el["x"] === nx && el["y"] === ny && el["userId"] === result["userId"])
-                    if (mine){
-                        var flipped = JSON.parse(JSON.stringify(target)); //参照渡し防止
-                        flipped["userId"] = result["userId"];
-                        arry.push([target,flipped]);
-                        // console.log(result,flipped, mine, "test");
-                    }
-                }
-            }
-        } 
-    return arry;
-};
+
