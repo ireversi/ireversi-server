@@ -64,9 +64,9 @@ router.route('/')
             flipList.push(flipDir);
           }
           flipList.map((n) => {
-            const abc = n;
-            abc.userId = Put.userId;
-            return abc;
+            const tmp = n;
+            tmp.userId = Put.userId;
+            return tmp;
           });
           break;
         }
