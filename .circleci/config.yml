@@ -60,7 +60,7 @@ jobs:
             - /usr/local/lib/node_modules
           key: nowcli-11.4.1
 
-      - run: now -t ${NOW_TOKEN} remove ireversi-server -y
+      - run: now -t ${NOW_TOKEN} remove ireversi-server -y 2> /dev/null
       - run: now -t ${NOW_TOKEN} --public -e MONGO_URI=@ireversi-mongo-uri -n ireversi-server
       - run: now -t ${NOW_TOKEN} alias
       - run: now -t ${NOW_TOKEN} scale ireversi-server.now.sh 1
