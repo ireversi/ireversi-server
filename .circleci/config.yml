@@ -45,6 +45,9 @@ jobs:
 
     working_directory: ~/repo
 
+    environment:
+      PATH: ~/.config/yarn/global/node_modules/:$PATH
+
     steps:
       - checkout
 
@@ -57,7 +60,7 @@ jobs:
 
       - save_cache:
           paths:
-            - .config/yarn/global/node_modules
+            - ~/.config/yarn/global/node_modules
           key: nowcli-11.4.1
 
       - run: now -t ${NOW_TOKEN} remove ireversi-server -y
