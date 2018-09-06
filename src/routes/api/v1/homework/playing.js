@@ -21,18 +21,17 @@ function checkTurnOver (result, data) {
                 var ny = result["y"] + dy; //確認するy座標
                 var copyData = [...data]; //参照渡し防止
                 var target = findTarget(copyData);
-                if (dx === 0 && dy === 0) {//中央（自身）はスキップ
-                    continue;
-                }
-                if (target){
-                    nx += dx;
-                    ny += dy;
-                    var mine = findMine(data);
-                    if (mine){
-                        var flipped = JSON.parse(JSON.stringify(target)); //参照渡し防止
-                        flipped["userId"] = result["userId"];
-                        arry.push([target,flipped]);
-                        // console.log(result,flipped, mine, "test");
+                if (dx !== 0 && dy !== 0) {//中央（自身）はスキップ
+                    if (target){
+                        nx += dx;
+                        ny += dy;
+                        var mine = findMine(data);
+                        if (mine){
+                            var flipped = JSON.parse(JSON.stringify(target)); //参照渡し防止
+                            flipped["userId"] = result["userId"];
+                            arry.push([target,flipped]);
+                            // console.log(result,flipped, mine, "test");
+                        }
                     }
                 }
             }
