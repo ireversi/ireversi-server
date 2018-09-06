@@ -1,9 +1,0 @@
-{
-  "env": {
-    "NODE_ENV": "production",
-    "URL_ORIGIN": "https://ireversi.now.sh",
-    "MONGO_URI": "@ireversi-mongo-uri"
-  },
-  "alias": "ireversi.now.sh",
-  "name": "ireversi"
-}
