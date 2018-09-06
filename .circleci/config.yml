@@ -48,19 +48,7 @@ jobs:
     steps:
       - checkout
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - nowcli-11.4.1
-
-      - run: yarn global add now@11.4.1
-
-      - save_cache:
-          paths:
-            - ~/.config/yarn/global/node_modules
-          key: nowcli-11.4.1
-
-      - run: set -x PATH $PATH $HOME/.config/yarn/global/node_modules/.bin
+      - run: npm i -g now@11.4.1
       - run: now -t ${NOW_TOKEN} remove ireversi-server -y
       - run: now -t ${NOW_TOKEN} --public -e MONGO_URI=@ireversi-mongo-uri -n ireversi-server
       - run: now -t ${NOW_TOKEN} alias
