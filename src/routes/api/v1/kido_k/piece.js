@@ -39,7 +39,7 @@ function sortList(list, sort) {
       return 0;
     });
   } else {
-    console.log('need setting sort param');
+    // console.log('need setting sort param');
   }
   return list;
 }

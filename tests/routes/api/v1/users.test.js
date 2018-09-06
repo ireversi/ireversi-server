@@ -8,7 +8,7 @@ const chai = require('chai');
 // export default () => {
 
 // };
-// ES6 import 
+// ES6 import
 
 const app = require('../../../../src/routes/app.js');
 const UserModel = require('../../../../src/models/UserModel.js');
@@ -38,13 +38,13 @@ describe('Request users', () => {
       await User.save();
 
       // When
-      const response = await chai.request(app) //expressサーバーに接続
-        .get(`${basePath}/users`) //ajaxで取りに行ってる
-        .query({ name }); //指定URLの設定
+      const response = await chai.request(app) // expressサーバーに接続
+        .get(`${basePath}/users`) // ajaxで取りに行ってる
+        .query({ name }); // 指定URLの設定
 
       // Then
-      expect(response.body).toMatchObject({ //Objectにマッチするかチェック
-        user_id: expect.any(String), //文字列w期待
+      expect(response.body).toMatchObject({ // Objectにマッチするかチェック
+        user_id: expect.any(String), // 文字列w期待
         name,
         email,
         password,
