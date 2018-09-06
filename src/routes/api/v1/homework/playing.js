@@ -7,19 +7,21 @@ const propfilter = '-_id -__v';
 
 function checkTurnOver (result, data) {
     var arry = [];
-        for (var dx = -1; dx <= 1; dx+=1) {//x座標の左右範囲
-            for(var dy = -1; dy <= 1; dy+=1) {//y座標の上下範囲
-                var nx = result["x"] + dx; //確認するx座標
-                var ny = result["y"] + dy; //確認するy座標
-                var copyData = [...data]; //参照渡し防止
-                var target = copyData.find(el => el["x"] === nx && el["y"] === ny && el["userId"] !== result["userId"]);
+        for (let dx = -1; dx <= 1; dx+=1) {//x座標の左右範囲
+            for(let dy = -1; dy <= 1; dy+=1) {//y座標の上下範囲
+                let nx = result["x"] + dx; //確認するx座標
+                let ny = result["y"] + dy; //確認するy座標
+                let copyData = [...data]; //参照渡し防止
+                // eslint-disable-next-line no-loop-func
+                let target = copyData.find(el => el["x"] === nx && el["y"] === ny && el["userId"] !== result["userId"]);
                 if (dx !== 0 && dy !== 0) {//中央（自身）はスキップ
                     if (target){
                         nx += dx;
                         ny += dy;
-                        var mine = data.find(el => el["x"] === nx && el["y"] === ny && el["userId"] === result["userId"]);
+                        // eslint-disable-next-line no-loop-func
+                        let mine = data.find(el => el["x"] === nx && el["y"] === ny && el["userId"] === result["userId"]);
                         if (mine){
-                            var flipped = JSON.parse(JSON.stringify(target)); //参照渡し防止
+                            let flipped = JSON.parse(JSON.stringify(target)); //参照渡し防止
                             flipped["userId"] = result["userId"];
                             arry.push([target,flipped]);
                             // console.log(result,flipped, mine, "test");
@@ -34,7 +36,7 @@ function checkTurnOver (result, data) {
 router.route('/')
 
     .post(async (req, res) => {
-        var data = await PlayingModel.find({}, propfilter);
+        let data = await PlayingModel.find({}, propfilter);
         const result = {
             x: +req.body.x,
             y: +req.body.y,
