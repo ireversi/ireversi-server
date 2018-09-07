@@ -149,14 +149,14 @@ describe('play', () => {
     it('cannon put same cell', async () => {
       // Given
       const pieces = array2Pieces([
-        0, 0, 0, '1:3',
+        0, 0, '1:3', 0,
         0, 0, ['2:2', '8:5'], 0,
         0, '1:1', 0, '3:4',
         0, 0, 0, 0,
       ]);
 
       const matchers = array2Machers([
-        0, 0, 0, 1,
+        0, 0, 1, 0,
         0, 0, 2, 0,
         0, 1, 0, 3,
         0, 0, 0, 0,
@@ -183,6 +183,41 @@ describe('play', () => {
     });
 
     // はさんだらめくれるテスト
+    it('turns over pieces between setting piece and other own pieces', async () => {
+      // Given
+      const pieces = array2Pieces([
+        0, '1:4', 0, '1:8',
+        0, '2:2', '3:6', 0,
+        0, '1:1', '3:3', '1:7',
+        0, 0, 0, '2:5',
+      ]);
+
+      const matchers = array2Machers([
+        0, 1, 0, 1,
+        0, 1, 1, 0,
+        0, 1, 1, 1,
+        0, 0, 0, 2,
+      ]);
+
+      // When
+      let response;
+      for (let i = 0; i < pieces.length; i++) {
+        response = await chai.request(app)
+          .post(`${basePath}/ando/piece`)
+          .set('content-type', 'application/x-www-form-urlencoded')
+          .send(pieces[i]);
+      }
+
+      // Then
+      expect(response.body).toHaveLength(matchers.length);
+      expect(response.body).toEqual(expect.arrayContaining(matchers));
+
+      const propFilter = '-_id -__v';
+
+      const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(matchers.length);
+      expect(pieceData).toMatchObject(expect.arrayContaining(matchers));
+    });
 
     // はなれたとことに置けないテスト（1回目は上下左右）
 
