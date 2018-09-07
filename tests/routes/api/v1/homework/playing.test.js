@@ -14,8 +14,8 @@ const propfilter = '-_id -__v';
 function reformPiece(d) {
   const arry = [...Array(d.length).fill(0)];
   const r = Math.sqrt(d.length);
-  let obj; let
-    order;
+  let obj;
+  let order;
   for (let i = 0; i < d.length; i += 1) {
     if (d[i] !== 0 && !Array.isArray(d[i])) {
       obj = {
@@ -57,10 +57,50 @@ describe('play', () => {
   beforeAll(prepareDB);
   afterEach(deleteAllDataFromDB);
 
+  // ---------------
+  // 駒を置くテスト
+  // ---------------
+
   describe('put piece', () => {
     it('puts piece(s)', async () => {
       const piece = [
         '2:4', '1:3',
+        '1:1', '2:2',
+      ];
+
+      const matchers = [
+        2, 1,
+        1, 2,
+      ];
+
+      // When
+      let response;
+      const rPiece = reformPiece(piece);
+      for (let i = 0; i < rPiece.length; i += 1) {
+        response = await chai.request(app)
+          .post(`${basePath}/homework/playing`)
+          .set('content-type', 'application/x-www-form-urlencoded')
+          .send(rPiece[i]);
+      }
+
+
+      // Then
+      const rMatchers = reformMatchers(matchers);
+      expect(response.body).toHaveLength(matchers.length);
+      expect(response.body).toEqual(expect.arrayContaining(rMatchers));
+
+      const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
+      expect(pieces).toHaveLength(matchers.length);
+      expect(pieces).toEqual(expect.arrayContaining(rMatchers));
+    });
+
+    // ---------------
+    // 同じ場所に置けないテスト
+    // ---------------
+
+    it('puts on same the place', async () => {
+      const piece = [
+        '2:4', ['1:3', '2:5'],
         '1:1', '2:2',
       ];
 
@@ -90,15 +130,23 @@ describe('play', () => {
       expect(pieces).toEqual(expect.arrayContaining(rMatchers));
     });
 
-    it('puts on same the place', async () => {
+
+    // ---------------
+    // 挟んでめくるテスト
+    // ---------------
+
+    it('puts a piece and flips ones', async () => {
       const piece = [
-        '2:4', ['1:3', '2:5'],
-        '1:1', '2:2',
+        '1:5', '1:6', '1:7',
+        '2:4', '1:3', '1:8',
+        '1:1', '2:2', '2:9',
       ];
 
       const matchers = [
-        2, 1,
-        1, 2,
+        1, 1, 1,
+        1, 1, 1,
+        1, 2, 2,
+
       ];
 
       // When
@@ -111,6 +159,7 @@ describe('play', () => {
           .set('content-type', 'application/x-www-form-urlencoded')
           .send(rPiece[i]);
       }
+      // console.log(response.body);
 
 
       // // Then
@@ -119,6 +168,7 @@ describe('play', () => {
       expect(response.body).toEqual(expect.arrayContaining(rMatchers));
 
       const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
+      // console.log(pieces);
       expect(pieces).toHaveLength(matchers.length);
       expect(pieces).toEqual(expect.arrayContaining(rMatchers));
     });
