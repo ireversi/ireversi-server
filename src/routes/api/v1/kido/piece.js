@@ -44,6 +44,12 @@ function sortList(list, sort) {
   return list;
 }
 
+router.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
 router.route('/')
   .post(async (req, res) => {
     const pieces = await PieceModel.find({}, propfilter);
