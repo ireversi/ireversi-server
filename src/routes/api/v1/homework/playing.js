@@ -19,6 +19,7 @@ function checkTurnOver (result, data) {
                 let nx = result["x"] + dx; //確認するx座標
                 let ny = result["y"] + dy; //確認するy座標
                 let copyData = [...data]; //参照渡し防止
+                /* eslint-disable-next-line no-loop-func */
                 let target = copyData.find(el => el["x"] === nx && el["y"] === ny && el["userId"] !== result["userId"]);
                 if (dx === 0 && dy === 0) {//中央（自身）はスキップ
                     continue;
@@ -26,6 +27,7 @@ function checkTurnOver (result, data) {
                     if (target){
                         nx += dx;
                         ny += dy;
+                        /* eslint-disable-next-line no-loop-func */
                         let mine = data.find(el => el["x"] === nx && el["y"] === ny && el["userId"] === result["userId"]);   
                         if (mine){
                             let flipped = JSON.parse(JSON.stringify(target)); //参照渡し防止

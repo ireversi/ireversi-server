@@ -154,7 +154,7 @@ describe('play', () => {
 
       // When
       let response;
-      var rPiece = reformPiece(piece)
+      let rPiece = reformPiece(piece)
       console.log(rPiece);
       for (let i = 0; i < rPiece.length; i+=1) {
 
@@ -167,7 +167,7 @@ describe('play', () => {
 
 
       // // Then
-      var rMatchers = reformMatchers(matchers);
+      const rMatchers = reformMatchers(matchers);
       expect(response.body).toHaveLength(matchers.length);
       expect(response.body).toEqual(expect.arrayContaining(rMatchers));
 
