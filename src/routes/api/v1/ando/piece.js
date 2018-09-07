@@ -70,6 +70,7 @@ router.route('/')
               }
             }
           }
+
         // X軸方向
         } else if (ownPieces[i].y === result.y) {
           // 置いたコマ方のがX方向に大きい
@@ -113,6 +114,7 @@ router.route('/')
               }
             }
           }
+          
         // 斜め方向
         } else if (Math.abs((result.y - ownPieces[i].y) / (result.x - ownPieces[i].x)) === 1) {
           // 置いたコマ方のがY方向に大きい
