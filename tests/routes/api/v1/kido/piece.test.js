@@ -3,20 +3,9 @@ const chai = require('chai');
 
 const ZERO0 = 0;
 const propfilter = '-_id -__v';
-// module.exports = () => {
-
-// }
-// common js
-
-// import chai from 'chai';
-// export default () => {
-
-// };
-// ES6 import
-
 
 const app = require('../../../../../src/routes/app.js');
-const PieceModel = require('../../../../../src/models/kido_k/PieceModel.js');
+const PieceModel = require('../../../../../src/models/kido/PieceModel.js');
 const {
   prepareDB,
   deleteAllDataFromDB,
@@ -103,7 +92,7 @@ describe('play', () => {
       let piece = record[i];
       piece = convertPiece(piece);
       response = await chai.request(app)
-        .post(`${basePath}/kido_k/piece`)
+        .post(`${basePath}/kido/piece`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
@@ -138,7 +127,7 @@ describe('play', () => {
       let piece = record[i];
       piece = convertPiece(piece);
       response = await chai.request(app)
-        .post(`${basePath}/kido_k/piece`)
+        .post(`${basePath}/kido/piece`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
@@ -173,7 +162,7 @@ describe('play', () => {
       let piece = record[i];
       piece = convertPiece(piece);
       response = await chai.request(app)
-        .post(`${basePath}/kido_k/piece`)
+        .post(`${basePath}/kido/piece`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
@@ -213,7 +202,7 @@ describe('play', () => {
       let piece = record[i];
       piece = convertPiece(piece);
       response = await chai.request(app)
-        .post(`${basePath}/kido_k/piece`)
+        .post(`${basePath}/kido/piece`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
@@ -253,7 +242,7 @@ describe('play', () => {
       let piece = record[i];
       piece = convertPiece(piece);
       response = await chai.request(app)
-        .post(`${basePath}/kido_k/piece`)
+        .post(`${basePath}/kido/piece`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
@@ -295,7 +284,7 @@ describe('play', () => {
       let piece = record[i];
       piece = convertPiece(piece);
       response = await chai.request(app)
-        .post(`${basePath}/kido_k/piece`)
+        .post(`${basePath}/kido/piece`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
@@ -337,7 +326,7 @@ describe('play', () => {
       let piece = record[i];
       piece = convertPiece(piece);
       response = await chai.request(app)
-        .post(`${basePath}/kido_k/piece`)
+        .post(`${basePath}/kido/piece`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
@@ -379,7 +368,7 @@ describe('play', () => {
       let piece = record[i];
       piece = convertPiece(piece);
       response = await chai.request(app)
-        .post(`${basePath}/kido_k/piece`)
+        .post(`${basePath}/kido/piece`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
@@ -421,7 +410,7 @@ describe('play', () => {
       let piece = record[i];
       piece = convertPiece(piece);
       response = await chai.request(app)
-        .post(`${basePath}/kido_k/piece`)
+        .post(`${basePath}/kido/piece`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
@@ -465,7 +454,7 @@ describe('play', () => {
       let piece = record[i];
       piece = convertPiece(piece);
       response = await chai.request(app)
-        .post(`${basePath}/kido_k/piece`)
+        .post(`${basePath}/kido/piece`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
@@ -509,7 +498,7 @@ describe('play', () => {
       let piece = record[i];
       piece = convertPiece(piece);
       response = await chai.request(app)
-        .post(`${basePath}/kido_k/piece`)
+        .post(`${basePath}/kido/piece`)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }

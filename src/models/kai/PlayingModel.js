@@ -8,7 +8,7 @@ const PlayingSchema = new Schema({
   x: Number,
   y: Number,
   userId: Number,
-  created: Number,
+  // created: Number,
 });
 
 module.exports = mongoose.model('KaiPlaying', PlayingSchema);
