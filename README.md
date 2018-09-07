@@ -7,3 +7,6 @@
 
 ## Environment Variables
 Show src/config.js  
+
+## API document (staging)
+[iReversi API - Swagger](https://ireversi-server.now.sh/api-docs/v1/)
