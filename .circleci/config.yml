@@ -4,7 +4,7 @@
 #
 version: 2
 jobs:
-  build:
+  test:
     docker:
       # specify the version you desire here
       - image: circleci/node:8.11
@@ -35,6 +35,44 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # run tests!
-      - run: yarn run lint:fix
+      - run: yarn run lint
       - run: yarn test
       - run: yarn run coverage
+
+  staging:
+    docker:
+      - image: circleci/node:8.11
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - nowcli-11.4.1
+
+      - run: sudo npm i -g now@11.4.1 --unsafe-perm
+
+      - save_cache:
+          paths:
+            - /usr/local/lib/node_modules
+          key: nowcli-11.4.1
+
+      - run: now -t ${NOW_TOKEN} remove ireversi-server -y || true
+      - run: now -t ${NOW_TOKEN} --public -e MONGO_URI=@ireversi-mongo-uri -n ireversi-server
+      - run: now -t ${NOW_TOKEN} alias
+      - run: now -t ${NOW_TOKEN} scale ireversi-server.now.sh 1
+
+workflows:
+  version: 2
+  test_and_staging:
+    jobs:
+      - test
+      - staging:
+          requires:
+            - test
+          filters:
+            branches:
+              only: develop

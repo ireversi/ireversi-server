@@ -9,10 +9,7 @@
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon --watch src --watch swagger -e js,yml src/server.js",
-    "start": "node src/server.js",
-    "stop": "now remove ireversi",
-    "deploy": "now && now alias",
-    "scale": "now scale ireversi.now.sh 1",
+    "start": "cross-env NODE_ENV=production node src/server.js",
     "lint": "eslint src tests -f codeframe",
     "lint:fix": "eslint src tests --fix",
     "test": "cross-env NODE_ENV=test jest --coverage",
@@ -56,5 +53,8 @@
     "*.js": [
       "eslint -f codeframe"
     ]
+  },
+  "now": {
+    "alias": "ireversi-server.now.sh"
   }
 }
