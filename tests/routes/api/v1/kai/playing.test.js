@@ -68,54 +68,32 @@ describe('Request piece', () => {
   afterEach(deleteAllDataFromDB);
 
   describe('create', () => {
-    it('creates piece', async () => {
+    it('can flip', async () => {
       // Given
-      const playingMatcher = array2Pieces(
-        [
-          0, 0, '3:3',
-          '5:5', 0, '4:4',
-          '6:6', '2:2', '1:1',
-        ],
-      );
-      console.log(playingMatcher);
-
-
-      const response = await chai.request(app)
-        .post(`${basePath}/kai/playing`)
-        .set('content-type', 'application/x-www-form-urlencoded')
-        .send(playingMatcher);
-
-      // Then
-      expect(response.body).toHaveLength(1);
-      // expect(response.body).toMatchObject(playingMatcher);
-
-      const pieces = await PlayingModel.find();
-      expect(pieces).toHaveLength(1);
-      expect(pieces).toMatchObject({}, propFilter);
-    });
-
-    it('creates pieces', async () => {
-      // Given
+      // 与えたい配列
       const pieces = array2Pieces(
         [
-          0, 0, 0, 0,
-          0, 0, 0, '1:1',
-          0, '1:2', '2:4', '1:3',
-          0, '1:7', '2:5', '4:6',
+          0, 0, '3:4', 0,
+          0, 0, '2:3', 0,
+          0, '1:1', '2:2', 0,
+          0, 0, '3:5', 0,
         ],
       );
       // console.log(pieces);
 
-      const matcher = array2Mathcers(
+      // 理想の配列
+      const matches = array2Mathcers(
         [
-          0, 0, 0, 0,
-          0, 0, 0, 1,
-          0, 1, 1, 1,
-          0, 1, 2, 4,
+          0, 0, 3, 0,
+          0, 0, 3, 0,
+          0, 1, 3, 0,
+          0, 0, 3, 0,
         ],
       );
-      console.log(matcher);
+      // console.log(matches);
 
+
+      // When
       let response;
       for (let i = 0; i < pieces.length; i += 1) {
         response = await chai.request(app)
@@ -126,136 +104,18 @@ describe('Request piece', () => {
 
       // Then
       // 配列 === 長さ
-      expect(response.body).toHaveLength(pieces.length);
+      console.log(response.body);
+
+      expect(response.body).toHaveLength(matches.length); // expectが希望で、toHaveLengthが現実のデータ
       // 配列 === 入っているものが一緒かどうか
-      expect(response.body).toEqual(expect.arrayContaining(pieces));
+      expect(response.body).toEqual(expect.arrayContaining(matches));
 
       // _id と __v を省いた配列
       const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
-      expect(pieceData).toHaveLength(pieces.length);
-      expect(pieceData).toEqual(expect.arrayContaining(pieces));
+      console.log(pieceData);
+
+      expect(pieceData).toHaveLength(matches.length);
+      expect(pieceData).toEqual(expect.arrayContaining(matches));
     });
-
-    // // 同じところに置けない
-    // // 座標に何かがあればエラーを返す
-    // // x, y座標しか使わない
-    // // 投げる配列（同じ箇所に置こうとする）と、動作後の理想の配列を用意
-    // it('cannot put on same cell', async () => {
-    //   // Given
-    //   // 与えたい配列
-    //   // 同じ箇所に置こうとする
-    //   const pieces = [
-    //     {
-    //       x: 0,
-    //       y: 0,
-    //       userId: 1,
-    //     },
-    //     { // ここで同じ場所に置こうとする
-    //       x: 0,
-    //       y: 0,
-    //       userId: 2,
-    //     },
-    //     {
-    //       x: 0,
-    //       y: 1,
-    //       userId: 2,
-    //     },
-    //   ];
-
-    //   // 理想の配列
-    //   const matches = [
-    //     {
-    //       x: 0,
-    //       y: 0,
-    //       userId: 1,
-    //     },
-    //     {
-    //       x: 0,
-    //       y: 1,
-    //       userId: 2,
-    //     },
-    //   ];
-
-    //   // When
-    //   let response;
-    //   for (let i = 0; i < pieces.length; i += 1) {
-    //     response = await chai.request(app)
-    //       .post(`${basePath}/kai/playing`)
-    //       .set('content-type', 'application/x-www-form-urlencoded')
-    //       .send(pieces[i]);
-    //   }
-
-    //   // Then
-    //   // 配列 === 長さ
-    //   expect(response.body).toHaveLength(matches.length); // expectが希望で、toHaveLengthが現実のデータ
-    //   // 配列 === 入っているものが一緒かどうか
-    //   expect(response.body).toEqual(expect.arrayContaining(matches));
-
-    //   // _id と __v を省いた配列
-    //   const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
-    //   expect(pieceData).toHaveLength(matches.length);
-    //   expect(pieceData).toEqual(expect.arrayContaining(matches));
-    // });
-
-    // 挟んだらめくれる
-    // x: 0, y: 0, userId: a
-    // x: 0, y: 1, userId: b → aに変わる
-    // x: 0, y: 2, userId: a
-    // it('can flip', async () => {
-    //   // console.time('あしんく');
-    //   // Given
-    //   // 与えたい配列
-    //   const pieces = array2Pieces(
-    //     [
-    //       0, 0, '3:3', 0,
-    //       0, 0, '2:2', 0,
-    //       0, '1:1', '3:4', 0,
-    //       0, 0, 0, 0,
-    //     ]
-    //   );
-    //   console.log(pieces);
-
-    //   // 理想の配列
-    //   const matches = array2Mathcers(
-    //     [
-    //       0, 0, 3, 0,
-    //       0, 0, 3, 0,
-    //       0, 1, 3, 0,
-    //       0, 0, 0, 0,
-    //     ]
-    //   );
-    //   console.log(matches);
-
-
-    //   // When
-    //   let response;
-    //   for (let i = 0; i < pieces.length; i++) {
-    //     response = await chai.request(app)
-    //     .post(`${basePath}/kai/playing`)
-    //     .set('content-type', 'application/x-www-form-urlencoded')
-    //     .send(pieces[i]);
-    //     // console.timeEnd('あしんく');
-    //   }
-
-    //   // Then
-    //   // 配列 === 長さ
-    //   expect(response.body).toHaveLength(matches.length); //expectが希望で、toHaveLengthが現実のデータ
-    //   // 配列 === 入っているものが一緒かどうか
-    //   expect(response.body).toEqual(expect.arrayContaining(matches));
-
-    //   // _id と __v を省いた配列
-    //   const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
-    //   expect(pieceData).toHaveLength(matches.length);
-    //   // expect(pieceData).toEqual(expect.arrayContaining(matches));
-    // });
   });
 });
-
-// 離れたところにおけない（上下左右隣接）
-// 配列に自分のuserIdが存在しないときに置く
-// 座標上下左右
-// xがプラスマイナス１
-// yがプラスマイナス１の場所に
-// 何かしらがあれば置ける
-// ちゃんとめくれるところにしか置けない
-// 縦横斜めの先に自分のコマがあるかをみにいく
