@@ -4,22 +4,29 @@ const PlayingModel = require('../../../../models/homework/PlayingModel.js');
 
 const propfilter = '-_id -__v';
 
+// function findTarget(copyData,nx,ny,result){
+//     return copyData.find(el => el["x"] === nx && el["y"] === ny && el["userId"] !== result["userId"]);
+// }
+
+function findMine(data, nx,ny,result){
+    return data.find(el => el["x"] === nx && el["y"] === ny && el["userId"] === result["userId"]);   
+}
 
 function checkTurnOver (result, data) {
-    var arry = [];
+    let arry = [];
         for (let dx = -1; dx <= 1; dx+=1) {//x座標の左右範囲
             for(let dy = -1; dy <= 1; dy+=1) {//y座標の上下範囲
                 let nx = result["x"] + dx; //確認するx座標
                 let ny = result["y"] + dy; //確認するy座標
                 let copyData = [...data]; //参照渡し防止
-                // eslint-disable-next-line no-loop-func
                 let target = copyData.find(el => el["x"] === nx && el["y"] === ny && el["userId"] !== result["userId"]);
-                if (dx !== 0 && dy !== 0) {//中央（自身）はスキップ
+                if (dx === 0 && dy === 0) {//中央（自身）はスキップ
+                    continue;
+                } else {
                     if (target){
                         nx += dx;
                         ny += dy;
-                        // eslint-disable-next-line no-loop-func
-                        let mine = data.find(el => el["x"] === nx && el["y"] === ny && el["userId"] === result["userId"]);
+                        let mine = data.find(el => el["x"] === nx && el["y"] === ny && el["userId"] === result["userId"]);   
                         if (mine){
                             let flipped = JSON.parse(JSON.stringify(target)); //参照渡し防止
                             flipped["userId"] = result["userId"];

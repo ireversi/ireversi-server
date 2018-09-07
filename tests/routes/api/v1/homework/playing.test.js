@@ -140,22 +140,22 @@ describe('play', () => {
     it('puts a piece and flips ones', async () => {
 
       const piece = [
-        '1:5','3:6','1:7',
+        '1:5','1:6','1:7',
         '2:4','1:3','1:8',
-        '1:1','3:2','2:9'
+        '1:1','2:2','2:9'
       ];
 
       const matchers = [
         1,1,1,
         1,1,1,
-        1,3,2
+        1,2,2
 
       ];
 
       // When
       let response;
       var rPiece = reformPiece(piece)
-      // console.log(rPiece);
+      console.log(rPiece);
       for (let i = 0; i < rPiece.length; i+=1) {
 
         response = await chai.request(app)
@@ -163,6 +163,7 @@ describe('play', () => {
           .set('content-type', 'application/x-www-form-urlencoded')
           .send(rPiece[i]);
       }
+      console.log(response.body);
 
 
       // // Then
