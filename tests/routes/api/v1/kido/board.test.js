@@ -1,9 +1,6 @@
 
 const chai = require('chai');
 
-const ZERO0 = 0;
-const propfilter = '-_id -__v';
-
 const app = require('../../../../../src/routes/app.js');
 const PieceModel = require('../../../../../src/models/kido/PieceModel.js');
 const {
@@ -49,11 +46,10 @@ describe('board', () => {
     await Promise.all(matchers.map(m => PieceModel(m).save()));
 
     // When
-    let response = await chai.request(app).get(`${basePath}/kido/board`);
+    const response = await chai.request(app).get(`${basePath}/kido/board`);
 
     // Then
     expect(response.body).toHaveLength(matchers.length);
     expect(response.body).toEqual(expect.arrayContaining(matchers));
-
   });
 });
