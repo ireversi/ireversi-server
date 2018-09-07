@@ -1,7 +1,7 @@
 
 const router = require('express').Router();
 
-const PieceModel = require('../../../../models/kido_k/PieceModel.js');
+const PieceModel = require('../../../../models/kido/PieceModel.js');
 
 const propfilter = '-_id -__v';
 
