@@ -114,7 +114,7 @@ router.route('/')
               }
             }
           }
-          
+
         // 斜め方向
         } else if (Math.abs((result.y - ownPieces[i].y) / (result.x - ownPieces[i].x)) === 1) {
           // 置いたコマ方のがY方向に大きい
