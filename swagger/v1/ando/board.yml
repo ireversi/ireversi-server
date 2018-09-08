@@ -1,0 +1,29 @@
+tags:
+  - name: board
+    description: Board API
+
+/ando/board:
+  get:
+    tags:
+      - board
+    summary: "Return All Pieces on the board"
+    responses:
+      200:
+        description: "Board data"
+        schema:
+          type: array
+          items:
+            type: "object"
+            properties:
+              x:
+                type: "integer"
+                format: "int64"
+                example: 1
+              y:
+                type: "integer"
+                format: "int64"
+                example: 1
+              userId:
+                type: "integer"
+                format: "int64"
+                example: 1
