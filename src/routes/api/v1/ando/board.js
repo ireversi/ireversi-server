@@ -4,10 +4,14 @@ const PieceModel = require('../../../../models/ando/PieceModel.js');
 
 const propFilter = '-_id -__v';
 
+router.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
 router.route('/')
   .get(async (req, res) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     res.json(await PieceModel.find({}, propFilter));
   });
 
