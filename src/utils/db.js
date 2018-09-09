@@ -63,10 +63,15 @@ module.exports = {
     if (nodeEnv !== 'test') throw new Error('You can drop db on test mode only');
 
     if (!isDBPrepared) {
-      isDBPrepared = true;
+      isDBPrepared = true; // 一回だけ立てれるように
 
-      const mongod = new MongoMemoryServer();
+      const mongod = new MongoMemoryServer(); // メモリー上で起動するサーバー
       const conn = mongoose.connect(await mongod.getConnectionString(), {
+        // testのときにMongoDB使うと不安定になるかも
+        // ローカルで動くMongoDB作ったほうがいい
+        // npm installで設定を済ます方法はないか
+        // → require('mongodb-memory-server'); [db.js]
+        // jestの公式にも書いてある
         useNewUrlParser: true,
         autoReconnect: true,
         reconnectTries: Number.MAX_VALUE,
@@ -80,6 +85,8 @@ module.exports = {
     }
   },
   async deleteAllDataFromDB() {
+    // testやる度にデータが残っていると、前のテストの結果が影響を残る可能性がある
+    // testは並列ではなく、直列でひとつひとつ試す。独立したテストを行うことができる
     if (nodeEnv !== 'test') throw new Error('You can drop db on test mode only');
 
     await mongoose.connection.dropDatabase();

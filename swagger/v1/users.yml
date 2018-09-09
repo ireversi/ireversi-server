@@ -1,8 +1,8 @@
-tags:
-  - name: users
-    description: Users API
+tags: #:(コロン)は{}の 配列
+  - name: users #-(ハイフン)は[]の配列
+    description: Users API #:(コロン)のあとは文字列
 
-/users:
+/users: #api/viの後に付いているルート（/users）
   get:
     tags:
       - users
@@ -13,7 +13,7 @@ tags:
         required: true
         type: "string"
     responses:
-      200:
+      200: # 404的なやつ
         description: "success"
         schema:
           type: "object"

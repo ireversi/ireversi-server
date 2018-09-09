@@ -1,10 +1,9 @@
 const router = require('express').Router();
 
 const UserModel = require('../../../models/UserModel.js');
-
-router.route('/')
-  .get(async (req, res) => {  //reqに全ての情報が入ってきている。resで返している
-    res.json(await UserModel.findOne({ name: req.query.name }));  //mongodbからfindOneする。連想配列で帰ってくる。
+router.route('/') //最後の処理として受け止める
+  .get(async (req, res) => { //reqで受け、resで返す.HTTP接続のルール
+    res.json(await UserModel.findOne({ name: req.query.name }));//users.test.jsのbodyに戻る
   })
   .post(async (req, res) => {
     const User = new UserModel({

@@ -10,6 +10,21 @@ const {
 
 const basePath = '/api/v1';
 
+function array2pieces(){
+  const 
+
+
+
+
+
+}
+
+
+
+
+
+
+
 describe('play', () => {
   beforeAll(prepareDB);   //全てのテストをやる前に1回だけ呼ばれる。
   afterEach(deleteAllDataFromDB);
