@@ -79,7 +79,6 @@ describe('Request piece', () => {
           0, 0, '3:5', 0,
         ],
       );
-      // console.log(pieces);
 
       // 理想の配列
       const matches = array2Mathcers(
@@ -90,8 +89,6 @@ describe('Request piece', () => {
           0, 0, 3, 0,
         ],
       );
-      // console.log(matches);
-
 
       // When
       let response;
@@ -104,15 +101,12 @@ describe('Request piece', () => {
 
       // Then
       // 配列 === 長さ
-      console.log(response.body);
-
       expect(response.body).toHaveLength(matches.length); // expectが希望で、toHaveLengthが現実のデータ
       // 配列 === 入っているものが一緒かどうか
       expect(response.body).toEqual(expect.arrayContaining(matches));
 
       // _id と __v を省いた配列
       const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
-      console.log(pieceData);
 
       expect(pieceData).toHaveLength(matches.length);
       expect(pieceData).toEqual(expect.arrayContaining(matches));
