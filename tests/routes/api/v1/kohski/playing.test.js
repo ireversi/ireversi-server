@@ -10,20 +10,73 @@ const {
 
 const basePath = '/api/v1';
 
-function array2pieces(){
-  const 
 
+function array2pieces(test_case){
+  //check whether given 2d array is square or not
+  let y_length = test_case.length;
+  let x_length = 0;
+  let square_length =0;
+  test_case.forEach(element=>{
+      temp_lebgth = element.length
+      if(temp_lebgth>x_length){
+          x_length=temp_lebgth;
+      };
+  });
+  if(x_length!==y_length){
+      return false;   //escape this function
+  }else{
+      square_length = x_length;　//adopt the square length
+  }
 
+  //clowring each elements
+  let count=0;
+  let temp_result = [];
+  test_case.forEach(row => {
+      row.forEach(column=>{
+          if(typeof(column)==="object"){
+              column.forEach(piece=>{
+                  temp_result.push([count,piece]);
+              });
+          }else{
+              temp_result.push([count,column]);
+          };
+          count++;
+      });
+  });
 
+  //processing temp_result
+  let result = [];
+  temp_result.forEach(element=>{
+      let index = Number(element[0]);
+      let x = index%square_length; 
+      let y = Math.floor(index/square_length);
+      let piece = element[1];
 
+      if(typeof(piece)==="string"){
+          let userID = Number(piece.split(":")[0]);
+          let turn  = Number(piece.split(":")[1]);
+          let temp_obj = {"x":x,"y":y,"userID":userID,"turn":turn};
+          result.push(temp_obj);
+      }else if(typeof(piece)==="number" && piece !== 0){
+          userID = piece;
+          temp_obj = {"x":x,"y":y,"userID":userID};
+          result.push(temp_obj);
+      };
+  });
 
-}
+  //sort temp_result by turn
+  result.sort(function(a,b){
+      if(a.turn<b.turn) return -1;
+      if(a.turn > b.turn) return 1;
+      return 0;
+  });
 
-
-
-
-
-
+  //delete property"turn"
+  result.forEach(element =>{
+      delete element.turn
+  })
+  return  result 
+};
 
 describe('play', () => {
   beforeAll(prepareDB);   //全てのテストをやる前に1回だけ呼ばれる。
@@ -33,48 +86,56 @@ describe('play', () => {
   describe('put piece', () => {
     it('puts a piece', async () => {
       // Given
-      const piece ={
-        x:0,
-        y:0,
-        userID:1
-      };
-      
+      const piece = array2pieces(
+        [
+          ["1:1",0],
+          [0,0]
+        ]
+      );
+      const matchers = array2pieces(
+        [
+          [1,0],
+          [0,0]
+        ]
+      );
+
       // When
       const response = await chai.request(app)
         .post(`${basePath}/kohski/playing`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(piece);
+        .send(piece[0]);
 
       // Then
-      expect(response.body).toHaveLength(1);
-      expect(response.body[0]).toMatchObject(piece);
+      expect(response.body).toHaveLength(piece.length);
+      expect(response.body).toMatchObject(matchers);
 
       const pieces = await PlayingModel.find({});
-      expect(pieces).toHaveLength(1);
-      expect(pieces[0]).toMatchObject(piece);
+      expect(pieces).toHaveLength(piece.length);
+      expect(pieces).toMatchObject(matchers);
     });
   });
 
 
   it('puts a piece', async () => {
     // Given
-    const pieces =[
-    {
-      x:0,
-      y:0,
-      userID:1
-    },
-    {
-      x:1,
-      y:1,
-      userID:2
-    }
-    ];
+    const pieces = array2pieces(
+      [
+        ['1:1','2:2'],
+        [0,0]
+      ]
+    );
     
+    const matchers = array2pieces(
+      [
+        [1,2],
+        [0,0]
+      ]
+    );
+
     // When
     let response;
 
-    for(let i = 0; i<pieces.length; i++){
+    for(let i = 0; i<pieces.length; i+=1){
       response = await chai.request(app)
       .post(`${basePath}/kohski/playing`)
       .set('content-type', 'application/x-www-form-urlencoded')
@@ -82,56 +143,34 @@ describe('play', () => {
     }
 
     // Then　expressからの配列
-    //配列===長さ
     expect(response.body).toHaveLength(pieces.length);
-    //配列===配列
-    expect(response.body).toEqual(expect.arrayContaining(pieces));
+    expect(response.body).toEqual(expect.arrayContaining(matchers));
 
-    //
+    //mongodbの検証
     const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({},propFilter)));
     expect(pieceData).toHaveLength(pieces.length);
-    expect(pieceData).toEqual(expect.arrayContaining(pieces));
+    expect(pieceData).toEqual(expect.arrayContaining(matchers));
   });
 
   //同じところに置けないテスト
   it('cannot be put on same place', async () => {
     // Given
-    const pieces =[
-    {
-      x:0,
-      y:0,
-      userID:1
-    },
-    {
-      x:0,
-      y:0,
-      userID:2
-    },
-    {
-      x:1,
-      y:1,
-      userID:3
-    }
-    ];
-    
-    const matchers = [
-      {
-        x:0,
-        y:0,
-        userID:1
-      },
-      {
-        x:1,
-        y:1,
-        userID:3
-      }
-    ];
+    const pieces =array2pieces(
+    [[["1:1","2:2"],0],
+     ["3:3",0]]);
 
+
+    const matchers = array2pieces(
+      [
+        [1,0],
+        [3,0]
+      ]
+    );
 
     // When
     let response;
 
-    for(let i = 0; i<pieces.length; i++){
+    for(let i = 0; i<pieces.length; i+=1){
       response = await chai.request(app)
       .post(`${basePath}/kohski/playing`)
       .set('content-type', 'application/x-www-form-urlencoded')

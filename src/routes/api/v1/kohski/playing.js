@@ -8,10 +8,12 @@ router.route('/')
   .post(async(req, res) => {
     const pieces = await PlayingModel.find({},propFilter);
     const result = {
-      x:+req.body.x,
-      y:+req.body.y,
-      userID:+req.body.userID
+      x: +req.body.x,
+      y: +req.body.y,
+      userID: +req.body.userID
     }
+    
+    console.log(result);
 
     if(pieces.find(p => p.x ===result.x && p.y === result.y)){
       res.json(pieces);
