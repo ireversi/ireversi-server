@@ -6,9 +6,9 @@ const { Schema } = mongoose;
 // const createUUID = require('../../utils/createUUID.js');
 
 const PlayingSchema = new Schema({
-  x:Number,
-  y:Number,
-  userID:Number,
+  x: Number,
+  y: Number,
+  userID: Number,
 });
 
 // // eslint-disable-next-line func-names

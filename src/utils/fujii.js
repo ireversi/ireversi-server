@@ -1,3 +1,1 @@
-module.exports =()=>  {
-    return 6;
-};
+module.exports = () => 6;

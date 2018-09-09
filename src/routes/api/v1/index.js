@@ -5,10 +5,10 @@
 // module.exports = router;
 
 
-const router = require('express').Router(); //ルーターの役割
+const router = require('express').Router(); // ルーターの役割
 
-router.use('/users', require('./users.js'));    //.../usersにマッチしたらrequireする
-router.use('/kohski/playing', require('./kohski/playing.js'));  //.../kohski/playingにマッチしたらrequireする
+router.use('/users', require('./users.js')); // .../usersにマッチしたらrequireする
+router.use('/kohski/playing', require('./kohski/playing.js')); // .../kohski/playingにマッチしたらrequireする
 
 router.use('/homework/playing', require('./homework/playing.js'));
 router.use('/matsui/playing', require('./matsui/playing.js'));
