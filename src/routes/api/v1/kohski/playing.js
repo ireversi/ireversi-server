@@ -12,7 +12,7 @@ router.route('/')
       userID: +req.body.userID,
     };
 
-    console.log(result);
+    // console.log(result);
 
     if (pieces.find(p => p.x === result.x && p.y === result.y)) {
       res.json(pieces);

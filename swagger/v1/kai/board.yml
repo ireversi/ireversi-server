@@ -1,0 +1,41 @@
+tags:
+  - name: kai-board
+    description: Kai's Board API
+
+/kai/board:
+  get:
+    tags:
+      - kai-board
+    parameters:
+      - name: "x"
+        in: "formData"
+        description: "x info"
+        required: true
+        type: "number"
+      - name: "y"
+        in: "formData"
+        description: "y info"
+        required: true
+        type: "number"
+      - name: "userId"
+        in: "formData"
+        description: "your userId"
+        required: true
+        type: "number"
+    responses:
+      200: # 404的なやつ
+        description: "success"
+        schema:
+          type: "array"
+          items:
+            type: object
+            properties:
+              x:
+                type: number
+                example: 1
+              y:
+                type: number
+                example: 1
+              userId:
+                type: number
+                example: 1
