@@ -64,9 +64,13 @@ router.route('/')
       }
     }
 
-    const Piece = new PlayingModel(result); // 今置いたピースのコピー
-    await Piece.save();
-    res.json(await PlayingModel.find({}, propfilter)); // 全体のデータを取ってくる
+    if (data.find(el => el.x === result.x && el.y === result.y)) {
+      res.json(await PlayingModel.find({}, propfilter)); // 全体のデータを取ってくる
+    } else {
+      const Piece = new PlayingModel(result); // 今置いたピースのコピー
+      await Piece.save();
+      res.json(await PlayingModel.find({}, propfilter)); // 全体のデータを取ってくる
+    }
   });
 
 module.exports = router;

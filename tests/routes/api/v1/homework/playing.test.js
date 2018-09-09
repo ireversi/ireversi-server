@@ -112,13 +112,13 @@ describe('play', () => {
       // When
       let response;
       const rPiece = reformPiece(piece);
+      // console.log(rPiece);
       for (let i = 0; i < rPiece.length; i += 1) {
         response = await chai.request(app)
           .post(`${basePath}/homework/playing`)
           .set('content-type', 'application/x-www-form-urlencoded')
           .send(rPiece[i]);
       }
-
 
       // // Then
       const rMatchers = reformMatchers(matchers);
