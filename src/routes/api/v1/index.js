@@ -19,5 +19,6 @@ router.use('/ando/piece', require('./ando/piece.js'));
 router.use('/kido/piece', require('./kido/piece.js'));
 
 router.use('/kai/playing', require('./kai/playing.js'));
+router.use('/kai/board', require('./kai/board.js'));
 
 module.exports = router;
