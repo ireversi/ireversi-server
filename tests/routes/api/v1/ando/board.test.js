@@ -105,7 +105,7 @@ describe('board', () => {
 
       // Then
       expect(body).toHaveLength(matchers.length);
-      expect(body).toEqual(matchers);
+      expect(body).toMatchObject(matchers);
     });
   });
 });
