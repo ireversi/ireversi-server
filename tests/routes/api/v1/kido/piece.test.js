@@ -219,7 +219,7 @@ describe('play', () => {
     expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
-  // // 挟んだらめくれるテスト part2（右方向、下方向）
+  // 挟んだらめくれるテスト part2（右方向、下方向）
   it('turn over piece about left and up', async () => {
     // Given
     const pieces = [
@@ -260,7 +260,7 @@ describe('play', () => {
   });
 
   // 挟んだらめくれるテスト part3
-  it('turn over piece about upper right and lower right', async () => {
+  it('turn over piece about upper left and lower left', async () => {
     // Given
     const pieces = [
       ZERO0, ZERO0, '4:1', ZERO0,
@@ -301,8 +301,8 @@ describe('play', () => {
     expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
-  // 挟んだらめくれるテスト part4
-  it('turn over piece about upper left and lower left', async () => {
+  // // 挟んだらめくれるテスト part4
+  it('turn over piece about upper right and lower right', async () => {
     // Given
     const pieces = [
       ZERO0, '4:1', ZERO0, ZERO0,
@@ -427,7 +427,7 @@ describe('play', () => {
     expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
-  // 場に駒がある場合の駒置きテスト（上下左右チェック） part1
+  // // 場に駒がある場合の駒置きテスト（上下左右チェック） part1
   it('the case about exist own piece, check to turn over four direction', async () => {
     // Given
     const pieces = [
