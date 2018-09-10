@@ -23,5 +23,4 @@ router.use('/kai/playing', require('./kai/playing.js'));
 router.use('/kai/board', require('./kai/board.js'));
 router.use('/kohski/playing', require('./kohski/playing.js'));
 
-
 module.exports = router;
