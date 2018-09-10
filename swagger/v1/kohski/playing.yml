@@ -11,17 +11,17 @@ tags:
         in: "query"
         description: "x axis"
         required: true
-        type: "Number"
+        type: "number"
       - name: "y"
         in: "query"
         description: "y axis"
         required: true
-        type: "Number"
+        type: "number"
       - name: "userID"
         in: "query"
         description: "user ID"
         required: true
-        type: "Number"
+        type: "number"
     responses:
       200:
         description: "array"
