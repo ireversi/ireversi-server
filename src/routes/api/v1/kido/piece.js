@@ -6,24 +6,24 @@ const PieceModel = require('../../../../models/kido/PieceModel.js');
 const propfilter = '-_id -__v';
 
 function sortList(list, sort) {
-    list.sort((a, b) => {
-      if (a.x < b.x) return -1 * sort.x;
-      if (a.x > b.x) return 1 * sort.x;
-      if (a.y < b.y) return -1 * sort.y;
-      if (a.y > b.y) return 1 * sort.y;
-      return 0;
-    });
+  list.sort((a, b) => {
+    if (a.x < b.x) return -1 * sort.x;
+    if (a.x > b.x) return 1 * sort.x;
+    if (a.y < b.y) return -1 * sort.y;
+    if (a.y > b.y) return 1 * sort.y;
+    return 0;
+  });
   return list;
 }
 
-async function turnOverPiece(list, result){
-  var check = true;
+async function turnOverPiece(list, result) {
+  let check = true;
   await new PieceModel(result).save();
-  await Promise.all(list.map( async(p) => {
-    if( p.userid !== result.userid && check){
-      await PieceModel.update({x: p.x, y: p.y }, {$set:{userid: + result.userid}});
-    } else{
-        check = false;
+  await Promise.all(list.map(async (p) => {
+    if (p.userid !== result.userid && check) {
+      await PieceModel.update({ x: p.x, y: p.y }, { $set: { userid: result.userid } });
+    } else {
+      check = false;
     }
   }));
 }
@@ -37,7 +37,7 @@ router.use((req, res, next) => {
 
 router.route('/')
   .post(async (req, res) => {
-    const pieces = await PieceModel.find({}, propfilter).sort({x: 1, y: 1});
+    const pieces = await PieceModel.find({}, propfilter).sort({ x: 1, y: 1 });
     const result = {
       x: +req.body.x,
       y: +req.body.y,
@@ -67,59 +67,59 @@ router.route('/')
     const turnlist = {
       n: [], e: [], s: [], w: [], ne: [], se: [], sw: [], nw: [],
     };
-    let isOtherPiece = {
+    const isOtherPiece = {
       n: false, e: false, s: false, w: false, ne: false, se: false, sw: false, nw: false,
     };
-    let isOwnPiece = {
+    const isOwnPiece = {
       n: false, e: false, s: false, w: false, ne: false, se: false, sw: false, nw: false,
     };
 
     // make list to turn over about eight direction from recent one
-    await Promise.all( pieces.map( p => {
+    await Promise.all(pieces.map(async (p) => {
       if (p.x === result.x && p.y < result.y) {
         if (p.y === result.y - 1 && p.userid !== result.userid) { isOtherPiece.n = true; }
-        if (p.userid === result.userid)  { isOwnPiece.n = true; }
+        if (p.userid === result.userid) { isOwnPiece.n = true; }
         turnlist.n.push(p);
       } else if (p.x > result.x && p.y === result.y) {
         if (p.x === result.x + 1 && p.userid !== result.userid) { isOtherPiece.e = true; }
-        if (p.userid === result.userid)  { isOwnPiece.e = true; }
+        if (p.userid === result.userid) { isOwnPiece.e = true; }
         turnlist.e.push(p);
       } else if (p.x === result.x && p.y > result.y) {
         if (p.y === result.y + 1 && p.userid !== result.userid) { isOtherPiece.s = true; }
-        if (p.userid === result.userid)  { isOwnPiece.s = true; }
+        if (p.userid === result.userid) { isOwnPiece.s = true; }
         turnlist.s.push(p);
       } else if (p.x < result.x && p.y === result.y) {
         if (p.x === result.x - 1 && p.userid !== result.userid) { isOtherPiece.w = true; }
-        if (p.userid === result.userid)  { isOwnPiece.w = true; }
+        if (p.userid === result.userid) { isOwnPiece.w = true; }
         turnlist.w.push(p);
       } else if (p.x > result.x && p.y < result.y
         && Math.abs(p.x - result.x) === Math.abs(p.y - result.y)) {
         if (p.x === result.x + 1 && p.y === result.y - 1
           && p.userid !== result.userid) { isOtherPiece.ne = true; }
-        if (p.userid === result.userid)  { isOwnPiece.ne = true; }
+        if (p.userid === result.userid) { isOwnPiece.ne = true; }
         turnlist.ne.push(p);
       } else if (p.x > result.x && p.y > result.y
         && Math.abs(p.x - result.x) === Math.abs(p.y - result.y)) {
         if (p.x === result.x + 1 && p.y === result.y + 1
           && p.userid !== result.userid) { isOtherPiece.se = true; }
-        if (p.userid === result.userid)  { isOwnPiece.se = true; }
+        if (p.userid === result.userid) { isOwnPiece.se = true; }
         turnlist.se.push(p);
       } else if (p.x < result.x && p.y > result.y
         && Math.abs(p.x - result.x) === Math.abs(p.y - result.y)) {
         if (p.x === result.x - 1 && p.y === result.y + 1
           && p.userid !== result.userid) { isOtherPiece.sw = true; }
-        if (p.userid === result.userid)  { isOwnPiece.sw = true; }
+        if (p.userid === result.userid) { isOwnPiece.sw = true; }
         turnlist.sw.push(p);
       } else if (p.x < result.x && p.y < result.y
         && Math.abs(p.x - result.x) === Math.abs(p.y - result.y)) {
         if (p.x === result.x - 1 && p.y === result.y - 1
           && p.userid !== result.userid) { isOtherPiece.nw = true; }
-        if (p.userid === result.userid)  { isOwnPiece.nw = true; }
+        if (p.userid === result.userid) { isOwnPiece.nw = true; }
         turnlist.nw.push(p);
       }
     }));
 
-    //set first piece for several user
+    // set first piece for several user
     if (!existPiece && (isOtherPiece.n || isOtherPiece.e || isOtherPiece.s || isOtherPiece.w)) {
       await new PieceModel(result).save();
       return res.json(await PieceModel.find({}, propfilter));
@@ -144,7 +144,7 @@ router.route('/')
         await turnOverPiece(list, result);
       }
     }));
-    res.json(await PieceModel.find({}, propfilter));
+    return res.json(await PieceModel.find({}, propfilter));
   });
 
 module.exports = router;
