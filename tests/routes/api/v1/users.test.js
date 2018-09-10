@@ -38,7 +38,7 @@ describe('Request users', () => {
       await User.save();
 
       // When
-      const response = await chai.request(app) // expressサーバーに接続
+      const response = await chai.request(app)
         .get(`${basePath}/users`) // ajaxで取りに行ってる
         .query({ name }); // 指定URLの設定
 
