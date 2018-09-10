@@ -11,9 +11,9 @@
     "dev": "cross-env NODE_ENV=development nodemon --watch src --watch swagger -e js,yml src/server.js",
     "start": "cross-env NODE_ENV=production node src/server.js",
     "lint": "eslint src tests -f codeframe",
+    "lint:fix": "eslint src tests --fix",
     "test": "cross-env NODE_ENV=test jest --coverage",
     "test:watch": "cross-env NODE_ENV=test jest --watch",
-    "lint:fix": "eslint src tests --fix",
     "coverage": "codecov"
   },
   "author": "m-mitsuhide <m.mitsuhide@amatelus.com>",
@@ -27,7 +27,6 @@
     "mongodb": "3.1.3",
     "mongodb-memory-server": "2.0.1",
     "mongoose": "5.2.9",
-    "socket.io": "^2.1.1",
     "swagger-jsdoc": "3.0.2",
     "swagger-ui-express": "3.0.10"
   },

@@ -7,8 +7,7 @@
 
 const router = require('express').Router(); // ルーターの役割
 
-router.use('/users', require('./users.js')); // .../usersにマッチしたらrequireする
-router.use('/kohski/playing', require('./kohski/playing.js')); // .../kohski/playingにマッチしたらrequireする
+router.use('/users', require('./users.js'));
 
 router.use('/homework/playing', require('./homework/playing.js'));
 router.use('/matsui/playing', require('./matsui/playing.js'));
@@ -22,6 +21,5 @@ router.use('/kido/piece', require('./kido/piece.js'));
 router.use('/kido/board', require('./kido/board.js'));
 router.use('/kai/playing', require('./kai/playing.js'));
 router.use('/kai/board', require('./kai/board.js'));
-router.use('/kohski/playing', require('./kohski/playing.js'));
 
 module.exports = router;
