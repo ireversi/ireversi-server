@@ -75,7 +75,7 @@ router.route('/')
     };
 
     // make list to turn over about eight direction from recent one
-    await Promise.all(pieces.map(async (p) => {
+    pieces.forEach((p) => {
       if (p.x === result.x && p.y < result.y) {
         if (p.y === result.y - 1 && p.userid !== result.userid) { isOtherPiece.n = true; }
         if (p.userid === result.userid) { isOwnPiece.n = true; }
@@ -117,7 +117,7 @@ router.route('/')
         if (p.userid === result.userid) { isOwnPiece.nw = true; }
         turnlist.nw.push(p);
       }
-    }));
+    });
 
     // set first piece for several user
     if (!existPiece && (isOtherPiece.n || isOtherPiece.e || isOtherPiece.s || isOtherPiece.w)) {
@@ -125,6 +125,7 @@ router.route('/')
       return res.json(await PieceModel.find({}, propfilter));
     }
 
+    // turn over piece
     await Promise.all(Object.keys(turnlist).map(async (key) => {
       if ((key === 'n' && isOtherPiece.n && isOwnPiece.n)
         || (key === 'w' && isOtherPiece.w && isOwnPiece.w)
