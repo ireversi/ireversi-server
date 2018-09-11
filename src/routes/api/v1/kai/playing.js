@@ -4,18 +4,25 @@ const PlayingModel = require('../../../../models/kai/PlayingModel.js');
 
 const propFilter = '-_id -__v';
 
-// var set = new Set();
-const dir = [
-  [-1, 1],
-  [0, 1],
-  [1, 1],
-  [1, 0],
-  [1, -1],
-  [0, -1],
-  [-1, -1],
-  [-1, 0],
+const dirXY = [
+  [0, 1], // 北
+  [1, 0], // 東
+  [0, -1], // 南
+  [-1, 0], // 西
 ];
 
+const dirAll = [
+  ...dirXY,
+  [-1, 1], // 北西
+  [1, 1], // 北東
+  [1, -1], // 南東
+  [-1, -1], // 南西
+];
+
+// 先のコマを確認する関数
+function seeNext(pieces, nextPieceX, nextPieceY) {
+  return pieces.find(p => p.x === nextPieceX && p.y === nextPieceY);
+}
 
 // route('/') はルーティングがここまでですよの書き方
 // データベースの処理は基本非同期なので、同期させる
@@ -36,49 +43,57 @@ router.route('/')
       res.json(pieces); // そっくりそのままお返しします
       return;
     }
-    // 挟んだらめくれる処理
-    for (let i = 0; i < 8; i += 1) {
-      const aroundX = Playing.x + dir[i][0]; // 向かいたい方向のxの値
-      const aroundY = Playing.y + dir[i][1]; // 向かいたい方向のyの値
-      // 向かいたい方向の１つ目をpiecesから取得
-      let dirPiece = pieces.find(p => p.x === aroundX && p.y === aroundY);
-      let rslt = []; // 結果に入れる候補
-      // 向かいたい方向の１つめに自分以外のidがある場合
-      if (dirPiece !== undefined && dirPiece.userId !== Playing.userId) {
-        rslt.push(dirPiece);
-        // 2つめ以降を見に行く
-        while (dirPiece !== undefined) {
-          const dirX = aroundX + dir[i][0]; // 向かう方向のxの値
-          const dirY = aroundY + dir[i][1]; // 向かう方向のyの値
-          // 向かう方向のコマの値をpiecesから取得
-          dirPiece = pieces.find(p => p.x === dirX && p.y === dirY);
 
-          if (dirPiece === undefined) { // 向かう方向の先に自コマがないとき
-            rslt = [];
-            break;
-          }
+    /* ----------------------------------------------------------- */
+    // 挟んだらめくれる
+    // フィールドに自コマがある場合、めくれる場所にしか置けない
+    const flip = [];
 
-          if (dirPiece !== undefined) { // 向かう方向の2つめ以降に自IDがある場合(userIdが0じゃない場合)
-            rslt.push(dirPiece);
+    // フィールドに自コマがあるとき
+    if (pieces.find(p => p.userId === Playing.userId)) {
+      for (let i = 0; i < dirAll.length; i += 1) {
+        const rslt = []; // めくる候補リスト
+
+        const dirX = dirAll[i][0];
+        const dirY = dirAll[i][1];
+        const aroundX = Playing.x + dirX; // 向かいたい方向のxの値
+        const aroundY = Playing.y + dirY; // 向かいたい方向のyの値
+
+        let n = 1; // 向かう方向の距離
+        let dirPiece = pieces.find(p => p.x === aroundX && p.y === aroundY); // 向かう先にあるコマ
+
+        while (dirPiece !== undefined) { // 向かい先に何かコマがある限り
+          if (dirPiece.userId !== Playing.userId) { // 向かう先が他コマの場合
+            rslt.push(dirPiece); // めくる候補にいれる
+            n += 1;
+            // もう１つ先を見る
+            const nextPieceX = Playing.x + dirX * n;
+            const nextPieceY = Playing.y + dirY * n;
+            dirPiece = seeNext(pieces, nextPieceX, nextPieceY);
+          } else if (dirPiece.userId === Playing.userId) { // 先に自コマがあるとき
+            for (let j = 0; j < rslt.length; j += 1) {
+              if (rslt[j] !== undefined) {
+                rslt[j].userId = Playing.userId; // 置いたコマと同じIdに変更
+                flip.push(rslt[j]);
+              }
+            }
+            break; // whileを抜ける
           }
-          for (let j = 0; j < rslt.length; j += 1) {
-            rslt[j].userId = Playing.userId;
-            await PlayingModel.remove({ x: rslt[j].x, y: rslt[j].y });
-            const Play = new PlayingModel({
-              x: rslt[j].x,
-              y: rslt[j].y,
-              userId: Playing.userId,
-            });
-            await Play.save();
-          }
-          break;
         }
-        break;
       }
+
+      if (flip.length === 0) {
+        await PlayingModel.remove({ x: Playing.x, y: Playing.y });
+      }
+    // フィールドに自コマがないとき、他コマの上下左右にしか置けない
+    } else {
+      console.log('');
+      // console.log(Playing);
     }
-    await Promise.all(pieces.map(p => PlayingModel.update(
-      { _id: p.id },
-      { _userId: p.userId },
+
+    await Promise.all(flip.map(p => PlayingModel.updateOne(
+      { x: p.x, y: p.y },
+      { userId: p.userId },
     )));
     res.json(await PlayingModel.find({}, propFilter)); // 全体のデータを取ってくる
   });

@@ -48,17 +48,16 @@ const array2Pieces = (field) => {
   return array; // 打ち手の順で生成した配列をreturn
 };
 
-// 理想の配列
-const array2Mathcers = (field) => {
-  const array = [];
+const array = [];
+const array2Matchers = (field) => {
   const sqrt = Math.sqrt(field.length);
-  for (let i = 0; i < order.length; i += 1) { // x, y, userIdを生成する
-    let elm = {}; //
-    const x = order[i] % 4;
-    const y = Math.floor(((field.length - 1) - order[i]) / sqrt);
-    const userId = field[order[i]];
-    elm = { x, y, userId };
-    array.push(elm);
+  for (let i = 0; i < field.length; i += 1) {
+    if (field[i] !== 0) {
+      const x = i % sqrt;
+      const y = Math.floor(((field.length - 1) - i) / sqrt);
+      const userId = field[i];
+      array.push({ x, y, userId });
+    }
   }
   return array;
 };
@@ -73,20 +72,22 @@ describe('Request piece', () => {
       // 与えたい配列
       const pieces = array2Pieces(
         [
-          0, 0, '3:4', 0,
-          0, 0, '2:3', 0,
-          0, '1:1', '2:2', 0,
-          0, 0, '3:5', 0,
+          0, 0, 0, '1:4', 0,
+          0, '1:1', '2:2', '1:5', 0,
+          0, 0, '1:3', 0, 0,
+          0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0,
         ],
       );
 
       // 理想の配列
-      const matches = array2Mathcers(
+      const matches = array2Matchers(
         [
-          0, 0, 3, 0,
-          0, 0, 3, 0,
-          0, 1, 3, 0,
-          0, 0, 3, 0,
+          0, 0, 0, 0, 0,
+          0, 1, 1, 1, 0,
+          0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0,
         ],
       );
 
