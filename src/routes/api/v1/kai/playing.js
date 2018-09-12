@@ -29,14 +29,15 @@ function seeNext(pieces, nextPieceX, nextPieceY) {
 router.route('/')
 // res.jsonでresponse.bodyに返す
   .post(async (req, res) => {
-    const pieces = (await PlayingModel.find({}, propFilter)); // 今存在するpiece
+    // PlayingModelにあるデータ全てをpiecesに入れる
+    const pieces = (await PlayingModel.find({}, propFilter));
 
     const Playing = new PlayingModel({
       x: +req.body.x,
       y: +req.body.y,
       userId: +req.body.userId,
     });
-    await Playing.save();
+    // await Playing.save();
 
     // 同じところに置けない
     if (pieces.find(p => p.x === Playing.x && p.y === Playing.y)) {
@@ -71,6 +72,7 @@ router.route('/')
             const nextPieceY = Playing.y + dirY * n;
             dirPiece = seeNext(pieces, nextPieceX, nextPieceY);
           } else if (dirPiece.userId === Playing.userId) { // 先に自コマがあるとき
+            await Playing.save();
             for (let j = 0; j < rslt.length; j += 1) {
               if (rslt[j] !== undefined) {
                 rslt[j].userId = Playing.userId; // 置いたコマと同じIdに変更
@@ -82,20 +84,34 @@ router.route('/')
         }
       }
 
+      // めくれるコマがないときは、置けない処理
       if (flip.length === 0) {
         await PlayingModel.remove({ x: Playing.x, y: Playing.y });
+        // res.json(pieces); // そっくりそのままお返しします
       }
-    // フィールドに自コマがないとき、他コマの上下左右にしか置けない
+      // 注意：フィールドに何もないときは置ける（１個目）
+    } else if (pieces.length === 0) {
+      await new PlayingModel(Playing).save(); // 置いてよし
+
+    // フィールドに自コマがないとき、他コマの上下左右にしか置けない処理
     } else {
-      console.log('');
-      // console.log(Playing);
+      for (let i = 0; i < dirXY.length; i += 1) {
+        const dirX = dirXY[i][0];
+        const dirY = dirXY[i][1];
+        const aroundX = Playing.x + dirX; // 調べたい方向のxの値
+        const aroundY = Playing.y + dirY; // 調べたい方向のyの値
+        const dirPiece = pieces.find(p => p.x === aroundX && p.y === aroundY);
+        // 誰かのコマがあるか
+        if (dirPiece !== undefined) {
+          await new PlayingModel(Playing).save(); // 置いてよし
+        }
+      }
     }
 
     await Promise.all(flip.map(p => PlayingModel.updateOne(
       { x: p.x, y: p.y },
       { userId: p.userId },
     )));
-    res.json(await PlayingModel.find({}, propFilter)); // 全体のデータを取ってくる
+    res.json(await PlayingModel.find({}, propFilter)); // 全体のデータを送る
   });
-
 module.exports = router;
