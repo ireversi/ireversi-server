@@ -18,12 +18,40 @@ router.route('/')
       userId: +req.body.userId,
     };
 
-    if ((await PieceModel.find({ x: result.x, y: result.y })).length === 0) {
+    const piecesCheck = [];
+    let putPieceFlg = false;
+
+    // 指定された場所を中心とした9マスの状況確認
+    for (let i = -1; i <= 1; i += 1) {
+      for (let j = -1; j <= 1; j += 1) {
+        if ((await PieceModel.find({ x: result.x + i, y: result.y + j })).length) {
+          piecesCheck.push(true);
+        } else {
+          piecesCheck.push(false);
+        }
+      }
+    }
+
+    // 同じ場所には置けない
+    if (!piecesCheck[4]) {
+      // 上下左右にコマがあれば置ける
+      if (piecesCheck[1] || piecesCheck[3] || piecesCheck[5] || piecesCheck[7]) {
+        putPieceFlg = true;
+      // ユーザーが2手目以降であったら斜めにコマがあれば置ける
+      } else if ((await PieceModel.find({ userId: result.userId })).length >= 1
+          && (piecesCheck[0] || piecesCheck[2] || piecesCheck[6] || piecesCheck[8])) {
+        putPieceFlg = true;
+      // その盤の1手目だったら、どこでも置ける
+      } else if ((await PieceModel.find({})).length === 0) {
+        putPieceFlg = true;
+      }
+    }
+
+    // 登録処理
+    if (putPieceFlg) {
       const Piece = new PieceModel(result);
       await Piece.save();
     }
-
-    // let allPieces = await PieceModel.find({}, propFilter);
 
     // 自分のコマを抽出
     const ownPieces = await PieceModel.find({ userId: result.userId }, propFilter);
@@ -218,8 +246,8 @@ router.route('/')
       }
     }
 
+    // 送信処理
     const allPieces = await PieceModel.find({}, propFilter);
-
     res.json(allPieces);
   });
 
