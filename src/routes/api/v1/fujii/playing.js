@@ -12,6 +12,13 @@ const adjacents = [
   ...adjacentPieces, [1, 1], [1, -1], [-1, -1], [-1, 1],
 ];
 
+// CORSを許可する
+router.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
 router.route('/')
   .post(async (req, res) => {
     const data = await PlayingModel.find({}, propfilter);
