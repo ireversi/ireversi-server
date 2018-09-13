@@ -1,11 +1,12 @@
 tags:
-  - name: piece
-    description: Piece API
+  - name: Ando-playing
+    description: Ando's Playing API
 
 /ando/piece:
   post:
     tags:
-      - piece
+      - Ando-playing
+    summary: "Set a piece on the board"
     parameters:
       - name: "x"
         in: "formData"

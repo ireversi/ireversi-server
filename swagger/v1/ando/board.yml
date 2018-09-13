@@ -1,12 +1,12 @@
 tags:
-  - name: board
-    description: Board API
+  - name: Ando-playing
+    description: Ando's Playing API
 
 /ando/board:
   get:
     tags:
-      - board
-    summary: "Return All Pieces on the board"
+      - Ando-playing
+    summary: "Return all pieces on the board"
     responses:
       200:
         description: "Board data"
