@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-const PlayingModel = require('../../../../models/homework/PlayingModel.js');
+const PlayingModel = require('../../../../models/fujii/PlayingModel.js');
 
 const propfilter = '-_id -__v';
 

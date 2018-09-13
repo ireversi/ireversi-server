@@ -1,7 +1,7 @@
 const chai = require('chai');
 
 const app = require('../../../../../src/routes/app.js');
-const PlayingModel = require('../../../../../src/models/homework/PlayingModel.js');
+const PlayingModel = require('../../../../../src/models/fujii/PlayingModel.js');
 const {
   prepareDB,
   deleteAllDataFromDB,
@@ -81,7 +81,7 @@ describe('play', () => {
       const rPiece = reformPiece(piece);
       for (let i = 0; i < rPiece.length; i += 1) {
         response = await chai.request(app)
-          .post(`${basePath}/homework/playing`)
+          .post(`${basePath}/fujii/playing`)
           .set('content-type', 'application/x-www-form-urlencoded')
           .send(rPiece[i]);
       }
@@ -116,7 +116,7 @@ describe('play', () => {
       // console.log(rPiece);
       for (let i = 0; i < rPiece.length; i += 1) {
         response = await chai.request(app)
-          .post(`${basePath}/homework/playing`)
+          .post(`${basePath}/fujii/playing`)
           .set('content-type', 'application/x-www-form-urlencoded')
           .send(rPiece[i]);
       }
@@ -156,7 +156,7 @@ describe('play', () => {
       // console.log(rPiece);
       for (let i = 0; i < rPiece.length; i += 1) {
         response = await chai.request(app)
-          .post(`${basePath}/homework/playing`)
+          .post(`${basePath}/fujii/playing`)
           .set('content-type', 'application/x-www-form-urlencoded')
           .send(rPiece[i]);
       }
@@ -192,7 +192,7 @@ describe('play', () => {
       const rPiece = reformPiece(piece);
       for (let i = 0; i < rPiece.length; i += 1) {
         response = await chai.request(app)
-          .post(`${basePath}/homework/playing`)
+          .post(`${basePath}/fujii/playing`)
           .set('content-type', 'application/x-www-form-urlencoded')
           .send(rPiece[i]);
       }
@@ -228,7 +228,7 @@ describe('play', () => {
       const rPiece = reformPiece(piece);
       for (let i = 0; i < rPiece.length; i += 1) {
         response = await chai.request(app)
-          .post(`${basePath}/homework/playing`)
+          .post(`${basePath}/fujii/playing`)
           .set('content-type', 'application/x-www-form-urlencoded')
           .send(rPiece[i]);
       }
