@@ -1,0 +1,25 @@
+tags:
+  - name: fujii-board
+    description: Fujii Reversi API
+
+/fujii/board:
+  get:
+    tags:
+      - fujii-board
+    responses:
+      200:
+        description: "all pieces"
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              x:
+                type: number
+                example: 0
+              y:
+                type: number
+                example: 0
+              userId:
+                type: number
+                example: 1
