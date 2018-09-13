@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-const PlayingModel = require('../../../../models/UserModel.js');
+const PlayingModel = require('../../../../models/momii/PlayingModel.js');
 
 router.route('/')
   .post(async (req, res) => {
