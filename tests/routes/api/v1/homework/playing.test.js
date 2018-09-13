@@ -123,7 +123,7 @@ describe('play', () => {
 
       // // Then
       const rMatchers = reformMatchers(matchers);
-      expect(response.body).toHaveLength(matchers.length);
+      expect(response.body).toHaveLength(rMatchers.length);
       expect(response.body).toEqual(expect.arrayContaining(rMatchers));
 
       const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
@@ -167,7 +167,6 @@ describe('play', () => {
       expect(response.body).toEqual(expect.arrayContaining(rMatchers));
 
       const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
-      // console.log(pieces);
       expect(pieces).toHaveLength(rMatchers.length);
       expect(pieces).toEqual(expect.arrayContaining(rMatchers));
     });
@@ -200,7 +199,7 @@ describe('play', () => {
 
       // // Then
       const rMatchers = reformMatchers(matchers);
-      // expect(response.body).toHaveLength(rMatchers.length + 1); // 何と比較するかわからない
+      expect(response.body).toHaveLength(rMatchers.length);
       expect(response.body).toEqual(expect.arrayContaining(rMatchers));
 
       const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
@@ -236,7 +235,7 @@ describe('play', () => {
 
       // Then
       const rMatchers = reformMatchers(matchers);
-      // expect(response.body).toHaveLength(matchers.length);
+      expect(response.body).toHaveLength(rMatchers.length);
       expect(response.body).toEqual(expect.arrayContaining(rMatchers));
 
       const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
