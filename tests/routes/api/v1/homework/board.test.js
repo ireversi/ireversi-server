@@ -1,7 +1,7 @@
 const chai = require('chai');
 
 const app = require('../../../../../src/routes/app.js');
-const PlayingModel = require('../../../../../src/models/homework/PlayingModel.js');
+const PlayingModel = require('../../../../../src/models/fujii/PlayingModel.js');
 const {
   prepareDB,
   deleteAllDataFromDB,
@@ -42,7 +42,7 @@ describe('board', () => {
       ]);
       await Promise.all(matchers.map(m => new PlayingModel(m).save()));
       // // When
-      const { body } = await chai.request(app).get(`${basePath}/homework/board`);
+      const { body } = await chai.request(app).get(`${basePath}/fujii/board`);
       // // Then
       expect(body).toHaveLength(matchers.length);
       expect(body).toEqual(expect.arrayContaining(matchers));
