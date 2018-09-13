@@ -24,6 +24,13 @@ function seeNext(pieces, nextPieceX, nextPieceY) {
   return pieces.find(p => p.x === nextPieceX && p.y === nextPieceY);
 }
 
+router.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
+
 // route('/') はルーティングがここまでですよの書き方
 // データベースの処理は基本非同期なので、同期させる
 router.route('/')
