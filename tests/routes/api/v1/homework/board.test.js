@@ -9,22 +9,21 @@ const {
 
 // const array2Matchers = require('./utils/array2Matchers.js');
 
-// const basePath = '/api/v1';
+const basePath = '/api/v1';
 // const propfilter = '-_id -__v';
 
 function array2Matchers(p) { // 改修必要
   const arry = [];
   const r = Math.sqrt(p.length);
-  let obj;
-  // let order;
   for (let i = 0; i < p.length; i += 1) {
-    obj = {
-      x: i % r,
-      y: r - Math.floor(i / r) - 1,
-      userId: +p[i],
-    };
-    arry.push(obj);
-    // arry.splice(order, 1, obj);
+    if (p[i] !== 0) {
+      const obj = {
+        x: i % r,
+        y: Math.floor(i / r),
+        userId: p[i],
+      };
+      arry.push(obj);
+    }
   }
   return arry;
 }
@@ -38,21 +37,15 @@ describe('board', () => {
       // Given
       const matchers = array2Matchers([
         0, 0, 0,
-        1, 2, 0,
+        4, 3, 0,
         1, 2, 0,
       ]);
-
-      // console.log(matchers.length);
       await Promise.all(matchers.map(m => new PlayingModel(m).save()));
-
       // // When
-      // const { body } = await chai.request(app).get(`${basePath}/homework/board`);
-
-      // console.log(body);
-
+      const { body } = await chai.request(app).get(`${basePath}/homework/board`);
       // // Then
-      // expect(body).toHaveLength(matchers.length);
-      // expect(body).toEqual(expect.arrayContaining(matchers));
+      expect(body).toHaveLength(matchers.length);
+      expect(body).toEqual(expect.arrayContaining(matchers));
     });
   });
 });
