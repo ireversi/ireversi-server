@@ -3,45 +3,6 @@ tags:
     description: Kai's Playing API
 
 /kai/playing:
-  get:
-    tags:
-      - kai-playing
-    parameters:
-      - name: "x"
-        in: "formData"
-        description: "x info"
-        required: true
-        type: "number"
-      - name: "y"
-        in: "formData"
-        description: "y info"
-        required: true
-        type: "number"
-      - name: "userId"
-        in: "formData"
-        description: "your userId"
-        required: true
-        type: "number"
-    responses:
-      200: # 404的なやつ
-        description: "success"
-        schema:
-          type: "array"
-          items:
-            type: object
-            properties:
-              x:
-                type: "integer"
-                format: "int64"
-                example: 1
-              y:
-                type: "integer"
-                format: "int64"
-                example: 1
-              userId:
-                type: "integer"
-                format: "int64"
-                example: 1
   post:
       tags:
         - kai-playing
@@ -63,7 +24,7 @@ tags:
           type: "number"
       responses:
         200: # 404的なやつ
-          description: "success"
+          description: "Playing data"
           schema:
             type: "array"
             items:
