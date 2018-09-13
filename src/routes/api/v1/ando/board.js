@@ -1,9 +1,8 @@
-
 const router = require('express').Router();
 
-const PieceModel = require('../../../../models/kido/PieceModel.js');
+const PieceModel = require('../../../../models/ando/PieceModel.js');
 
-const propfilter = '-_id -__v';
+const propFilter = '-_id -__v';
 
 router.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -13,7 +12,7 @@ router.use((req, res, next) => {
 
 router.route('/')
   .get(async (req, res) => {
-    res.json(await PieceModel.find({}, propfilter));
+    res.json(await PieceModel.find({}, propFilter));
   });
 
 module.exports = router;
