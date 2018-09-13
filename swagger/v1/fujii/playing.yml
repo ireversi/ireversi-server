@@ -2,7 +2,7 @@ tags: #:(コロン)は{}の 配列
   - name: playing #-(ハイフン)は[]の配列
     description: Playing API #:(コロン)のあとは文字列
 
-/homework/playing: #api/viの後に付いているルート（/users）
+/fujii/playing: #api/viの後に付いているルート（/users）
   post:
     tags:
       - playing

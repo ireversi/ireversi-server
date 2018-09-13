@@ -1,0 +1,25 @@
+tags:
+  - name: kido-piece
+    description: Kido Reversi API
+
+/kido/board:
+  get:
+    tags:
+      - kido-piece
+    responses:
+      200:
+        description: "all pieces"
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              x:
+                type: number
+                example: 0
+              y:
+                type: number
+                example: 0
+              userId:
+                type: number
+                example: 1
