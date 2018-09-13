@@ -8,8 +8,8 @@ const {
 } = require('../../../../../src/utils/db.js');
 
 const basePath = '/api/v1';
-
 const propfilter = '-_id -__v';
+
 
 function reformPiece(d) {
   const arry = [...Array(d.length).fill(0)];
@@ -35,19 +35,22 @@ function reformPiece(d) {
       arry.splice(order, 1, obj);
     }
   }
-  return arry;
+  const newArray = arry.filter(el => el !== 0);
+  return newArray;
 }
 
 function reformMatchers(m) {
   const arry = [];
   const r = Math.sqrt(m.length);
   for (let i = 0; i < m.length; i += 1) {
-    const obj = {
-      x: i % r,
-      y: r - Math.floor(i / r) - 1,
-      userId: +m[i],
-    };
-    arry.push(obj);
+    if (!(m[i] === 0)) {
+      const obj = {
+        x: i % r,
+        y: r - Math.floor(i / r) - 1,
+        userId: +m[i],
+      };
+      arry.push(obj);
+    }
   }
   return arry;
 }
@@ -64,12 +67,12 @@ describe('play', () => {
   describe('put piece', () => {
     it('puts piece(s)', async () => {
       const piece = [
-        '2:4', '1:3',
+        '3:4', '4:3',
         '1:1', '2:2',
       ];
 
       const matchers = [
-        2, 1,
+        3, 4,
         1, 2,
       ];
 
@@ -82,15 +85,13 @@ describe('play', () => {
           .set('content-type', 'application/x-www-form-urlencoded')
           .send(rPiece[i]);
       }
-
-
       // Then
       const rMatchers = reformMatchers(matchers);
-      expect(response.body).toHaveLength(matchers.length);
+      expect(response.body).toHaveLength(rMatchers.length);
       expect(response.body).toEqual(expect.arrayContaining(rMatchers));
 
       const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
-      expect(pieces).toHaveLength(matchers.length);
+      expect(pieces).toHaveLength(rMatchers.length);
       expect(pieces).toEqual(expect.arrayContaining(rMatchers));
     });
 
@@ -100,12 +101,12 @@ describe('play', () => {
 
     it('puts on same the place', async () => {
       const piece = [
-        '2:4', ['1:3', '2:5'],
+        '3:4', ['4:3', '5:5'],
         '1:1', '2:2',
       ];
 
       const matchers = [
-        2, 1,
+        3, 4,
         1, 2,
       ];
 
@@ -122,11 +123,12 @@ describe('play', () => {
 
       // // Then
       const rMatchers = reformMatchers(matchers);
-      expect(response.body).toHaveLength(matchers.length);
+      expect(response.body).toHaveLength(rMatchers.length);
       expect(response.body).toEqual(expect.arrayContaining(rMatchers));
 
       const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
-      expect(pieces).toHaveLength(matchers.length);
+      // console.log(pieces);
+      expect(pieces).toHaveLength(rMatchers.length);
       expect(pieces).toEqual(expect.arrayContaining(rMatchers));
     });
 
@@ -137,16 +139,15 @@ describe('play', () => {
 
     it('puts a piece and flips ones', async () => {
       const piece = [
-        '1:5', '1:6', '1:7',
-        '2:4', '1:3', '1:8',
-        '1:1', '2:2', '2:9',
+        '1:5', 0, 0,
+        '3:4', '4:3', 0,
+        '1:1', '2:2', 0,
       ];
 
       const matchers = [
-        1, 1, 1,
-        1, 1, 1,
-        1, 2, 2,
-
+        1, 0, 0,
+        1, 4, 0,
+        1, 2, 0,
       ];
 
       // When
@@ -159,17 +160,86 @@ describe('play', () => {
           .set('content-type', 'application/x-www-form-urlencoded')
           .send(rPiece[i]);
       }
-      // console.log(response.body);
-
 
       // // Then
       const rMatchers = reformMatchers(matchers);
-      expect(response.body).toHaveLength(matchers.length);
+      expect(response.body).toHaveLength(rMatchers.length);
       expect(response.body).toEqual(expect.arrayContaining(rMatchers));
 
       const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
-      // console.log(pieces);
-      expect(pieces).toHaveLength(matchers.length);
+      expect(pieces).toHaveLength(rMatchers.length);
+      expect(pieces).toEqual(expect.arrayContaining(rMatchers));
+    });
+
+    // ---------------
+    // 自分の駒が場にないときは、誰かの上下左右にしか置けない機能
+    // ---------------
+    it('no my piece and put a piece', async () => {
+      const piece = [
+        '1:5', 0, '5:7',
+        '3:4', '4:3', 0,
+        '1:1', '2:2', 0,
+      ];
+
+      const matchers = [
+        1, 0, 0,
+        1, 4, 0,
+        1, 2, 0,
+      ];
+
+      // When
+      let response;
+      const rPiece = reformPiece(piece);
+      for (let i = 0; i < rPiece.length; i += 1) {
+        response = await chai.request(app)
+          .post(`${basePath}/homework/playing`)
+          .set('content-type', 'application/x-www-form-urlencoded')
+          .send(rPiece[i]);
+      }
+
+      // // Then
+      const rMatchers = reformMatchers(matchers);
+      expect(response.body).toHaveLength(rMatchers.length);
+      expect(response.body).toEqual(expect.arrayContaining(rMatchers));
+
+      const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
+      expect(pieces).toHaveLength(rMatchers.length);
+      expect(pieces).toEqual(expect.arrayContaining(rMatchers));
+    });
+
+    // ---------------
+    // 自分の駒がある場合、めくれる場所にのみ置ける
+    // ---------------
+    it('can put on specific places', async () => {
+      const piece = [
+        0, 0, 0,
+        0, 0, '1:3',
+        '1:1', '2:2', 0,
+      ];
+
+      const matchers = [
+        0, 0, 0,
+        0, 0, 0,
+        1, 2, 0,
+      ];
+
+      // When
+      let response;
+      const rPiece = reformPiece(piece);
+      for (let i = 0; i < rPiece.length; i += 1) {
+        response = await chai.request(app)
+          .post(`${basePath}/homework/playing`)
+          .set('content-type', 'application/x-www-form-urlencoded')
+          .send(rPiece[i]);
+      }
+
+      // Then
+      const rMatchers = reformMatchers(matchers);
+      expect(response.body).toHaveLength(rMatchers.length);
+      expect(response.body).toEqual(expect.arrayContaining(rMatchers));
+
+      const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
+      expect(pieces).toHaveLength(rMatchers.length);
       expect(pieces).toEqual(expect.arrayContaining(rMatchers));
     });
   });
