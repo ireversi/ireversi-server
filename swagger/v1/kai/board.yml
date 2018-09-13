@@ -6,22 +6,6 @@ tags:
   get:
     tags:
       - kai-board
-    parameters:
-      - name: "x"
-        in: "formData"
-        description: "x info"
-        required: true
-        type: "number"
-      - name: "y"
-        in: "formData"
-        description: "y info"
-        required: true
-        type: "number"
-      - name: "userId"
-        in: "formData"
-        description: "your userId"
-        required: true
-        type: "number"
     responses:
       200: # 404的なやつ
         description: "success"
@@ -31,11 +15,14 @@ tags:
             type: object
             properties:
               x:
-                type: number
+                type: "integer"
+                format: "int64"
                 example: 1
               y:
-                type: number
+                type: "integer"
+                format: "int64"
                 example: 1
               userId:
-                type: number
+                type: "integer"
+                format: "int64"
                 example: 1
