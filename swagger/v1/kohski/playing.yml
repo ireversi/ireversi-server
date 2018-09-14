@@ -1,27 +1,27 @@
 tags:
-  - name: playing
-    description: Playing API
+  - name: Kohski-Playing
+    description: Kohski's Playing API
 
 /kohski/playing:
   post:
     tags:
-      - playing
+      - Kohski-playing
     parameters:
       - name: "x"
         in: "query"
         description: "x axis"
         required: true
-        type: "Number"
+        type: "number"
       - name: "y"
         in: "query"
         description: "y axis"
         required: true
-        type: "Number"
+        type: "number"
       - name: "userID"
         in: "query"
         description: "user ID"
         required: true
-        type: "Number"
+        type: "number"
     responses:
       200:
         description: "array"
