@@ -1,11 +1,11 @@
 tags:
-  - name: playing
-    description: Playing API
+  - name: Kohski-Playing
+    description: Kohski's Playing API
 
 /kohski/playing:
   post:
     tags:
-      - playing
+      - Kohski-playing
     parameters:
       - name: "x"
         in: "query"
