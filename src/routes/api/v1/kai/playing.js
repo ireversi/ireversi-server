@@ -83,7 +83,6 @@ router.route('/')
           }
         }
       }
-
       // めくれるコマがないときは、置けない処理
       if (flip.length === 0) {
         await PlayingModel.remove({ x: Playing.x, y: Playing.y });
