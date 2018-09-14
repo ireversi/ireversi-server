@@ -3,6 +3,17 @@ const PlayingModel = require('../../../../models/kohski/PlayingModel.js');
 
 const propFilter = '-_id -__v';
 
+const dirArr = [
+  [0,1],  //
+  [1,1],
+  [1,0],
+  [1,-1],
+  [0,-1],
+  [-1,-1],
+  [-1,0],
+  [-1,1]
+]
+
 router.route('/')
   .post(async (req, res) => {
     const pieces = await PlayingModel.find({}, propFilter);

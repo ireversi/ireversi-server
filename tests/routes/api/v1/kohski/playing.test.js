@@ -159,8 +159,6 @@ describe('play', () => {
         [[['1:1', '2:2'], 0],
           ['3:3', 0]],
       );
-
-
       const matchers = array2pieces(
         [
           [1, 0],
@@ -191,7 +189,34 @@ describe('play', () => {
     });
 
     // 挟んだらめくれるテスト
-
+    // it('reverse piece ', async () => {
+    //   // Given
+    //     const pieces = array2pieces(
+    //     );
+    //     const matchers = array2pieces(
+    //     );
+  
+    //     // When
+    //     let response;
+  
+    //     for (let i = 0; i < pieces.length; i += 1) {
+    //       response = await chai.request(app)
+    //         .post(`${basePath}/kohski/playing`)
+    //         .set('content-type', 'application/x-www-form-urlencoded')
+    //         .send(pieces[i]);
+    //     }
+  
+    //     // Then
+    //     // 左辺は現実、右辺は理想(=Matchers)
+    //     // 上はexpressの検証
+    //     expect(response.body).toHaveLength(pieces.length - 1);
+    //     expect(response.body).toEqual(expect.arrayContaining(matchers));
+  
+    //     // mongodbの検証
+    //     const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
+    //     expect(pieceData).toHaveLength(pieces.length - 1);
+    //     expect(pieceData).toEqual(expect.arrayContaining(matchers));
+    //   });
 
     // はなれたところにおけないテスト
     // 自分のがあったらめくれるところにしかおけない
