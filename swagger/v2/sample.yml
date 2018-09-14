@@ -1,0 +1,7 @@
+/:
+  get:
+    tags:
+    - description: sample API
+    responses:
+      204:
+        description: no content
