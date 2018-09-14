@@ -22,9 +22,6 @@ describe('Play', () => {
       userId: 1,
     };
 
-    const Playing = new PlayingModel(piece);
-    await Playing.save();
-
     // when
     const response = await chai.request(app)
       .post(`${basePath}/momii/playing`)
@@ -35,7 +32,7 @@ describe('Play', () => {
     expect(response.body).toHaveLength(1);
     expect(response.body[0]).toMatchObject(piece);
 
-    const pieces = await PlayingModel.find({});
+    const pieces = await PlayingModel.find({}, '-_id -__v').lean();
     expect(pieces).toHaveLength(1);
     expect(pieces[0]).toMatchObject(piece);
   });

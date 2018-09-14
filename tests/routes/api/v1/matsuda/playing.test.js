@@ -13,6 +13,8 @@ const savePieces = require('./testUtils/savePieces.js');
 const getPiecesFromDB = require('./testUtils/getPiecesFromDB.js');
 const { basePath } = require('./testUtils/config.js');
 
+const SPACE = 0;
+
 expect.extend({
   toEqualPosition(rec, arg) {
     const sameLength = rec.length === arg.length;
@@ -176,8 +178,8 @@ describe('Board', () => {
 
     it('sets multi pieces', async () => {
       const pieces = await putPieces([
-        0, 0, 0,
-        0, 0, 0,
+        SPACE, SPACE, SPACE,
+        SPACE, SPACE, SPACE,
         '1:1', '2:3', '3:2',
       ]);
 
@@ -193,7 +195,7 @@ describe('Board', () => {
 
     it('cannot set same place', async () => {
       const pieces = await putPieces([
-        0, 0,
+        [SPACE, SPACE], SPACE,
         ['1:1', '3:2'], '2:3',
       ]);
 
@@ -208,10 +210,10 @@ describe('Board', () => {
 
     it('turns sandwiched pieces', async () => {
       const pieces = await putPieces([
-        0, '6:3', 0, 0,
-        0, '5:2', '4:1', 0,
-        0, '3:2', 0, 0,
-        '1:1', '2:3', 0, 0,
+        SPACE, '6:3', SPACE, SPACE,
+        SPACE, '5:2', '4:1', SPACE,
+        SPACE, '3:2', SPACE, SPACE,
+        '1:1', '2:3', SPACE, SPACE,
       ]);
 
       const matchers = array2Matchers([
@@ -227,9 +229,9 @@ describe('Board', () => {
 
     it('cannot set remote cell', async () => {
       const pieces = await putPieces([
-        '2:2', 0, 0,
-        0, '3:2', 0,
-        '1:1', '4:3', 0,
+        '2:2', SPACE, SPACE,
+        SPACE, '3:2', SPACE,
+        '1:1', '4:3', SPACE,
       ]);
 
       const matchers = array2Matchers([
@@ -244,8 +246,8 @@ describe('Board', () => {
 
     it('can set only turnable cell when exsisting self pieces', async () => {
       const pieces = await putPieces([
-        0, 0, 0,
-        0, '3:1', 0,
+        SPACE, SPACE, SPACE,
+        SPACE, '3:1', SPACE,
         '1:1', '2:3', '4:1',
       ]);
 
