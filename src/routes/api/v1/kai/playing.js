@@ -24,6 +24,12 @@ function seeNext(pieces, nextPieceX, nextPieceY) {
   return pieces.find(p => p.x === nextPieceX && p.y === nextPieceY);
 }
 
+router.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
 // route('/') はルーティングがここまでですよの書き方
 // データベースの処理は基本非同期なので、同期させる
 router.route('/')
@@ -37,7 +43,6 @@ router.route('/')
       y: +req.body.y,
       userId: +req.body.userId,
     });
-    // await Playing.save();
 
     // 同じところに置けない
     if (pieces.find(p => p.x === Playing.x && p.y === Playing.y)) {
@@ -86,7 +91,6 @@ router.route('/')
       // めくれるコマがないときは、置けない処理
       if (flip.length === 0) {
         await PlayingModel.remove({ x: Playing.x, y: Playing.y });
-        // res.json(pieces); // そっくりそのままお返しします
       }
       // 注意：フィールドに何もないときは置ける（１個目）
     } else if (pieces.length === 0) {
