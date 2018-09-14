@@ -99,8 +99,6 @@ describe('Request piece', () => {
           .set('content-type', 'application/x-www-form-urlencoded')
           .send(pieces[i]);
       }
-      console.log(response.body);
-
 
       // Then
       // 配列 === 長さ

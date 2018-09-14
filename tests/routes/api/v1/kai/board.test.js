@@ -37,7 +37,6 @@ describe('board', () => {
         0, 5, 4, 0, 0,
         0, 7, 0, 0, 2,
       ]);
-      // console.log(matchers);
       await Promise.all(matchers.map(m => new PlayingModel(m).save()));
       // When
       const { body } = await chai.request(app).get(`${basePath}/kai/board`);
