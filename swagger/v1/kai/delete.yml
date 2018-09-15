@@ -1,17 +1,18 @@
 tags:
-  - name: kai-playing
+  - name: kai-board
     description: Kai's Board API
 
 /kai/board:
-  get:
+  delete:
     tags:
       - kai-playing
     externalDocs:
       description: "Jump directly to JSON"
-      url: "https://ireversi-server.now.sh/api/v1/kai/board"
+      url: "https://ireversi-server.now.sh/api/v1/kai/delete"
+    description: "delete all pieces"
     responses:
       200:
-        description: "success"
+        description: "delete success"
         schema:
           type: "array"
           items:

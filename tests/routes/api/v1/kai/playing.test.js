@@ -23,10 +23,10 @@ const {
 
 const basePath = '/api/v1';
 const propFilter = '-_id -__v';
-let order = []; //  配列順番
 // 与えたい配列
 const array2Pieces = (field) => {
   const array = [];
+  let order = []; //  配列順番
   const sqrt = Math.sqrt(field.length); // 平方根
   const fieldExist = field.filter(n => n !== 0); // コマだけを抽出
 
@@ -48,8 +48,8 @@ const array2Pieces = (field) => {
   return array; // 打ち手の順で生成した配列をreturn
 };
 
-const array = [];
 const array2Matchers = (field) => {
+  const array = [];
   const sqrt = Math.sqrt(field.length);
   for (let i = 0; i < field.length; i += 1) {
     if (field[i] !== 0) {
