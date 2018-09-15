@@ -21,6 +21,12 @@ router.use((req, res, next) => {
 });
 
 router.route('/')
+  // 削除処理
+  .delete(async (req, res) => {
+    await PlayingModel.remove();
+    res.json(await PlayingModel.find({}, propfilter));
+  })
+  // データ登録処理
   .post(async (req, res) => {
     const data = await PlayingModel.find({}, propfilter);
     const result = {
