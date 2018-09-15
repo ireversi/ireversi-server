@@ -177,8 +177,7 @@ describe('play', () => {
       }
 
       // Then
-      // 左辺は現実、右辺は理想(=Matchers)
-      // 上はexpressの検証
+      // expressの検証
       expect(response.body).toHaveLength(pieces.length - 1);
       expect(response.body).toEqual(expect.arrayContaining(matchers));
 
@@ -229,6 +228,7 @@ describe('play', () => {
     //   });
 
     // はなれたところにおけないテスト
+
     // 自分のがあったらめくれるところにしかおけない
   });
 });

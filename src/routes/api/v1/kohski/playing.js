@@ -38,34 +38,34 @@ router.route('/')
       return;
     }
 
-    // // turn over test
-    // const turnCandidate = [];
+    //     // turn over test
+    //     const turnCandidate = [];
 
-    // for (let i = 0; i < dirArr.length; i += 1) {
-    //   // dirArrから進行方向の成分を取得
-    //   const dirX = dirArr[i][0];
-    //   const dirY = dirArr[i][1];
+    //     for (let i = 0; i < dirArr.length; i += 1) {
+    //       // dirArrから進行方向の成分を取得
+    //       const dirX = dirArr[i][0];
+    //       const dirY = dirArr[i][1];
 
-    //   let dist = 1;
-    //   const searchX = result.x + (dirX * dist);
-    //   const searchY = result.y + (dirY * dist);
+    //       let dist = 1;
+    //       const searchX = result.x + (dirX * dist);
+    //       const searchY = result.y + (dirY * dist);
 
 
-    //   // picesの中に、result起点でdirArr[i]方向にdist進んだpieceがあるか検索。リターンはobj
-    //   const targetPiece = pieces.find(p => p.x === searchX && p.y === searchY);
+    //       // picesの中に、result起点でdirArr[i]方向にdist進んだpieceがあるか検索。リターンはobj
+    //       const targetPiece = pieces.find(p => p.x === searchX && p.y === searchY);
 
-    //   while (targetPiece !== undefined) {
-    //     if (targetPiece.userID !== result.userID) {
-    //       turnCandidate.push(targetPiece);
-    //       dist += 1;
-    //     } else if (targetPiece.userID === result.userID) {
-    //       for (let k = 0; k < turnCandidate.length; k += 1) {
-    //         turnCandidate[k].userID = result.userID;
+    //       while (targetPiece !== undefined) {
+    //         if (targetPiece.userID !== result.userID) {
+    //           turnCandidate.push(targetPiece);
+    //           dist += 1;
+    //         } else if (targetPiece.userID === result.userID) {
+    //           for (let k = 0; k < turnCandidate.length; k += 1) {
+    //             turnCandidate[k].userID = result.userID;
+    //           }
+    //           break;
+    //         }
     //       }
-    //       break;
     //     }
-    //   }
-    // }
 
     const Playing = new PlayingModel(result);
     await Playing.save();
