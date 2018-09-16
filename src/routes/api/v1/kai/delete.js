@@ -11,7 +11,7 @@ router.use((req, res, next) => {
 });
 
 router.route('/')
-  .get(async (req, res) => {
+  .delete(async (req, res) => {
     await PlayingModel.remove(); // delete.testでsaveした内容を全て削除
     res.json(await PlayingModel.find({}, propFilter)); // 更新後のコレクションを取ってくる
   });

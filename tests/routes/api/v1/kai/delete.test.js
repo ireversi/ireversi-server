@@ -51,8 +51,7 @@ describe('Delete all pieces', () => {
       await Promise.all(pieces.map(p => new PlayingModel(p).save()));
       // When
       // saveしたboard情報をbodyに分割代入
-      const { body } = await chai.request(app).get(`${basePath}/kai/delete`);
-
+      const { body } = await chai.request(app).delete(`${basePath}/kai/delete`);
       // Then
       // 削除されてlengthは0
       expect(body).toHaveLength(matches.length);

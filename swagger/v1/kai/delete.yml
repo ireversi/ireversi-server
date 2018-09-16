@@ -2,7 +2,7 @@ tags:
   - name: kai-board
     description: Kai's Board API
 
-/kai/board:
+/kai/delete:
   delete:
     tags:
       - kai-playing
@@ -16,7 +16,7 @@ tags:
         schema:
           type: "array"
           items:
-            type: object
+            type: "object"
             properties:
               x:
                 type: "integer"
