@@ -1,8 +1,10 @@
 const chai = require('chai');
 
 const app = require('../../../../../src/routes/app.js'); // express引っ張ってきてサーバー立てる
+
 const PlayingModel = require('../../../../../src/models/kai/PlayingModel.js'); // Mongoテーブル引っ張ってくる
 
+const propFilter = '-_id -__v';
 const {
   prepareDB,
   deleteAllDataFromDB,
@@ -57,6 +59,11 @@ describe('Delete all pieces', () => {
       expect(body).toHaveLength(matches.length);
       // 削除されて要素は0
       expect(body).toEqual(expect.arrayContaining(matches));
+
+      // ちゃんとデータベースから消えているかを確認
+      const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(matches.length);
+      expect(pieceData).toEqual(expect.arrayContaining(matches));
     });
   });
 });
