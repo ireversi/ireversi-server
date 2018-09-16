@@ -39,7 +39,9 @@ describe('board', () => {
       ]);
       await Promise.all(matchers.map(m => new PlayingModel(m).save()));
       // When
+      // saveしたboard情報をbodyに分割代入
       const { body } = await chai.request(app).get(`${basePath}/kai/board`);
+
       // Then
       expect(body).toHaveLength(matchers.length);
       expect(body).toEqual(expect.arrayContaining(matchers));

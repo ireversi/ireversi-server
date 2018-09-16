@@ -45,23 +45,19 @@ describe('Delete all pieces', () => {
         ],
       );
 
-      const empty = {};
+      const matches = []; // 空の配列が期待される
 
+      // piecesの情報をmongoDBにsave
+      await Promise.all(pieces.map(p => new PlayingModel(p).save()));
       // When
-      let response;
-      for (let i = 0; i < pieces.length; i += 1) {
-        response = await chai.request(app)
-          .post(`${basePath}/kai/delete`)
-          .set('content-type', 'application/x-www-form-urlencoded')
-          .send(pieces[i]);
-      }
+      // saveしたboard情報をbodyに分割代入
+      const { body } = await chai.request(app).get(`${basePath}/kai/delete`);
 
       // Then
-      // 配列 === 長さ
-      expect(response.body).toEqual(empty);
-
-      const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({})));
-      expect(pieceData).toEqual(expect.not.arrayContaining(pieces));
+      // 削除されてlengthは0
+      expect(body).toHaveLength(matches.length);
+      // 削除されて要素は0
+      expect(body).toEqual(expect.arrayContaining(matches));
     });
   });
 });
