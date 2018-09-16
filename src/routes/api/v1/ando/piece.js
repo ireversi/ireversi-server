@@ -17,11 +17,13 @@ router.route('/')
       y: +req.body.y,
       userId: +req.body.userId,
     };
+    // console.log(result);
 
     const piecesCheck = [];
     let putPieceFlg = false;
+    let removeFlg = true;
 
-    // 指定された場所を中心とした9マスの状況確認
+    // 置こうとしている場所を中心とした9マスの状況確認
     for (let i = -1; i <= 1; i += 1) {
       for (let j = -1; j <= 1; j += 1) {
         if ((await PieceModel.find({ x: result.x + i, y: result.y + j })).length) {
@@ -31,33 +33,30 @@ router.route('/')
         }
       }
     }
+    // console.log(piecesCheck);
+
+    // 自分のコマを抽出
+    const ownPieces = await PieceModel.find({ userId: result.userId }, propFilter);
 
     // 同じ場所には置けない
     if (!piecesCheck[4]) {
       // 上下左右にコマがあれば置ける
       if (piecesCheck[1] || piecesCheck[3] || piecesCheck[5] || piecesCheck[7]) {
         putPieceFlg = true;
+        // console.log('上下左右');
       // ユーザーが2手目以降であったら斜めにコマがあれば置ける
-      } else if ((await PieceModel.find({ userId: result.userId })).length >= 1
+      } else if (ownPieces.length >= 1
           && (piecesCheck[0] || piecesCheck[2] || piecesCheck[6] || piecesCheck[8])) {
         putPieceFlg = true;
+        // console.log('斜め');
       // その盤の1手目だったら、どこでも置ける
       } else if ((await PieceModel.find({})).length === 0) {
         putPieceFlg = true;
       }
     }
 
-    // 登録処理
-    if (putPieceFlg) {
-      const Piece = new PieceModel(result);
-      await Piece.save();
-    }
-
-    // 自分のコマを抽出
-    const ownPieces = await PieceModel.find({ userId: result.userId }, propFilter);
-
-    // 自分のコマが存在して、かつ2コ以上のとき
-    if (ownPieces && ownPieces.length >= 2) {
+    // console.log(ownPieces);
+    if (ownPieces) {
       for (let i = 0; i < ownPieces.length; i += 1) {
         let flg = true;
 
@@ -82,6 +81,7 @@ router.route('/')
               for (let j = result.y - 1; j > ownPieces[i].y; j -= 1) {
                 await PieceModel.update({ x: result.x, y: j }, { $set: { userId: result.userId } });
               }
+              removeFlg = false;
             }
           // 置いたコマの方がY方向に小さい
           } else if (ownPieces[i].y > result.y) {
@@ -102,6 +102,7 @@ router.route('/')
               for (let j = result.y + 1; j < ownPieces[i].y; j += 1) {
                 await PieceModel.update({ x: result.x, y: j }, { $set: { userId: result.userId } });
               }
+              removeFlg = false;
             }
           }
 
@@ -126,6 +127,7 @@ router.route('/')
               for (let j = result.x - 1; j > ownPieces[i].x; j -= 1) {
                 await PieceModel.update({ x: j, y: result.y }, { $set: { userId: result.userId } });
               }
+              removeFlg = false;
             }
           // 置いたコマ方のがX方向に小さい
           } else if (ownPieces[i].x > result.x) {
@@ -146,6 +148,7 @@ router.route('/')
               for (let j = result.x + 1; j < ownPieces[i].x; j += 1) {
                 await PieceModel.update({ x: j, y: result.y }, { $set: { userId: result.userId } });
               }
+              removeFlg = false;
             }
           }
 
@@ -155,7 +158,7 @@ router.route('/')
           if (ownPieces[i].y < result.y) {
             if (ownPieces[i].x < result.x) {
               // 置いたコマの下から次のコマまで
-              for (let j = 1; j < (result.y - ownPieces[i].y); j += 1) {
+              for (let j = 1; j <= (result.y - ownPieces[i].y); j += 1) {
                 // コマを取得
                 const targetPiece = await PieceModel.find({ x: result.x - j, y: result.y - j },
                   propFilter);
@@ -173,10 +176,11 @@ router.route('/')
                   await PieceModel.update({ x: result.x - j, y: result.y - j },
                     { $set: { userId: result.userId } });
                 }
+                removeFlg = false;
               }
             } else if (ownPieces[i].x > result.x) {
               // 置いたコマの下から次のコマまで
-              for (let j = 1; j < (result.y - ownPieces[i].y); j += 1) {
+              for (let j = 1; j <= (result.y - ownPieces[i].y); j += 1) {
                 // コマを取得
                 const targetPiece = await PieceModel.find({ x: result.x + j, y: result.y - j },
                   propFilter);
@@ -194,6 +198,7 @@ router.route('/')
                   await PieceModel.update({ x: result.x + j, y: result.y - j },
                     { $set: { userId: result.userId } });
                 }
+                removeFlg = false;
               }
             }
           // 置いたコマ方のがY方向に小さい
@@ -218,6 +223,7 @@ router.route('/')
                   await PieceModel.update({ x: result.x - j, y: result.y + j },
                     { $set: { userId: result.userId } });
                 }
+                removeFlg = false;
               }
             } else if (ownPieces[i].x > result.x) {
               // 置いたコマの下から次のコマまで
@@ -239,16 +245,41 @@ router.route('/')
                   await PieceModel.update({ x: result.x + j, y: result.y + j },
                     { $set: { userId: result.userId } });
                 }
+                removeFlg = false;
               }
             }
           }
         }
       }
     }
+    //
+    if (removeFlg && ownPieces.length > 0) {
+      putPieceFlg = false;
+    }
+
+    // 登録処理
+    if (putPieceFlg) {
+      const Piece = new PieceModel(result);
+      await Piece.save();
+    }
 
     // 送信処理
     const allPieces = await PieceModel.find({}, propFilter);
+    // console.log(allPieces);
     res.json(allPieces);
+  })
+  .delete(async (req, res) => {
+    if (req.body.keyword === 'deleteAll') {
+      await PieceModel.remove();
+    } else {
+      const result = {
+        x: +req.body.x,
+        y: +req.body.y,
+        userId: +req.body.userId,
+      };
+      await PieceModel.remove({ x: result.x, y: result.y, userId: result.userId });
+    }
+    res.json(await PieceModel.find({}, propFilter));
   });
 
 module.exports = router;
