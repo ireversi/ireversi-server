@@ -43,3 +43,48 @@ tags:
                 type: "integer"
                 format: "int64"
                 example: 1
+  delete:
+    tags:
+      - Ando-playing
+    summary: "Delete a piece or all pieces"
+    parameters:
+      - name: "x"
+        in: "formData"
+        description: "X position"
+        required: true
+        type: "number"
+      - name: "y"
+        in: "formData"
+        description: "Y position"
+        required: true
+        type: "number"
+      - name: "userId"
+        in: "formData"
+        description: "User ID"
+        required: true
+        type: "number"
+      - name: "keyword"
+        in: "formData"
+        description: "Please enter keyword 'deleteAll' if you want to delete all pieces."
+        required: false
+        type: "string"
+    responses:
+      200:
+        description: "Board data"
+        schema:
+          type: array
+          items:
+            type: "object"
+            properties:
+              x:
+                type: "integer"
+                format: "int64"
+                example: 1
+              y:
+                type: "integer"
+                format: "int64"
+                example: 1
+              userId:
+                type: "integer"
+                format: "int64"
+                example: 1
