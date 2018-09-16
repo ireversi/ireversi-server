@@ -9,6 +9,8 @@ const {
 
 const basePath = '/api/v1';
 
+const propFilter = '-_id -__v';
+
 // baseArrayはオプション
 function array2Pieces(requestArray, baseArray) {
   // フィールドのサイズ算出
@@ -138,8 +140,6 @@ describe('play', () => {
       expect(response.body).toHaveLength(pieces.length);
       expect(response.body).toEqual(expect.arrayContaining(pieces));
 
-      const propFilter = '-_id -__v';
-
       const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
       expect(pieceData).toHaveLength(pieces.length);
       expect(pieceData).toMatchObject(expect.arrayContaining(pieces));
@@ -175,8 +175,6 @@ describe('play', () => {
       expect(response.body).toHaveLength(matchers.length);
       expect(response.body).toEqual(expect.arrayContaining(matchers));
 
-      const propFilter = '-_id -__v';
-
       const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
       expect(pieceData).toHaveLength(matchers.length);
       expect(pieceData).toMatchObject(expect.arrayContaining(matchers));
@@ -211,8 +209,6 @@ describe('play', () => {
       // Then
       expect(response.body).toHaveLength(matchers.length);
       expect(response.body).toEqual(expect.arrayContaining(matchers));
-
-      const propFilter = '-_id -__v';
 
       const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
       expect(pieceData).toHaveLength(matchers.length);
@@ -250,8 +246,6 @@ describe('play', () => {
       // Then
       expect(response.body).toHaveLength(matchers.length);
       expect(response.body).toEqual(expect.arrayContaining(matchers));
-
-      const propFilter = '-_id -__v';
 
       const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
       expect(pieceData).toHaveLength(matchers.length);
@@ -295,7 +289,12 @@ describe('play', () => {
       // Then
       expect(body).toHaveLength(matchers.length);
       expect(body).toEqual(expect.arrayContaining(matchers));
+
+      const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(matchers.length);
+      expect(pieceData).toMatchObject(expect.arrayContaining(matchers));
     });
+
     it('deletes the piece', async () => {
       // Given
       const pieces = array2Matchers([
@@ -329,6 +328,10 @@ describe('play', () => {
       // Then
       expect(body).toHaveLength(matchers.length);
       expect(body).toEqual(expect.arrayContaining(matchers));
+
+      const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(matchers.length);
+      expect(pieceData).toMatchObject(expect.arrayContaining(matchers));
     });
   });
 });
