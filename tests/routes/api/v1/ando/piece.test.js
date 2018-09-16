@@ -273,6 +273,10 @@ describe('play', () => {
         1, 0, 0, 0, 0, 0,
       ]);
 
+      await Promise.all(pieces.map(m => new PieceModel(m).save()));
+
+      const keyword = 'deleteAll';
+
       const matchers = array2Matchers([
         0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0,
@@ -282,13 +286,11 @@ describe('play', () => {
         0, 0, 0, 0, 0, 0,
       ]);
 
-      await Promise.all(pieces.map(m => new PieceModel(m).save()));
-
       // When
       const { body } = await chai.request(app)
         .delete(`${basePath}/ando/piece`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send({ keyword: 'deleteAll' });
+        .send({ keyword });
 
       // Then
       expect(body).toHaveLength(matchers.length);
@@ -305,6 +307,10 @@ describe('play', () => {
         1, 0, 0, 0, 0, 0,
       ]);
 
+      await Promise.all(pieces.map(m => new PieceModel(m).save()));
+
+      const targetPiece = { x: 0, y: 0, userId: 1 };
+
       const matchers = array2Matchers([
         0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 8,
@@ -314,13 +320,11 @@ describe('play', () => {
         0, 0, 0, 0, 0, 0,
       ]);
 
-      await Promise.all(pieces.map(m => new PieceModel(m).save()));
-
       // When
       const { body } = await chai.request(app)
         .delete(`${basePath}/ando/piece`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send({ x: 0, y: 0, userId: 1 });
+        .send(targetPiece);
 
       // Then
       expect(body).toHaveLength(matchers.length);
