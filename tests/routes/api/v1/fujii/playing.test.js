@@ -242,5 +242,27 @@ describe('play', () => {
       expect(pieces).toHaveLength(rMatchers.length);
       expect(pieces).toEqual(expect.arrayContaining(rMatchers));
     });
+
+    // ---------------
+    // ゲームリセット
+    // ---------------
+
+    it('reset games', async () => {
+      const matchers = [
+        0, 0,
+        0, 0,
+      ];
+
+      // When
+      const response = await chai.request(app).delete(`${basePath}/fujii/playing`);
+      // Then
+      const rMatchers = reformMatchers(matchers);
+      expect(response.body).toHaveLength(rMatchers.length);
+      expect(response.body).toEqual(expect.arrayContaining(rMatchers));
+
+      const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
+      expect(pieces).toHaveLength(rMatchers.length);
+      expect(pieces).toEqual(expect.arrayContaining(rMatchers));
+    });
   });
 });

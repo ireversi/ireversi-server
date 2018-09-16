@@ -16,10 +16,17 @@ const adjacents = [
 router.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   next();
 });
 
 router.route('/')
+  // 削除処理
+  .delete(async (req, res) => {
+    await PlayingModel.remove();
+    res.json(await PlayingModel.find({}, propfilter));
+  })
+  // データ登録処理
   .post(async (req, res) => {
     const data = await PlayingModel.find({}, propfilter);
     const result = {
