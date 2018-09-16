@@ -12,17 +12,17 @@ tags:
         in: "formData"
         description: "X position"
         required: true
-        type: "number"
+        type: "integer"
       - name: "y"
         in: "formData"
         description: "Y position"
         required: true
-        type: "number"
+        type: "integer"
       - name: "userId"
         in: "formData"
-        description: "User ID"
+        description: "User ID (>= 1)"
         required: true
-        type: "number"
+        type: "integer"
     responses:
       200:
         description: "Piece data"
@@ -51,18 +51,18 @@ tags:
       - name: "x"
         in: "formData"
         description: "X position"
-        required: true
-        type: "number"
+        required: false
+        type: "integer"
       - name: "y"
         in: "formData"
         description: "Y position"
-        required: true
-        type: "number"
+        required: false
+        type: "integer"
       - name: "userId"
         in: "formData"
-        description: "User ID"
-        required: true
-        type: "number"
+        description: "User ID (>= 1)"
+        required: false
+        type: "integer"
       - name: "keyword"
         in: "formData"
         description: "Please enter keyword 'deleteAll' if you want to delete all pieces."
