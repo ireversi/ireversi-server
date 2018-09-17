@@ -187,10 +187,48 @@ describe('play', () => {
       expect(pieceData).toEqual(expect.arrayContaining(matchers));
     });
 
-    // // 挟んだらめくれるテスト
+    // 挟んだらめくれるテスト
+    it('turnover pieces', async () => {
+      // Given
+      const pieces = array2pieces(
+        [
+          ['1:6', '2:4', '1:1', 0],
+          ['2:2', 0, 0, 0],
+          ['3:3', 0, 0, 0],
+          ['1:5', 0, 0, 0],
+        ],
+      );
+      const matchers = array2pieces(
+        [
+          [1, 1, 1, 0],
+          [1, 0, 0, 0],
+          [1, 0, 0, 0],
+          [1, 0, 0, 0],
+        ],
+      );
+
+      // When
+      let response;
+
+      for (let i = 0; i < pieces.length; i += 1) {
+        response = await chai.request(app)
+          .post(`${basePath}/kohski/playing`)
+          .set('content-type', 'application/x-www-form-urlencoded')
+          .send(pieces[i]);
+      }
+
+      // Then
+      // expressの検証
+      expect(response.body).toHaveLength(pieces.length);
+      expect(response.body).toEqual(expect.arrayContaining(matchers));
+
+      // mongodbの検証
+      const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(pieces.length);
+      expect(pieceData).toEqual(expect.arrayContaining(matchers));
+    });
 
     // はなれたところにおけないテスト
-
     // 自分のがあったらめくれるところにしかおけない
   });
 });
