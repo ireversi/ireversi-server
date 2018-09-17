@@ -1,11 +1,12 @@
 tags:
-  - name: fujii-board
+  - name: Fujii-Playing
     description: Fujii Reversi API
 
 /fujii/board:
   get:
     tags:
-      - fujii-board
+      - Fujii-Playing
+    summary: "Get all pieces on the board"
     responses:
       200:
         description: "all pieces"

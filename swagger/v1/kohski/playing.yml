@@ -8,39 +8,37 @@ tags:
       - Kohski-playing
     parameters:
       - name: "x"
-        in: "query"
+        in: "formData"
         description: "x axis"
         required: true
         type: "number"
       - name: "y"
-        in: "query"
+        in: "formData"
         description: "y axis"
         required: true
         type: "number"
       - name: "userID"
-        in: "query"
+        in: "formData"
         description: "user ID"
         required: true
         type: "number"
     responses:
       200:
-        description: "array"
+        description: "Playing data"
         schema:
-          type: "object"
-          properties:
-            user_id:
-              type: "string"
-              example: "aaaaaaaa"
-            name:
-              type: "string"
-              example: "aaaaaaaa"
-            email:
-              type: "string"
-              example: "aaa@aaa.aaa"
-            password:
-              type: "string"
-              example: "aaaaaaaa"
-            created:
-              type: "string"
-              example: "YYYY-MM-DD HH:mm:ss"
-  
+          type: "array"
+          items:
+            type: object
+            properties:
+              x:
+                type: "integer"
+                format: "int64"
+                example: 1
+              y:
+                type: "integer"
+                format: "int64"
+                example: 1
+              userId:
+                type: "integer"
+                format: "int64"
+                example: 1  

@@ -248,21 +248,151 @@ describe('play', () => {
     // ---------------
 
     it('reset games', async () => {
+      const pieces = [
+        0, 0,
+        '1:1', '2:2',
+      ];
+
+      const rPiece = reformPiece(pieces);
+      await Promise.all(rPiece.map(m => new PlayingModel(m).save()));
+
+      const keyword = 'deleteAll';
+
       const matchers = [
         0, 0,
         0, 0,
       ];
 
       // When
-      const response = await chai.request(app).delete(`${basePath}/fujii/playing`);
+      const response = await chai.request(app)
+        .delete(`${basePath}/fujii/playing`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send({ keyword });
+
       // Then
       const rMatchers = reformMatchers(matchers);
       expect(response.body).toHaveLength(rMatchers.length);
       expect(response.body).toEqual(expect.arrayContaining(rMatchers));
 
-      const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
-      expect(pieces).toHaveLength(rMatchers.length);
-      expect(pieces).toEqual(expect.arrayContaining(rMatchers));
+      const piecesData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
+      expect(piecesData).toHaveLength(rMatchers.length);
+      expect(piecesData).toEqual(expect.arrayContaining(rMatchers));
+    });
+
+    // ---------------
+    // ゲームリセット処理時の失敗
+    // ---------------
+
+    it('reset the game but keyword is wrong', async () => {
+      // Given
+      const pieces = [
+        0, 0,
+        '1:1', '2:2',
+      ];
+
+      const rPiece = reformPiece(pieces);
+      await Promise.all(rPiece.map(m => new PlayingModel(m).save()));
+
+      const keyword = 'wrongKeyword';
+
+      const matchers = [
+        0, 0,
+        1, 2,
+      ];
+
+      // When
+      const response = await chai.request(app)
+        .delete(`${basePath}/fujii/playing`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send({ keyword });
+
+      // Then
+      const rMatchers = reformMatchers(matchers);
+      expect(response.body).toHaveLength(rMatchers.length);
+      expect(response.body).toEqual(expect.arrayContaining(rMatchers));
+
+      const piecesData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
+      expect(piecesData).toHaveLength(rMatchers.length);
+      expect(piecesData).toEqual(expect.arrayContaining(rMatchers));
+    });
+
+    // ---------------
+    // 一齣のみの削除
+    // ---------------
+
+    it('delete a piece', async () => {
+      // Given
+      const pieces = [
+        0, 0,
+        '1:1', '2:2',
+      ];
+
+      const rPiece = reformPiece(pieces);
+      await Promise.all(rPiece.map(m => new PlayingModel(m).save()));
+
+      const keyword = 'deleteOne';
+
+      const target = { x: 0, y: 0, userId: 1 };
+
+      const matchers = [
+        0, 0,
+        0, 2,
+      ];
+
+      // When
+      const response = await chai.request(app)
+        .delete(`${basePath}/fujii/playing`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(target)
+        .send({ keyword });
+
+      // Then
+      const rMatchers = reformMatchers(matchers);
+      expect(response.body).toHaveLength(rMatchers.length);
+      expect(response.body).toEqual(expect.arrayContaining(rMatchers));
+
+      const piecesData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
+      expect(piecesData).toHaveLength(rMatchers.length);
+      expect(piecesData).toEqual(expect.arrayContaining(rMatchers));
+    });
+    // ---------------
+    // 一齣のみの削除&&keyword間違い
+    // ---------------
+
+    it('delete a piece', async () => {
+      // Given
+      const pieces = [
+        0, 0,
+        '1:1', '2:2',
+      ];
+
+      const rPiece = reformPiece(pieces);
+      await Promise.all(rPiece.map(m => new PlayingModel(m).save()));
+
+      const keyword = 'deletewrong';
+
+      const target = { x: 0, y: 0, userId: 1 };
+
+      const matchers = [
+        0, 0,
+        1, 2,
+      ];
+
+      // When
+      const response = await chai.request(app)
+        .delete(`${basePath}/fujii/playing`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(target)
+        .send({ keyword });
+
+      // Then
+      const rMatchers = reformMatchers(matchers);
+      expect(response.body).toHaveLength(rMatchers.length);
+      expect(response.body).toEqual(expect.arrayContaining(rMatchers));
+
+      const piecesData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
+      expect(piecesData).toHaveLength(rMatchers.length);
+      expect(piecesData).toEqual(expect.arrayContaining(rMatchers));
     });
   });
 });

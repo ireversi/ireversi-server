@@ -145,14 +145,83 @@ describe('play', () => {
       expect(pieceData).toMatchObject(expect.arrayContaining(pieces));
     });
 
+    it('puts pieces but parameters', async () => {
+      // Given
+      const pieces = [
+        {
+          x: 2,
+          userId: 1,
+        },
+        {
+          y: 2,
+          userId: 1,
+        },
+        {
+          x: -1,
+          y: 1,
+        },
+        {
+          x: 0,
+          y: 1,
+          userId: -1,
+        },
+        {
+          x: 1,
+          y: 1,
+          userId: 3.14,
+        },
+        {
+          x: -1,
+          y: 0.5,
+          userId: 1,
+        },
+        {
+          x: -0.5,
+          y: 0,
+          userId: 1,
+        },
+        {
+        },
+        {
+          x: 0,
+          y: 0,
+          userId: 1,
+        },
+      ];
+
+      const matchers = array2Matchers([
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 0, 0,
+      ], [-1, -1]);
+
+      // When
+      let response;
+      for (let i = 0; i < pieces.length; i += 1) {
+        response = await chai.request(app)
+          .post(`${basePath}/ando/piece`)
+          .set('content-type', 'application/x-www-form-urlencoded')
+          .send(pieces[i]);
+      }
+
+      // Then
+      expect(response.body).toHaveLength(matchers.length);
+      expect(response.body).toEqual(expect.arrayContaining(matchers));
+
+      const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(matchers.length);
+      expect(pieceData).toMatchObject(expect.arrayContaining(matchers));
+    });
+
     // 同じところに置けないテスト
     it('cannon put same cell', async () => {
       // Given
       const pieces = array2Pieces([
-        0, '1:3', 0, 0,
-        0, ['2:2', '8:5'], 0, 0,
-        0, '1:1', '3:4', 0,
-        0, 0, 0, 0,
+        0, '1:3.00000000', 0.000, 0,
+        0, ['2:2', '8:5'], 0.000, 0,
+        0, '1:1.00000000', '3:4', 0,
+        0, 0.000000000000, 0.000, 0,
       ]);
 
       const matchers = array2Matchers([
@@ -254,8 +323,12 @@ describe('play', () => {
 
     // 既に自分のコマがあるときは、めくれるところにしか置けないテスト
   });
+});
+describe('delete', () => {
+  beforeAll(prepareDB);
+  afterEach(deleteAllDataFromDB);
 
-  describe('delete peces', () => {
+  describe('delete all', () => {
     it('deletes all', async () => {
       // Given
       const pieces = array2Matchers([
@@ -295,6 +368,46 @@ describe('play', () => {
       expect(pieceData).toMatchObject(expect.arrayContaining(matchers));
     });
 
+    it('deletes all but keyword is wrong', async () => {
+      // Given
+      const pieces = array2Matchers([
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 8,
+        0, 4, 8, 2, 0, 0,
+        0, 2, 0, 0, 3, 0,
+        3, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0,
+      ]);
+
+      await Promise.all(pieces.map(m => new PieceModel(m).save()));
+
+      const keyword = 'wrongKeyword';
+
+      const matchers = array2Matchers([
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 8,
+        0, 4, 8, 2, 0, 0,
+        0, 2, 0, 0, 3, 0,
+        3, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0,
+      ]);
+
+      // When
+      const { body } = await chai.request(app)
+        .delete(`${basePath}/ando/piece`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send({ keyword });
+
+      // Then
+      expect(body).toHaveLength(matchers.length);
+      expect(body).toEqual(expect.arrayContaining(matchers));
+
+      const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(matchers.length);
+      expect(pieceData).toMatchObject(expect.arrayContaining(matchers));
+    });
+  });
+  describe('delete the piece', () => {
     it('deletes the piece', async () => {
       // Given
       const pieces = array2Matchers([
@@ -308,15 +421,15 @@ describe('play', () => {
 
       await Promise.all(pieces.map(m => new PieceModel(m).save()));
 
-      const targetPiece = { x: 0, y: 0, userId: 1 };
+      const targetPiece = { x: 0, y: 1, userId: 3 };
 
       const matchers = array2Matchers([
         0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 8,
         0, 4, 8, 2, 0, 0,
         0, 2, 0, 0, 3, 0,
-        3, 0, 0, 0, 0, 1,
-        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0,
       ]);
 
       // When
