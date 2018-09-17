@@ -23,8 +23,22 @@ router.use((req, res, next) => {
 router.route('/')
   // 削除処理
   .delete(async (req, res) => {
-    await PlayingModel.remove();
-    res.json(await PlayingModel.find({}, propfilter));
+    // リセット
+    if (req.body.keyword === 'deleteAll') {
+      await PlayingModel.remove();
+      res.json(await PlayingModel.find({}, propfilter));
+    // １コマ削除
+    } else if (req.body.keyword === 'deleteOne') {
+      const result = {
+        x: +req.body.x,
+        y: +req.body.y,
+        userId: +req.body.userId,
+      };
+      await PlayingModel.remove({ x: result.x, y: result.y, userId: result.userId });
+      res.json(await PlayingModel.find({}, propfilter));
+    } else {
+      res.json(await PlayingModel.find({}, propfilter));
+    }
   })
   // データ登録処理
   .post(async (req, res) => {
