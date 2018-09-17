@@ -7,13 +7,8 @@
       200:
         description: "all pieces on board"
         schema:
-          type: "object"
-          properties:
-            state:
-              $ref: "#/definitions/Pieces"
-            position:
-              $ref: "#/definitions/Candidates"
-/board/specified-range:
+          $ref: "#/definitions/Board"
+/board/specified_range:
   get:
     tags:
       - "board"
@@ -32,58 +27,31 @@
       200:
         description: "pieces on specified board range"
         schema:
-          type: "object"
-          properties:
-            state:
-              $ref: "#/definitions/Pieces"
-            candidate:
-              $ref: "#/definitions/Candidates"
+          $ref: "#/definitions/Board"
 /piece:
   post:
     tags:
       - piece
     summary: "set a piece on board"
     parameters:
-      - name: "x"
-        in: "formData"
-        description: "X position"
-        required: true
-        type: "number"
-      - name: "y"
-        in: "formData"
-        description: "Y position"
-        required: true
-        type: "number"
-      - name: "userId"
-        in: "formData"
-        description: "User ID"
-        required: true
-        type: "number"
+      - $ref: "#/definitions/Piece/properties/x"
+      - $ref: "#/definitions/Piece/properties/y"
+      - $ref: "#/definitions/Piece/properties/userId"
     responses:
       200:
-        description: "Piece data"
+        description: "show specified board range"
         schema:
-          $ref: "#/definitions/Pieces"
+          $ref: "#/definitions/Response"
   delete:
     tags:
       - piece
     summary: "delete a piece or all pieces"
     parameters:
-      - name: "x"
-        in: "formData"
-        description: "X position"
-        required: true
-        type: "number"
-      - name: "y"
-        in: "formData"
-        description: "Y position"
-        required: true
-        type: "number"
-      - name: "userId"
-        in: "formData"
-        description: "User ID"
-        required: true
-        type: "number"
+      - name: "pieces"
+        description: "Add items to be deleted"
+        in: "body"
+        schema:
+          $ref: "#/definitions/Pieces"
       - name: "keyword"
         in: "formData"
         description: "Please enter keyword 'deleteAll' if you want to delete all pieces."
@@ -93,85 +61,43 @@
       200:
         description: "Board data"
         schema:
-          $ref: "#/definitions/Pieces"
+          $ref: "#/definitions/Response"
 /piece/first_piece:
   post:
     tags:
       - piece
     summary: "set the first piece"
     parameters:
-      - name: "first x"
-        in: "formData"
-        description: "first X position"
-        required: true
-        type: "number"
-      - name: "first y"
-        in: "formData"
-        description: "first Y position"
-        required: true
-        type: "number"
-      - name: "userId"
-        in: "formData"
-        description: "User ID"
-        required: true
-        type: "number"
-      - name: "second x"
-        in: "formData"
-        description: "second X position"
-        required: true
-        type: "number"
-      - name: "second y"
-        in: "formData"
-        description: "second Y position"
-        required: true
-        type: "number"
+    - in: "body"
+      name: "first"
+      schema:
+        $ref: "#/definitions/Piece"
+    - in: "body"
+      name: "second"
+      schema:
+        $ref: "#/definitions/Position"
     responses:
       200:
         description: "show specified board range"
         schema:
-          type: "object"
-          properties:
-            status:
-              type: "boolean"
-              example: true
-            board:
-              type: "object"
-              properties:
-                first:
-                  $ref: "#/definitions/Piece"
-                second:
-                  $ref: "#/definitions/Position"
-/user:
-  get:
-    tags:
-    - "user"
-    summary: "find user by userId"
-    description: "return a single ID"
-    parameters:
-    - name: "userId"
-      in: "formData"
-      description: "your userId"
-      required: true
-      type: "number"
-    responses:
-      200:
-        description: "successful operation"
-        schema:
-          userId: "integer"
-          format: "int64"
-          example: 1234
-      400:
-        description: "Invalid ID supplied"
-      404:
-        description: "User not found"
+          $ref: "#/definitions/Response"
 
 definitions:
+  Response:
+    type: "object"
+    properties:
+      status:
+        type: "boolean"
+        example: true
+      board:
+        type: "object"
+        $ref: "#/definitions/Board"
   Board:
     type: "object"
     properties:
       pieces:
         $ref: "#/definitions/Pieces"
-      candidate:
+      candidates:
         $ref: "#/definitions/Candidates"
   Pieces:
     type: array
@@ -181,17 +107,24 @@ definitions:
     type: object
     properties:
       x:
+        name: "x"
         type: number
-        example: 0
+        example: 1
+        in: "formData"
+        required: true
       y:
+        name: "y"
         type: number
-        example: 0
+        example: 1
+        in: "formData"
+        required: true
       userId:
         name: userId
         in: "query"
-        description: "UserId"
+        description: "userId"
         type: number
         example: 1
+        required: true
   Candidates:
     type: array
     items:
@@ -200,11 +133,15 @@ definitions:
     type: "object"
     properties:
       x:
+        name: "x"
         type: number
-        example: 0
+        example: 1
+        in: "formData"
       y:
+        name: "y"
         type: number
-        example: 0
+        example: 1
+        in: "formData"
   Range:
     type: "object"
     properties:
