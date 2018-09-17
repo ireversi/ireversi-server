@@ -1,7 +1,234 @@
-/:
+/board:
   get:
     tags:
-    - description: sample API
+      - "board"
+    summary: "show all board conditon"
     responses:
-      204:
-        description: no content
+      200:
+        description: "all pieces on board"
+        schema:
+          type: "object"
+          properties:
+            state:
+              $ref: "#/definitions/Pieces"
+            position:
+              $ref: "#/definitions/Candidates"
+/board/specified-range:
+  get:
+    tags:
+      - "board"
+    summary: "show specified board range"
+    parameters:
+      - $ref: "#/definitions/Range/properties/left"
+      - $ref: "#/definitions/Range/properties/right"
+      - $ref: "#/definitions/Range/properties/bottom"
+      - $ref: "#/definitions/Range/properties/top"
+      - name: "userId"
+        in: "query"
+        description: "your userId"
+        required: true
+        type: "number"
+    responses:
+      200:
+        description: "pieces on specified board range"
+        schema:
+          type: "object"
+          properties:
+            state:
+              $ref: "#/definitions/Pieces"
+            candidate:
+              $ref: "#/definitions/Candidates"
+/piece:
+  post:
+    tags:
+      - piece
+    summary: "set a piece on board"
+    parameters:
+      - name: "x"
+        in: "formData"
+        description: "X position"
+        required: true
+        type: "number"
+      - name: "y"
+        in: "formData"
+        description: "Y position"
+        required: true
+        type: "number"
+      - name: "userId"
+        in: "formData"
+        description: "User ID"
+        required: true
+        type: "number"
+    responses:
+      200:
+        description: "Piece data"
+        schema:
+          $ref: "#/definitions/Pieces"
+  delete:
+    tags:
+      - piece
+    summary: "delete a piece or all pieces"
+    parameters:
+      - name: "x"
+        in: "formData"
+        description: "X position"
+        required: true
+        type: "number"
+      - name: "y"
+        in: "formData"
+        description: "Y position"
+        required: true
+        type: "number"
+      - name: "userId"
+        in: "formData"
+        description: "User ID"
+        required: true
+        type: "number"
+      - name: "keyword"
+        in: "formData"
+        description: "Please enter keyword 'deleteAll' if you want to delete all pieces."
+        required: false
+        type: "string"
+    responses:
+      200:
+        description: "Board data"
+        schema:
+          $ref: "#/definitions/Pieces"
+/piece/first_piece:
+  post:
+    tags:
+      - piece
+    summary: "set the first piece"
+    parameters:
+      - name: "first x"
+        in: "formData"
+        description: "first X position"
+        required: true
+        type: "number"
+      - name: "first y"
+        in: "formData"
+        description: "first Y position"
+        required: true
+        type: "number"
+      - name: "userId"
+        in: "formData"
+        description: "User ID"
+        required: true
+        type: "number"
+      - name: "second x"
+        in: "formData"
+        description: "second X position"
+        required: true
+        type: "number"
+      - name: "second y"
+        in: "formData"
+        description: "second Y position"
+        required: true
+        type: "number"
+    responses:
+      200:
+        description: "show specified board range"
+        schema:
+          type: "object"
+          properties:
+            status:
+              type: "boolean"
+              example: true
+            board:
+              type: "object"
+              properties:
+                first:
+                  $ref: "#/definitions/Piece"
+                second:
+                  $ref: "#/definitions/Position"
+/user:
+  get:
+    tags:
+    - "user"
+    summary: "find user by userId"
+    description: "return a single ID"
+    parameters:
+    - name: "userId"
+      in: "formData"
+      description: "your userId"
+      required: true
+      type: "number"
+    responses:
+      200:
+        description: "successful operation"
+        schema:
+          userId: "integer"
+          format: "int64"
+          example: 1234
+      400:
+        description: "Invalid ID supplied"
+      404:
+        description: "User not found"
+
+definitions:
+  Board:
+    type: "object"
+    properties:
+      pieces:
+        $ref: "#/definitions/Pieces"
+      candidate:
+        $ref: "#/definitions/Candidates"
+  Pieces:
+    type: array
+    items:
+      $ref: "#/definitions/Piece"
+  Piece:
+    type: object
+    properties:
+      x:
+        type: number
+        example: 0
+      y:
+        type: number
+        example: 0
+      userId:
+        name: userId
+        in: "query"
+        description: "UserId"
+        type: number
+        example: 1
+  Candidates:
+    type: array
+    items:
+      $ref: "#/definitions/Position"
+  Position:
+    type: "object"
+    properties:
+      x:
+        type: number
+        example: 0
+      y:
+        type: number
+        example: 0
+  Range:
+    type: "object"
+    properties:
+      left:
+        name: "l"
+        in: "query"
+        description: "Min of X axis (left)"
+        required: true
+        type: "number"
+      right:
+        name: "r"
+        in: "query"
+        description: "Max of X axis (right)"
+        required: true
+        type: "number"
+      bottom:
+        name: "b"
+        in: "query"
+        description: "Min of Y axis (bottom)"
+        required: true
+        type: "number"
+      top:
+        name: "t"
+        in: "query"
+        description: "Max of X axis (top)"
+        required: true
+        type: "number"
