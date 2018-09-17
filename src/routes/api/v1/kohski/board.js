@@ -1,7 +1,7 @@
 
 const router = require('express').Router();
 
-const PlayingModel = require('../../../../models/kido/PieceModel.js');
+const PlayingModel = require('../../../../models/kohski/PlayingModel.js');
 
 const propfilter = '-_id -__v';
 

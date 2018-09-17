@@ -9,6 +9,8 @@ const {
 
 const basePath = '/api/v1';
 
+const propFilter = '-_id -__v';
+
 // baseArrayはオプション
 function array2Pieces(requestArray, baseArray) {
   // フィールドのサイズ算出
@@ -63,7 +65,7 @@ function array2Pieces(requestArray, baseArray) {
   return result;
 }
 
-function array2Machers(exceptArray, baseArray) {
+function array2Matchers(exceptArray, baseArray) {
   // 基本的な処理は、array2Pieces関数と共通なので、処理できるようデータ整形
   const treatedExceptArray = exceptArray;
   for (let i = 0; i < treatedExceptArray.length; i += 1) {
@@ -138,24 +140,91 @@ describe('play', () => {
       expect(response.body).toHaveLength(pieces.length);
       expect(response.body).toEqual(expect.arrayContaining(pieces));
 
-      const propFilter = '-_id -__v';
-
       const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
       expect(pieceData).toHaveLength(pieces.length);
       expect(pieceData).toMatchObject(expect.arrayContaining(pieces));
+    });
+
+    it('puts pieces but parameters', async () => {
+      // Given
+      const pieces = [
+        {
+          x: 2,
+          userId: 1,
+        },
+        {
+          y: 2,
+          userId: 1,
+        },
+        {
+          x: -1,
+          y: 1,
+        },
+        {
+          x: 0,
+          y: 1,
+          userId: -1,
+        },
+        {
+          x: 1,
+          y: 1,
+          userId: 3.14,
+        },
+        {
+          x: -1,
+          y: 0.5,
+          userId: 1,
+        },
+        {
+          x: -0.5,
+          y: 0,
+          userId: 1,
+        },
+        {
+        },
+        {
+          x: 0,
+          y: 0,
+          userId: 1,
+        },
+      ];
+
+      const matchers = array2Matchers([
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 0, 0,
+      ], [-1, -1]);
+
+      // When
+      let response;
+      for (let i = 0; i < pieces.length; i += 1) {
+        response = await chai.request(app)
+          .post(`${basePath}/ando/piece`)
+          .set('content-type', 'application/x-www-form-urlencoded')
+          .send(pieces[i]);
+      }
+
+      // Then
+      expect(response.body).toHaveLength(matchers.length);
+      expect(response.body).toEqual(expect.arrayContaining(matchers));
+
+      const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(matchers.length);
+      expect(pieceData).toMatchObject(expect.arrayContaining(matchers));
     });
 
     // 同じところに置けないテスト
     it('cannon put same cell', async () => {
       // Given
       const pieces = array2Pieces([
-        0, '1:3', 0, 0,
-        0, ['2:2', '8:5'], 0, 0,
-        0, '1:1', '3:4', 0,
-        0, 0, 0, 0,
+        0, '1:3.00000000', 0.000, 0,
+        0, ['2:2', '8:5'], 0.000, 0,
+        0, '1:1.00000000', '3:4', 0,
+        0, 0.000000000000, 0.000, 0,
       ]);
 
-      const matchers = array2Machers([
+      const matchers = array2Matchers([
         0, 1, 0, 0,
         0, 1, 0, 0,
         0, 1, 3, 0,
@@ -175,8 +244,6 @@ describe('play', () => {
       expect(response.body).toHaveLength(matchers.length);
       expect(response.body).toEqual(expect.arrayContaining(matchers));
 
-      const propFilter = '-_id -__v';
-
       const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
       expect(pieceData).toHaveLength(matchers.length);
       expect(pieceData).toMatchObject(expect.arrayContaining(matchers));
@@ -186,13 +253,13 @@ describe('play', () => {
     it('turns over pieces between setting piece and other own pieces', async () => {
       // Given
       const pieces = array2Pieces([
-        0, '1:4', 0, 0,
-        0, '2:2', 0, 0,
-        '3:6', '1:1', '3:3', 0,
-        0, 0, '2:5', '1:7',
+        0.000, '1:4', 0.000, 0.000,
+        0.000, '2:2', 0.000, 0.000,
+        '3:6', '1:1', '3:3', 0.000,
+        0.000, 0.000, '2:5', '1:7',
       ]);
 
-      const matchers = array2Machers([
+      const matchers = array2Matchers([
         0, 1, 0, 0,
         0, 1, 0, 0,
         3, 3, 1, 0,
@@ -212,8 +279,6 @@ describe('play', () => {
       expect(response.body).toHaveLength(matchers.length);
       expect(response.body).toEqual(expect.arrayContaining(matchers));
 
-      const propFilter = '-_id -__v';
-
       const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
       expect(pieceData).toHaveLength(matchers.length);
       expect(pieceData).toMatchObject(expect.arrayContaining(matchers));
@@ -223,14 +288,14 @@ describe('play', () => {
     it('cannon put a piece at a distance from other pieces', async () => {
       // Given
       const pieces = array2Pieces([
-        '2:2', 0, 0, 0, 0,
-        0, 0, 0, '3:4', 0,
-        0, 0, '1:1', 0, 0,
-        0, '3:5', '2:3', 0, 0,
-        '1:6', 0, 0, 0, 0,
+        '2:2', 0.000, 0.000, 0.000, 0,
+        0.000, 0.000, 0.000, '3:4', 0,
+        0.000, 0.000, '1:1', 0.000, 0,
+        0.000, '3:5', '2:3', 0.000, 0,
+        '1:6', 0.000, 0.000, 0.000, 0,
       ], [-2, -2]);
 
-      const matchers = array2Machers([
+      const matchers = array2Matchers([
         0, 0, 0, 0, 0,
         0, 0, 0, 0, 0,
         0, 0, 1, 0, 0,
@@ -251,13 +316,135 @@ describe('play', () => {
       expect(response.body).toHaveLength(matchers.length);
       expect(response.body).toEqual(expect.arrayContaining(matchers));
 
-      const propFilter = '-_id -__v';
+      const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(matchers.length);
+      expect(pieceData).toMatchObject(expect.arrayContaining(matchers));
+    });
+
+    // 既に自分のコマがあるときは、めくれるところにしか置けないテスト
+  });
+});
+describe('delete', () => {
+  beforeAll(prepareDB);
+  afterEach(deleteAllDataFromDB);
+
+  describe('delete all', () => {
+    it('deletes all', async () => {
+      // Given
+      const pieces = array2Matchers([
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 8,
+        0, 4, 8, 2, 0, 0,
+        0, 2, 0, 0, 3, 0,
+        3, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0,
+      ]);
+
+      await Promise.all(pieces.map(m => new PieceModel(m).save()));
+
+      const keyword = 'deleteAll';
+
+      const matchers = array2Matchers([
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+      ]);
+
+      // When
+      const { body } = await chai.request(app)
+        .delete(`${basePath}/ando/piece`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send({ keyword });
+
+      // Then
+      expect(body).toHaveLength(matchers.length);
+      expect(body).toEqual(expect.arrayContaining(matchers));
 
       const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
       expect(pieceData).toHaveLength(matchers.length);
       expect(pieceData).toMatchObject(expect.arrayContaining(matchers));
     });
 
-    // 手ごまがあったらめくれるところにしか置けないテスト
+    it('deletes all but keyword is wrong', async () => {
+      // Given
+      const pieces = array2Matchers([
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 8,
+        0, 4, 8, 2, 0, 0,
+        0, 2, 0, 0, 3, 0,
+        3, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0,
+      ]);
+
+      await Promise.all(pieces.map(m => new PieceModel(m).save()));
+
+      const keyword = 'wrongKeyword';
+
+      const matchers = array2Matchers([
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 8,
+        0, 4, 8, 2, 0, 0,
+        0, 2, 0, 0, 3, 0,
+        3, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0,
+      ]);
+
+      // When
+      const { body } = await chai.request(app)
+        .delete(`${basePath}/ando/piece`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send({ keyword });
+
+      // Then
+      expect(body).toHaveLength(matchers.length);
+      expect(body).toEqual(expect.arrayContaining(matchers));
+
+      const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(matchers.length);
+      expect(pieceData).toMatchObject(expect.arrayContaining(matchers));
+    });
+  });
+  describe('delete the piece', () => {
+    it('deletes the piece', async () => {
+      // Given
+      const pieces = array2Matchers([
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 8,
+        0, 4, 8, 2, 0, 0,
+        0, 2, 0, 0, 3, 0,
+        3, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0,
+      ]);
+
+      await Promise.all(pieces.map(m => new PieceModel(m).save()));
+
+      const targetPiece = { x: 0, y: 1, userId: 3 };
+
+      const matchers = array2Matchers([
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 8,
+        0, 4, 8, 2, 0, 0,
+        0, 2, 0, 0, 3, 0,
+        0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0,
+      ]);
+
+      // When
+      const { body } = await chai.request(app)
+        .delete(`${basePath}/ando/piece`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(targetPiece);
+
+      // Then
+      expect(body).toHaveLength(matchers.length);
+      expect(body).toEqual(expect.arrayContaining(matchers));
+
+      const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(matchers.length);
+      expect(pieceData).toMatchObject(expect.arrayContaining(matchers));
+    });
   });
 });

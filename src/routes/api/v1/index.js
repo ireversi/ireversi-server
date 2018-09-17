@@ -12,6 +12,7 @@ router.use('/kido/piece', require('./kido/piece.js'));
 router.use('/kido/board', require('./kido/board.js'));
 router.use('/kai/playing', require('./kai/playing.js'));
 router.use('/kai/board', require('./kai/board.js'));
+router.use('/kai/delete', require('./kai/delete.js'));
 router.use('/kohski/playing', require('./kohski/playing.js'));
 router.use('/fujii/board', require('./fujii/board.js'));
 router.use('/kohski/board', require('./kohski/board.js'));
