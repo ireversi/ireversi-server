@@ -11,76 +11,95 @@ const {
 
 const basePath = '/api/v1';
 
-
+// テストケース成型用の関数
 function array2pieces(testCase) {
-  // check whether given 2d array is square or not
-  const yLength = testCase.length;
-  let xLength = 0;
-  let squareLength = 0;
-  testCase.forEach((element) => {
-    tempLength = element.length;
-    if (tempLength > xLength) {
-      xLength = tempLength;
-    }
-  });
-  if (xLength !== yLength) {
-    return false; // escape this function
+  // square check
+  const square = Math.sqrt(testCase.length);
+  if (Math.round(square) !== square) {
+    return false;
   }
-  squareLength = xLength; // adopt the square length
-
-
-  // clowring each elements
-  let count = 0;
+  // chekcking elements
   const tempResult = [];
-  testCase.forEach((row) => {
-    row.forEach((column) => {
-      if (typeof (column) === 'object') {
-        column.forEach((piece) => {
-          tempResult.push([count, piece]);
-        });
-      } else {
-        tempResult.push([count, column]);
-      }
-      count += 1;
-    });
-  });
 
-  // processing tempResult
-  const result = [];
-  tempResult.forEach((element) => {
-    const index = Number(element[0]);
-    const x = index % squareLength;
-    const y = Math.floor(index / squareLength);
-    const piece = element[1];
-
-    if (typeof (piece) === 'string') {
-      const userID = Number(piece.split(':')[0]);
-      const turn = Number(piece.split(':')[1]);
-      const tempObj = {
-        x, y, userID, turn,
-      };
-      result.push(tempObj);
-    } else if (typeof (piece) === 'number' && piece !== 0) {
-      userID = piece;
-      tempObj = { x, y, userID };
-      result.push(tempObj);
+  // 一次元の配列に入力していく
+  testCase.forEach((elm, index) => {
+    if (typeof (elm) === 'object') {
+      elm.forEach((element) => {
+        tempResult.push(
+          {
+            content: element,
+            position: index,
+          },
+        );
+      });
+    } else {
+      tempResult.push(
+        {
+          content: elm,
+          position: index,
+        },
+      );
     }
   });
-
+  // x,y,content,turnに分割していく。
+  const resultArray = [];
+  tempResult.forEach((elm) => {
+    if (elm.content !== 0) {
+      const ans = elm.content.split(':');
+      const userID = ans[0];
+      const turn = ans[1];
+      const posX = elm.position % square;
+      const posY = Math.floor(elm.position / square);
+      const ansObj = {
+        x: posX,
+        y: posY,
+        userID: Number(userID),
+        turn: Number(turn),
+      };
+      resultArray.push(ansObj);
+    }
+  });
   // sort tempResult by turn
-  result.sort((a, b) => {
+  resultArray.sort((a, b) => {
     if (a.turn < b.turn) return -1;
     if (a.turn > b.turn) return 1;
     return 0;
   });
 
   // delete property"turn"
-  result.forEach((element) => {
+  resultArray.forEach((element) => {
     const temp = element;
     delete temp.turn;
   });
-  return result;
+  return resultArray;
 }
+
+
+// ==========================================
+function array2matchers(testCase) {
+  const resultArray = [];
+
+  // square check
+  const square = Math.sqrt(testCase.length);
+  if (Math.round(square) !== square) {
+    return false;
+  }
+
+  testCase.forEach((elm, index) => {
+    if (elm !== 0) {
+      const posX = index % square;
+      const posY = Math.floor(index / square);
+      const tempObj = {
+        x: posX,
+        y: posY,
+        userID: elm,
+      };
+      resultArray.push(tempObj);
+    }
+  });
+  return resultArray;
+}
+
 
 describe('play', () => {
   beforeAll(prepareDB); // 全てのテストをやる前に1回だけ呼ばれる。
@@ -92,14 +111,14 @@ describe('play', () => {
       // Given
       const piece = array2pieces(
         [
-          ['1:1', 0],
-          [0, 0],
+          '1:1', 0,
+          0, 0,
         ],
       );
-      const matchers = array2pieces(
+      const matchers = array2matchers(
         [
-          [1, 0],
-          [0, 0],
+          1, 0,
+          0, 0,
         ],
       );
       // When
@@ -120,15 +139,15 @@ describe('play', () => {
       // Given
       const pieces = array2pieces(
         [
-          ['1:1', '2:2'],
-          [0, 0],
+          '1:1', '2:2',
+          0, 0,
         ],
       );
 
-      const matchers = array2pieces(
+      const matchers = array2matchers(
         [
-          [1, 2],
-          [0, 0],
+          1, 2,
+          0, 0,
         ],
       );
 
@@ -156,13 +175,15 @@ describe('play', () => {
     it('cannot be put on same place', async () => {
     // Given
       const pieces = array2pieces(
-        [[['1:1', '2:2'], 0],
-          ['3:3', 0]],
-      );
-      const matchers = array2pieces(
         [
-          [1, 0],
-          [3, 0],
+          ['1:1', '2:2'], 0,
+          '3:3', 0,
+        ],
+      );
+      const matchers = array2matchers(
+        [
+          1, 0,
+          3, 0,
         ],
       );
 
@@ -192,18 +213,18 @@ describe('play', () => {
       // Given
       const pieces = array2pieces(
         [
-          ['1:6', '2:4', '1:1', 0],
-          ['2:2', 0, 0, 0],
-          ['3:3', 0, 0, 0],
-          ['1:5', 0, 0, 0],
+          '1:6', '2:4', '1:1', 0,
+          '2:2', 0, 0, 0,
+          '3:3', 0, 0, 0,
+          '1:5', 0, 0, 0,
         ],
       );
-      const matchers = array2pieces(
+      const matchers = array2matchers(
         [
-          [1, 1, 1, 0],
-          [1, 0, 0, 0],
-          [1, 0, 0, 0],
-          [1, 0, 0, 0],
+          1, 1, 1, 0,
+          1, 0, 0, 0,
+          1, 0, 0, 0,
+          1, 0, 0, 0,
         ],
       );
 
