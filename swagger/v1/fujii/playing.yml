@@ -1,11 +1,11 @@
 tags: #:(コロン)は{}の 配列
   - name: playing #-(ハイフン)は[]の配列
-    description: Playing API #:(コロン)のあとは文字列
+    description: Fujii Reversi API #:(コロン)のあとは文字列
 
 /fujii/playing: #api/viの後に付いているルート（/users）
   post:
     tags:
-      - playing
+      - fujii-playing
     parameters:
       - name: "x"
         in: "formData"
@@ -39,4 +39,21 @@ tags: #:(コロン)は{}の 配列
             userId: 
               type: "number"
               example: 1
-           
+  delete:
+      tags:
+        - fujii-delete
+      summary: "Delete all pieces"
+      parameters:
+        - name: "keyword"
+          in: "formData"
+          description: "Please enter keyword 'confirm' if you want to delete all pieces."
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Board data"
+          schema:
+            type: array
+            items:
+              type: "object"
+            

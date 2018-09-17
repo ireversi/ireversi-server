@@ -248,21 +248,35 @@ describe('play', () => {
     // ---------------
 
     it('reset games', async () => {
+      const pieces = [
+        0, 0,
+        '1:1', '2:2',
+      ];
+
+      const rPiece = reformPiece(pieces);
+      await Promise.all(rPiece.map(m => new PlayingModel(m).save()));
+
+      const keyword = 'confirm';
+
       const matchers = [
         0, 0,
         0, 0,
       ];
 
       // When
-      const response = await chai.request(app).delete(`${basePath}/fujii/playing`);
+      const response = await chai.request(app)
+        .delete(`${basePath}/fujii/playing`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send({ keyword });
+
       // Then
       const rMatchers = reformMatchers(matchers);
       expect(response.body).toHaveLength(rMatchers.length);
       expect(response.body).toEqual(expect.arrayContaining(rMatchers));
 
-      const pieces = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
-      expect(pieces).toHaveLength(rMatchers.length);
-      expect(pieces).toEqual(expect.arrayContaining(rMatchers));
+      const piecesData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propfilter)));
+      expect(piecesData).toHaveLength(rMatchers.length);
+      expect(piecesData).toEqual(expect.arrayContaining(rMatchers));
     });
   });
 });
