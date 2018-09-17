@@ -50,8 +50,9 @@
       - name: "pieces"
         description: "Add items to be deleted"
         in: "body"
+        type: "array"
         schema:
-          $ref: "#/definitions/Pieces"
+          $ref: "#/definitions/Positions"
       - name: "keyword"
         in: "formData"
         description: "Please enter keyword 'deleteAll' if you want to delete all pieces."
@@ -70,10 +71,12 @@
     parameters:
     - in: "body"
       name: "first"
+      type: "object"
       schema:
         $ref: "#/definitions/Piece"
     - in: "body"
       name: "second"
+      type: "object"
       schema:
         $ref: "#/definitions/Position"
     responses:
@@ -98,7 +101,7 @@ definitions:
       pieces:
         $ref: "#/definitions/Pieces"
       candidates:
-        $ref: "#/definitions/Candidates"
+        $ref: "#/definitions/Positions"
   Pieces:
     type: array
     items:
@@ -125,7 +128,7 @@ definitions:
         type: number
         example: 1
         required: true
-  Candidates:
+  Positions:
     type: array
     items:
       $ref: "#/definitions/Position"
