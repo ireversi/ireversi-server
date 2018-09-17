@@ -1,5 +1,5 @@
 tags:
-  - name: fujii-board
+  - name: board
     description: Fujii Reversi API
 
 /fujii/board:
