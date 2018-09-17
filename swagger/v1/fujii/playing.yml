@@ -43,16 +43,31 @@ tags: #:(コロン)は{}の 配列
   delete:
       tags:
         - Fujii-Playing
-      summary: "Delete all pieces"
+      summary: "Delete a piece or all pieces"
       parameters:
-        - name: "keyword"
-          in: "formData"
-          description: "Please enter keyword 'confirm' if you want to delete all pieces."
-          required: true
-          type: "string"
+      - name: "x"
+        in: "formData"
+        description: "X position"
+        required: false
+        type: "integer"
+      - name: "y"
+        in: "formData"
+        description: "Y position"
+        required: false
+        type: "integer"
+      - name: "userId"
+        in: "formData"
+        description: "User ID"
+        required: false
+        type: "integer"
+      - name: "keyword"
+        in: "formData"
+        description: "Enter 'deleteAll' if you want to delete all pieces. Otherwise, enter 'deleteOne' to delete only one piece"
+        required: true
+        type: "string"
       responses:
         200:
-          description: "Board data"
+          description: "delete data"
           schema:
             type: array
             items:
