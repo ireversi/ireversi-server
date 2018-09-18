@@ -5,7 +5,6 @@ router.use('/matsui/playing', require('./matsui/playing.js'));
 router.use('/matsuda/playing', require('./matsuda/playing.js'));
 router.use('/hi85/playing', require('./hi85/playing.js'));
 router.use('/momii/playing', require('./momii/playing.js'));
-router.use('/ando/playing', require('./ando/playing.js'));
 router.use('/ando/piece', require('./ando/piece.js'));
 router.use('/ando/board', require('./ando/board.js'));
 router.use('/kido/piece', require('./kido/piece.js'));
