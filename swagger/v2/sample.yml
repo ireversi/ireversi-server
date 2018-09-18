@@ -1,7 +1,174 @@
-/:
+/board:
   get:
     tags:
-    - description: sample API
+      - "board"
+    summary: "show all board conditon"
     responses:
-      204:
-        description: no content
+      200:
+        description: "all pieces on board"
+        schema:
+          $ref: "#/definitions/Board"
+/board/specified_range:
+  get:
+    tags:
+      - "board"
+    summary: "show specified board range"
+    parameters:
+      - $ref: "#/definitions/Range/properties/left"
+      - $ref: "#/definitions/Range/properties/right"
+      - $ref: "#/definitions/Range/properties/bottom"
+      - $ref: "#/definitions/Range/properties/top"
+      - name: "userId"
+        in: "query"
+        description: "your userId"
+        required: true
+        type: "number"
+    responses:
+      200:
+        description: "pieces on specified board range"
+        schema:
+          $ref: "#/definitions/Board"
+/piece:
+  post:
+    tags:
+      - piece
+    summary: "set a piece on board"
+    parameters:
+      - $ref: "#/definitions/Piece/properties/x"
+      - $ref: "#/definitions/Piece/properties/y"
+      - $ref: "#/definitions/Piece/properties/userId"
+    responses:
+      200:
+        description: "show specified board range"
+        schema:
+          $ref: "#/definitions/Response"
+  delete:
+    tags:
+      - piece
+    summary: "delete a piece or all pieces"
+    parameters:
+      - name: "pieces"
+        description: "Add items to be deleted"
+        in: "body"
+        type: "array"
+        schema:
+          $ref: "#/definitions/Positions"
+      - name: "keyword"
+        in: "formData"
+        description: "Please enter keyword 'deleteAll' if you want to delete all pieces."
+        required: false
+        type: "string"
+    responses:
+      200:
+        description: "Board data"
+        schema:
+          $ref: "#/definitions/Response"
+/piece/first_piece:
+  post:
+    tags:
+      - piece
+    summary: "set the first piece"
+    parameters:
+    - in: "body"
+      name: "first"
+      type: "object"
+      schema:
+        $ref: "#/definitions/Piece"
+    - in: "body"
+      name: "second"
+      type: "object"
+      schema:
+        $ref: "#/definitions/Position"
+    responses:
+      200:
+        description: "show specified board range"
+        schema:
+          $ref: "#/definitions/Response"
+
+definitions:
+  Response:
+    type: "object"
+    properties:
+      status:
+        type: "boolean"
+        example: true
+      board:
+        type: "object"
+        $ref: "#/definitions/Board"
+  Board:
+    type: "object"
+    properties:
+      pieces:
+        $ref: "#/definitions/Pieces"
+      candidates:
+        $ref: "#/definitions/Positions"
+  Pieces:
+    type: array
+    items:
+      $ref: "#/definitions/Piece"
+  Piece:
+    type: object
+    properties:
+      x:
+        name: "x"
+        type: number
+        example: 1
+        in: "formData"
+        required: true
+      y:
+        name: "y"
+        type: number
+        example: 1
+        in: "formData"
+        required: true
+      userId:
+        name: userId
+        in: "query"
+        description: "userId"
+        type: number
+        example: 1
+        required: true
+  Positions:
+    type: array
+    items:
+      $ref: "#/definitions/Position"
+  Position:
+    type: "object"
+    properties:
+      x:
+        name: "x"
+        type: number
+        example: 1
+        in: "formData"
+      y:
+        name: "y"
+        type: number
+        example: 1
+        in: "formData"
+  Range:
+    type: "object"
+    properties:
+      left:
+        name: "l"
+        in: "query"
+        description: "Min of X axis (left)"
+        required: true
+        type: "number"
+      right:
+        name: "r"
+        in: "query"
+        description: "Max of X axis (right)"
+        required: true
+        type: "number"
+      bottom:
+        name: "b"
+        in: "query"
+        description: "Min of Y axis (bottom)"
+        required: true
+        type: "number"
+      top:
+        name: "t"
+        in: "query"
+        description: "Max of X axis (top)"
+        required: true
+        type: "number"

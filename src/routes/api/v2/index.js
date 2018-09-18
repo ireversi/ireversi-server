@@ -1,5 +1,7 @@
 const router = require('express').Router();
 
-router.get('/', (req, res) => res.sendStatus(204));
+router.use('/board', require('./board/index.js'));
+router.use('/piece', require('./piece/index.js'));
+router.use('/first_piece', require('./first_piece/index.js'));
 
 module.exports = router;

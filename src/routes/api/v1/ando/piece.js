@@ -15,272 +15,160 @@ router.route('/')
     // バリデーション
     if (Number.isInteger(+req.body.x) && Number.isInteger(+req.body.y)
                 && Number.isInteger(+req.body.userId) && +req.body.userId >= 1) {
+      /* 初期値設定 */
       const result = {
         x: +req.body.x,
         y: +req.body.y,
         userId: +req.body.userId,
       };
-      // console.log(result);
 
       const piecesCheck = [];
       let putPieceFlg = false;
       let removeFlg = true;
 
-      // 置こうとしている場所を中心とした9マスの状況確認
+      const ownPieces = await PieceModel.find({ userId: result.userId }, propFilter);
+
+      /* リクエストされた座標を中心とした9マスの状況確認 */
       for (let i = -1; i <= 1; i += 1) {
         for (let j = -1; j <= 1; j += 1) {
-          if ((await PieceModel.find({ x: result.x + i, y: result.y + j })).length) {
-            piecesCheck.push(true);
+          const piece = await PieceModel.find({ x: result.x + i, y: result.y + j });
+          if (piece[0]) {
+            piecesCheck.push(piece[0].userId);
           } else {
             piecesCheck.push(false);
           }
         }
       }
-      // console.log(piecesCheck);
-
-      // 自分のコマを抽出
-      const ownPieces = await PieceModel.find({ userId: result.userId }, propFilter);
-
-      // 同じ場所には置けない
+      // 既に同一座標にコマがないか判定
       if (!piecesCheck[4]) {
-        // 上下左右にコマがあれば置ける
-        if (piecesCheck[1] || piecesCheck[3] || piecesCheck[5] || piecesCheck[7]) {
+        // 隣接する上下左右にコマがあるか判定
+        if ((piecesCheck[1] && (piecesCheck[1] !== result.userId))
+              || (piecesCheck[3] && (piecesCheck[3] !== result.userId))
+              || (piecesCheck[5] && (piecesCheck[5] !== result.userId))
+              || (piecesCheck[7] && (piecesCheck[7] !== result.userId))) {
           putPieceFlg = true;
-          // console.log('上下左右');
-        // ユーザーが2手目以降であったら斜めにコマがあれば置ける
-        } else if (ownPieces.length >= 1
-            && (piecesCheck[0] || piecesCheck[2] || piecesCheck[6] || piecesCheck[8])) {
+        // 既に自分のコマがあるとき、斜めにコマがあるか判定
+        } else if (ownPieces.length > 0
+            && ((piecesCheck[0] && (piecesCheck[0] !== result.userId))
+                  || (piecesCheck[2] && (piecesCheck[2] !== result.userId))
+                  || (piecesCheck[6] && (piecesCheck[6] !== result.userId))
+                  || (piecesCheck[8] && (piecesCheck[8] !== result.userId)))) {
           putPieceFlg = true;
-          // console.log('斜め');
-        // その盤の1手目だったら、どこでも置ける
+        // その盤で1手目の場合は制限なし
         } else if ((await PieceModel.find({})).length === 0) {
           putPieceFlg = true;
         }
       }
 
-      // console.log(ownPieces);
-      if (ownPieces) {
+      /* めくり判定 */
+      if (putPieceFlg && ownPieces.length > 0) {
         for (let i = 0; i < ownPieces.length; i += 1) {
-          let flg = true;
-
+          let turnFlg = false;
           // Y軸方向
           if (ownPieces[i].x === result.x) {
-            // 置いたコマ方のがY方向に大きい
-            if (ownPieces[i].y < result.y) {
-              // 置いたコマの下から次のコマまで
-              for (let j = result.y - 1; j > ownPieces[i].y; j -= 1) {
-                // コマを取得
-                const targetPiece = await PieceModel.find({ x: result.x, y: j }, propFilter);
-
-                // コマが存在しない、またはコマは存在するが自分のコマの場合、処理を終了しめくらない
-                if (targetPiece.length === 0 || targetPiece[0].userId === result.userId) {
-                  flg = false;
-                  break;
-                }
+            let sign = 1;
+            // リクエストされたコマから既存のコマに向かって確認
+            for (let j = 1; j < Math.abs(ownPieces[i].y - result.y); j += 1) {
+              // 置いたコマ方のがY方向に大きい
+              if (ownPieces[i].y < result.y) sign = -1;
+              // コマを取得
+              const targetPiece = await PieceModel.find({ x: result.x, y: result.y + sign * j },
+                propFilter);
+              // コマが存在しない、またはコマは存在するが自分のコマの場合、処理を終了しめくらない
+              if (targetPiece.length === 0 || targetPiece[0].userId === result.userId) {
+                turnFlg = false;
+                break;
+              } else {
+                turnFlg = true;
               }
-
-              // めくる処理
-              if (flg) {
-                for (let j = result.y - 1; j > ownPieces[i].y; j -= 1) {
-                  await PieceModel.update(
-                    { x: result.x, y: j },
-                    { $set: { userId: result.userId } },
-                  );
-                }
-                removeFlg = false;
+            }
+            // めくり処理
+            if (turnFlg) {
+              for (let j = 1; j < Math.abs(ownPieces[i].y - result.y); j += 1) {
+                await PieceModel.update(
+                  { x: result.x, y: result.y + sign * j },
+                  { $set: { userId: result.userId } },
+                );
               }
-            // 置いたコマの方がY方向に小さい
-            } else if (ownPieces[i].y > result.y) {
-              // 置いたコマの下から次のコマまで
-              for (let j = result.y + 1; j < ownPieces[i].y; j += 1) {
-                // コマを取得
-                const targetPiece = await PieceModel.find({ x: result.x, y: j }, propFilter);
-
-                // コマが存在しない、またはコマは存在するが自分のコマの場合、処理を終了しめくらない
-                if (targetPiece.length === 0 || targetPiece[0].userId === result.userId) {
-                  flg = false;
-                  break;
-                }
-              }
-
-              // めくる処理
-              if (flg) {
-                for (let j = result.y + 1; j < ownPieces[i].y; j += 1) {
-                  await PieceModel.update(
-                    { x: result.x, y: j },
-                    { $set: { userId: result.userId } },
-                  );
-                }
-                removeFlg = false;
-              }
+              removeFlg = false;
             }
 
           // X軸方向
           } else if (ownPieces[i].y === result.y) {
-            // 置いたコマ方のがX方向に大きい
-            if (ownPieces[i].x < result.x) {
-              // 置いたコマの下から次のコマまで
-              for (let j = result.x - 1; j > ownPieces[i].x; j -= 1) {
-                // コマを取得
-                const targetPiece = await PieceModel.find({ x: j, y: result.y }, propFilter);
-
-                // コマが存在しない、またはコマは存在するが自分のコマの場合、処理を終了しめくらない
-                if (targetPiece.length === 0 || targetPiece[0].userId === result.userId) {
-                  flg = false;
-                  break;
-                }
+            let sign = 1;
+            // リクエストされたコマから既存のコマに向かって確認
+            for (let j = 1; j < Math.abs(ownPieces[i].x - result.x); j += 1) {
+              // 置いたコマ方のがX方向に大きい
+              if (ownPieces[i].x < result.x) sign = -1;
+              // コマを取得
+              const targetPiece = await PieceModel.find({ x: result.x + sign * j, y: result.y },
+                propFilter);
+              // コマが存在しない、またはコマは存在するが自分のコマの場合、処理を終了しめくらない
+              if (targetPiece.length === 0 || targetPiece[0].userId === result.userId) {
+                turnFlg = false;
+                break;
+              } else {
+                turnFlg = true;
               }
-
-              // めくる処理
-              if (flg) {
-                for (let j = result.x - 1; j > ownPieces[i].x; j -= 1) {
-                  await PieceModel.update(
-                    { x: j, y: result.y },
-                    { $set: { userId: result.userId } },
-                  );
-                }
-                removeFlg = false;
+            }
+            // めくり処理
+            if (turnFlg) {
+              for (let j = 1; j < Math.abs(ownPieces[i].x - result.x); j += 1) {
+                await PieceModel.update(
+                  { x: result.x + sign * j, y: result.y },
+                  { $set: { userId: result.userId } },
+                );
               }
-            // 置いたコマ方のがX方向に小さい
-            } else if (ownPieces[i].x > result.x) {
-              // 置いたコマの下から次のコマまで
-              for (let j = result.x + 1; j < ownPieces[i].x; j += 1) {
-                // コマを取得
-                const targetPiece = await PieceModel.find({ x: j, y: result.y }, propFilter);
-
-                // コマが存在しない、またはコマは存在するが自分のコマの場合、処理を終了しめくらない
-                if (targetPiece.length === 0 || targetPiece[0].userId === result.userId) {
-                  flg = false;
-                  break;
-                }
-              }
-
-              // めくる処理
-              if (flg) {
-                for (let j = result.x + 1; j < ownPieces[i].x; j += 1) {
-                  await PieceModel.update(
-                    { x: j, y: result.y },
-                    { $set: { userId: result.userId } },
-                  );
-                }
-                removeFlg = false;
-              }
+              removeFlg = false;
             }
 
           // 斜め方向
           } else if (Math.abs((result.y - ownPieces[i].y) / (result.x - ownPieces[i].x)) === 1) {
-            // 置いたコマ方のがY方向に大きい
-            if (ownPieces[i].y < result.y) {
-              if (ownPieces[i].x < result.x) {
-                // 置いたコマの下から次のコマまで
-                for (let j = 1; j <= (result.y - ownPieces[i].y); j += 1) {
-                  // コマを取得
-                  const targetPiece = await PieceModel.find({ x: result.x - j, y: result.y - j },
-                    propFilter);
-
-                  // コマが存在しない、またはコマは存在するが自分のコマの場合、処理を終了しめくらない
-                  if (targetPiece.length === 0 || targetPiece[0].userId === result.userId) {
-                    flg = false;
-                    break;
-                  }
-                }
-
-                // めくる処理
-                if (flg) {
-                  for (let j = 1; j < (result.y - ownPieces[i].y); j += 1) {
-                    await PieceModel.update({ x: result.x - j, y: result.y - j },
-                      { $set: { userId: result.userId } });
-                  }
-                  removeFlg = false;
-                }
-              } else if (ownPieces[i].x > result.x) {
-                // 置いたコマの下から次のコマまで
-                for (let j = 1; j <= (result.y - ownPieces[i].y); j += 1) {
-                  // コマを取得
-                  const targetPiece = await PieceModel.find({ x: result.x + j, y: result.y - j },
-                    propFilter);
-
-                  // コマが存在しない、またはコマは存在するが自分のコマの場合、処理を終了しめくらない
-                  if (targetPiece.length === 0 || targetPiece[0].userId === result.userId) {
-                    flg = false;
-                    break;
-                  }
-                }
-
-                // めくる処理
-                if (flg) {
-                  for (let j = 1; j < (result.y - ownPieces[i].y); j += 1) {
-                    await PieceModel.update({ x: result.x + j, y: result.y - j },
-                      { $set: { userId: result.userId } });
-                  }
-                  removeFlg = false;
-                }
+            // 象限により符号反転
+            let signX = 1;
+            let signY = 1;
+            if (ownPieces[i].x < result.x) signX = -1;
+            if (ownPieces[i].y < result.y) signY = -1;
+            // リクエストされたコマから既存のコマに向かって確認
+            for (let j = 1; j < Math.abs(ownPieces[i].x - result.x); j += 1) {
+              // コマを取得
+              const targetPiece = await PieceModel.find({
+                x: result.x + signX * j,
+                y: result.y + signY * j,
+              }, propFilter);
+              // コマが存在しない、またはコマは存在するが自分のコマの場合、処理を終了しめくらない
+              if (targetPiece.length === 0 || targetPiece[0].userId === result.userId) {
+                turnFlg = false;
+                break;
+              } else {
+                turnFlg = true;
               }
-            // 置いたコマ方のがY方向に小さい
-            } else if (ownPieces[i].y > result.y) {
-              if (ownPieces[i].x < result.x) {
-                // 置いたコマの下から次のコマまで
-                for (let j = 1; j < (ownPieces[i].y - result.y); j += 1) {
-                  // コマを取得
-                  const targetPiece = await PieceModel.find({ x: result.x - j, y: result.y + j },
-                    propFilter);
-
-                  // コマが存在しない、またはコマは存在するが自分のコマの場合、処理を終了しめくらない
-                  if (targetPiece.length === 0 || targetPiece[0].userId === result.userId) {
-                    flg = false;
-                    break;
-                  }
-                }
-
-                // めくる処理
-                if (flg) {
-                  for (let j = 1; j < (ownPieces[i].y - result.y); j += 1) {
-                    await PieceModel.update({ x: result.x - j, y: result.y + j },
-                      { $set: { userId: result.userId } });
-                  }
-                  removeFlg = false;
-                }
-              } else if (ownPieces[i].x > result.x) {
-                // 置いたコマの下から次のコマまで
-                for (let j = 1; j < (ownPieces[i].y - result.y); j += 1) {
-                  // コマを取得
-                  const targetPiece = await PieceModel.find({ x: result.x + j, y: result.y + j },
-                    propFilter);
-
-                  // コマが存在しない、またはコマは存在するが自分のコマの場合、処理を終了しめくらない
-                  if (targetPiece.length === 0 || targetPiece[0].userId === result.userId) {
-                    flg = false;
-                    break;
-                  }
-                }
-
-                // めくる処理
-                if (flg) {
-                  for (let j = 1; j < (ownPieces[i].y - result.y); j += 1) {
-                    await PieceModel.update({ x: result.x + j, y: result.y + j },
-                      { $set: { userId: result.userId } });
-                  }
-                  removeFlg = false;
-                }
+            }
+            // めくり処理
+            if (turnFlg) {
+              for (let j = 1; j < Math.abs(ownPieces[i].x - result.x); j += 1) {
+                await PieceModel.update({ x: result.x + signX * j, y: result.y + signY * j },
+                  { $set: { userId: result.userId } });
               }
+              removeFlg = false;
             }
           }
         }
-      }
-      //
-      if (removeFlg && ownPieces.length > 0) {
-        putPieceFlg = false;
+        // めくれなかった場合
+        if (removeFlg) {
+          putPieceFlg = false;
+        }
       }
 
-      // 登録処理
+      /*  登録処理 */
       if (putPieceFlg) {
         const Piece = new PieceModel(result);
         await Piece.save();
       }
     }
-    // 送信処理
+
+    /* 送信処理 */
     const allPieces = await PieceModel.find({}, propFilter);
-    // console.log(allPieces);
     res.json(allPieces);
   })
   .delete(async (req, res) => {
