@@ -322,6 +322,41 @@ describe('play', () => {
     });
 
     // 既に自分のコマがあるときは、めくれるところにしか置けないテスト
+    it('cannot put a piece where it cannot turn other pieces, if it already have own pieces', async () => {
+      // Given
+      const pieces = array2Pieces([
+        0, '2:4', 0.000, '2:6', 0,
+        0, 0.000, '2:2', '1:1', 0,
+        0, 0.000, '3:3', 0.000, 0,
+        0, '1:5', '2:7', 0.000, 0,
+        0, '2:8', 0.000, '2:9', 0,
+      ], [-2, -2]);
+
+      const matchers = array2Matchers([
+        0, 0, 0, 0, 0,
+        0, 0, 2, 1, 0,
+        0, 0, 2, 0, 0,
+        0, 1, 2, 0, 0,
+        0, 0, 0, 0, 0,
+      ], [-2, -2]);
+
+      // When
+      let response;
+      for (let i = 0; i < pieces.length; i += 1) {
+        response = await chai.request(app)
+          .post(`${basePath}/ando/piece`)
+          .set('content-type', 'application/x-www-form-urlencoded')
+          .send(pieces[i]);
+      }
+
+      // Then
+      expect(response.body).toHaveLength(matchers.length);
+      expect(response.body).toEqual(expect.arrayContaining(matchers));
+
+      const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(matchers.length);
+      expect(pieceData).toMatchObject(expect.arrayContaining(matchers));
+    });
   });
 });
 describe('delete', () => {
