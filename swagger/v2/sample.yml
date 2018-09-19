@@ -3,7 +3,7 @@
     tags:
       - "board"
     summary: "show all board conditon. 全ての盤面情報"
-    description: >
+    description: |
       - pieces
         - 盤面に置かれているコマの情報
       - candidates
@@ -14,10 +14,14 @@
             - standbyの残り時間
           - piece
             - 置かれる予定の他コマの情報
+      - score
+        - 全フィールドにある自コマの合計
+      - field_size
+        - フィールド全体のうち、上下左右の終端の位置情報
     parameters:
-      - name: userId
+      - name: user_id
         in: "query"
-        description: "userId"
+        description: "user_id"
         type: number
         example: 1
         required: true
@@ -38,9 +42,9 @@
       - $ref: "#/definitions/Range/properties/right"
       - $ref: "#/definitions/Range/properties/bottom"
       - $ref: "#/definitions/Range/properties/top"
-      - name: "userId"
+      - name: "user_id"
         in: "query"
-        description: "your userId"
+        description: "your user_id"
         required: true
         type: "number"
     responses:
@@ -60,7 +64,7 @@
     parameters:
       - $ref: "#/definitions/Piece/properties/x"
       - $ref: "#/definitions/Piece/properties/y"
-      - $ref: "#/definitions/Piece/properties/userId"
+      - $ref: "#/definitions/Piece/properties/user_id"
     responses:
       200:
         description: "show specified board range"
@@ -104,7 +108,7 @@
     parameters:
       - $ref: "#/definitions/Piece/properties/x"
       - $ref: "#/definitions/Piece/properties/y"
-      - $ref: "#/definitions/Piece/properties/userId"
+      - $ref: "#/definitions/Piece/properties/user_id"
     responses:
       200:
         description: "return a place second piece has put"
@@ -123,11 +127,11 @@
     parameters:
     - in: "number"
       required: true
-      name: "userId"
-      description: "userId"
+      name: "user_id"
+      description: "user_id"
       type: "number"
       schema:
-        $ref: "#/definitions/Piece/properties/userId"
+        $ref: "#/definitions/Piece/properties/user_id"
     - in: "string"
       required: true
       name: "direction"
@@ -173,6 +177,20 @@ definitions:
         $ref: "#/definitions/Positions"
       standbys:
         $ref: "#/definitions/Standbys"
+      score:
+        type: number
+        in: "formData"
+      field_size:
+        type: "object"
+        properties:
+          x_min:
+            type: "number"
+          x_max:
+            type: "number"
+          y_min:
+            type: "number"
+          y_max:
+            type: "number"
   Pieces:
     type: array
     description: "pieces condition on board"
@@ -196,21 +214,21 @@ definitions:
         example: 1
         in: "formData"
         required: true
-      userId:
-        name: userId
+      user_id:
+        name: user_id
         in: "query"
-        description: "userId"
+        description: "user_id"
         type: number
         example: 1
         required: true
   Positions:
     type: array
-    description: "just show piece locations (not include userId information)"
+    description: "just show piece locations (not include user_id information)"
     items:
       $ref: "#/definitions/Position"
   Position:
     type: "object"
-    description: "just show piece location (not include userId information)"
+    description: "just show piece location (not include user_id information)"
     properties:
       x:
         name: "x"
