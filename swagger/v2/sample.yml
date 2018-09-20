@@ -16,7 +16,7 @@
             - 置かれる予定の他コマの情報
       - score
         - 全フィールドにある自コマの合計
-      - field_size
+      - size
         - フィールド全体のうち、上下左右の終端の位置情報
     parameters:
       - name: user_id
@@ -31,17 +31,17 @@
         schema:
           type: "object"
           $ref: "#/definitions/Board"
-/board/specified_range:
+/board/specified_size:
   get:
     tags:
       - "board"
-    summary: "show specified board range"
+    summary: "show specified board size"
     description: "指定した範囲内でのboard情報"
     parameters:
-      - $ref: "#/definitions/Range/properties/left"
-      - $ref: "#/definitions/Range/properties/right"
-      - $ref: "#/definitions/Range/properties/bottom"
-      - $ref: "#/definitions/Range/properties/top"
+      - $ref: "#/definitions/Size/properties/left"
+      - $ref: "#/definitions/Size/properties/right"
+      - $ref: "#/definitions/Size/properties/bottom"
+      - $ref: "#/definitions/Size/properties/top"
       - name: "user_id"
         in: "query"
         description: "your user_id"
@@ -49,7 +49,7 @@
         type: "number"
     responses:
       200:
-        description: "pieces on specified board range"
+        description: "pieces on specified board size"
         schema:
           $ref: "#/definitions/Board"
 /piece:
@@ -67,7 +67,7 @@
       - $ref: "#/definitions/Piece/properties/user_id"
     responses:
       200:
-        description: "show specified board range"
+        description: "show specified board size"
         schema:
           type: "object"
           properties:
@@ -180,7 +180,7 @@ definitions:
       score:
         type: number
         in: "formData"
-      field_size:
+      size:
         type: "object"
         properties:
           x_min:
@@ -240,30 +240,30 @@ definitions:
         type: number
         example: 1
         in: "formData"
-  Range:
+  Size:
     type: "object"
-    description: "specify a board range to be show"
+    description: "specify a board size to be show"
     properties:
       left:
-        name: "l"
+        name: "x_min"
         in: "query"
         description: "Min of X axis (left)"
         required: true
         type: "number"
       right:
-        name: "r"
+        name: "x_max"
         in: "query"
         description: "Max of X axis (right)"
         required: true
         type: "number"
       bottom:
-        name: "b"
+        name: "y_min"
         in: "query"
         description: "Min of Y axis (bottom)"
         required: true
         type: "number"
       top:
-        name: "t"
+        name: "y_max"
         in: "query"
         description: "Max of X axis (top)"
         required: true
