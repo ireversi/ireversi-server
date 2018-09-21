@@ -1,5 +1,7 @@
 const router = require('express').Router();
-const boardCtrl = require('../../../../models/v2/boardControler');
+const boardCtrl = require('../../../../models/v2/boardController.js');
+
+router.use('/flip', require('./flip.js'));
 
 router.route('/')
   .get((req, res) => {
