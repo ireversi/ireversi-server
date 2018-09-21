@@ -1,6 +1,6 @@
 const chai = require('chai');
 
-const propFilter = '-_id -__v';
+// const propFilter = '-_id -__v';
 
 const app = require('../../../../../src/routes/app.js');
 const PlayingModel = require('../../../../../src/models/kohski/PlayingModel.js');
@@ -101,39 +101,38 @@ function array2matchers(testCase) {
 }
 
 describe('play', () => {
-    beforeAll(prepareDB); // 全てのテストをやる前に1回だけ呼ばれる。
-    afterEach(deleteAllDataFromDB);
-  
-    // ここからtaskで作成したテスト
-    describe('put piece', () => {
-      it('puts a piece', async () => {
-        // Given
-        const piece = array2pieces(
-          [
-            '1:1', 0,
-            0, 0,
-          ],
-        );
-        const matchers = array2matchers(
-          [
-            1, 0,
-            0, 0,
-          ],
-        );
+  beforeAll(prepareDB); // 全てのテストをやる前に1回だけ呼ばれる。
+  afterEach(deleteAllDataFromDB);
+
+  // ここからtaskで作成したテスト
+  describe('put piece', () => {
+    it('puts a piece', async () => {
+      // Given
+      const piece = array2pieces(
+        [
+          '1:1', 0,
+          0, 0,
+        ],
+      );
+      const matchers = array2matchers(
+        [
+          1, 0,
+          0, 0,
+        ],
+      );
         // When
-        const response = await chai.request(app)
-          .post(`${basePath}/kohski/board`)
-          .set('content-type', 'application/x-www-form-urlencoded')
-          .send(piece[0]);
-  
-        // Then
-        expect(response.body).toHaveLength(piece.length);
-        expect(response.body).toMatchObject(matchers);
-  
-        const pieces = await PlayingModel.find({});
-        expect(pieces).toHaveLength(piece.length);
-        expect(pieces).toMatchObject(matchers);
-      });
+      const response = await chai.request(app)
+        .post(`${basePath}/kohski/board`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(piece[0]);
+
+      // Then
+      expect(response.body).toHaveLength(piece.length);
+      expect(response.body).toMatchObject(matchers);
+
+      const pieces = await PlayingModel.find({});
+      expect(pieces).toHaveLength(piece.length);
+      expect(pieces).toMatchObject(matchers);
     });
   });
-  
+});

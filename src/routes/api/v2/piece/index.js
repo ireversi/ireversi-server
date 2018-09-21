@@ -2,14 +2,14 @@ const router = require('express').Router();
 const boardCtrl = require('../../../../models/v2/boardControler');
 
 router.route('/')
-  .get((req, res)=>{
+  .get((req, res) => {
     const x = +req.query.x;
     const y = +req.query.y;
-    const user_id = +req.query.user_id;
+    const userId = +req.query.userId;
     boardCtrl.addPiece({
       x,
       y,
-      user_id,
+      userId,
     });
 
     res.json({
