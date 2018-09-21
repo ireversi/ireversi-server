@@ -1,0 +1,270 @@
+/board:
+  get:
+    tags:
+      - "board"
+    summary: "show all board conditon. 全ての盤面情報"
+    description: |
+      - pieces
+        - 盤面に置かれているコマの情報
+      - candidates
+        - 自コマが置けるセルの位置情報
+      - standbys
+        - 他コマが置かれる予定のセル情報
+          - remaining
+            - standbyの残り時間
+          - piece
+            - 置かれる予定の他コマの情報
+      - score
+        - 全フィールドにある自コマの合計
+      - size
+        - フィールド全体のうち、上下左右の終端の位置情報
+    parameters:
+      - name: user_id
+        in: "query"
+        description: "user_id"
+        type: number
+        example: 1
+        required: true
+    responses:
+      200:
+        description: "all condition of pieces on board."
+        schema:
+          type: "object"
+          $ref: "#/definitions/Board"
+/board/specified_size:
+  get:
+    tags:
+      - "board"
+    summary: "show specified board size"
+    description: "指定した範囲内でのboard情報"
+    parameters:
+      - $ref: "#/definitions/Size/properties/left"
+      - $ref: "#/definitions/Size/properties/right"
+      - $ref: "#/definitions/Size/properties/bottom"
+      - $ref: "#/definitions/Size/properties/top"
+      - name: "user_id"
+        in: "query"
+        description: "your user_id"
+        required: true
+        type: "number"
+    responses:
+      200:
+        description: "pieces on specified board size"
+        schema:
+          $ref: "#/definitions/Board"
+/piece:
+  post:
+    tags:
+      - piece
+    summary: "set a piece on board"
+    description: |
+      - status
+        - コマが置けたかtrue, falaseで返す
+      - 以下、boardと同じくすべての盤面情報を返す
+    parameters:
+      - $ref: "#/definitions/Piece/properties/x"
+      - $ref: "#/definitions/Piece/properties/y"
+      - $ref: "#/definitions/Piece/properties/user_id"
+    responses:
+      200:
+        description: "show specified board size"
+        schema:
+          type: "object"
+          properties:
+            status:
+              $ref: "#/definitions/Status"
+            board:
+              $ref: "#/definitions/Board"
+  delete:
+    tags:
+      - piece
+    summary: "delete a piece or all pieces"
+    parameters:
+      - name: "pieces"
+        description: "Add items to be deleted"
+        in: "body"
+        schema:
+          $ref: "#/definitions/Positions"
+      - name: "keyword"
+        in: "formData"
+        description: "Please enter keyword 'deleteAll' if you want to delete all pieces."
+        required: false
+        type: "string"
+    responses:
+      200:
+        description: "return delete status and board condition"
+        schema:
+          type: "object"
+          properties:
+            status:
+              $ref: "#/definitions/Status"
+            board:
+              $ref: "#/definitions/Board"
+/first_piece/position:
+  post:
+    tags:
+      - first_piece
+    summary: "set the first piece"
+    parameters:
+      - $ref: "#/definitions/Piece/properties/x"
+      - $ref: "#/definitions/Piece/properties/y"
+      - $ref: "#/definitions/Piece/properties/user_id"
+    responses:
+      200:
+        description: "return a place second piece has put"
+        schema:
+          type: "object"
+          properties:
+            status:
+              $ref: "#/definitions/Status"
+            standby:
+              $ref: "#/definitions/Standby"
+/first_piece/direction:
+  post:
+    tags:
+      - first_piece
+    summary: "direction from first piece"
+    parameters:
+    - in: "number"
+      required: true
+      name: "user_id"
+      description: "user_id"
+      type: "number"
+      schema:
+        $ref: "#/definitions/Piece/properties/user_id"
+    - in: "string"
+      required: true
+      name: "direction"
+      type: "body"
+      description: "type one of following direction"
+      enum: ["n", "ne", "e", "se", "s", "sw", "w", "nw"]
+    responses:
+      200:
+        description: "return board condition when first piece shoot"
+        schema:
+          type: "object"
+          properties:
+            status:
+              $ref: "#/definitions/Status"
+            board:
+              $ref: "#/definitions/Board"
+
+definitions:
+  Standbys:
+    type: array
+    description: "pieces to be ready to put"
+    items:
+      $ref: "#/definitions/Standby"
+  Standby:
+    type: "object"
+    description: "piece to be ready to put"
+    properties:
+      remaining:
+        type: "number"
+      piece:
+        $ref: "#/definitions/Piece"
+  Status:
+    type: "boolean"
+    description: "return success or fail of your order"
+    example: true
+  Board:
+    type: "object"
+    description: "show a condition of all pieces on board"
+    properties:
+      pieces:
+        $ref: "#/definitions/Pieces"
+      candidates:
+        $ref: "#/definitions/Positions"
+      standbys:
+        $ref: "#/definitions/Standbys"
+      score:
+        type: number
+        in: "formData"
+      size:
+        type: "object"
+        properties:
+          x_min:
+            type: "number"
+          x_max:
+            type: "number"
+          y_min:
+            type: "number"
+          y_max:
+            type: "number"
+  Pieces:
+    type: array
+    description: "pieces condition on board"
+    items:
+      $ref: "#/definitions/Piece"
+  Piece:
+    type: object
+    description: "piece condition"
+    properties:
+      x:
+        name: "x"
+        type: number
+        description: "x position"
+        example: 1
+        in: "formData"
+        required: true
+      y:
+        name: "y"
+        type: number
+        description: "y position"
+        example: 1
+        in: "formData"
+        required: true
+      user_id:
+        name: user_id
+        in: "query"
+        description: "user_id"
+        type: number
+        example: 1
+        required: true
+  Positions:
+    type: array
+    description: "just show piece locations (not include user_id information)"
+    items:
+      $ref: "#/definitions/Position"
+  Position:
+    type: "object"
+    description: "just show piece location (not include user_id information)"
+    properties:
+      x:
+        name: "x"
+        type: number
+        example: 1
+        in: "formData"
+      y:
+        name: "y"
+        type: number
+        example: 1
+        in: "formData"
+  Size:
+    type: "object"
+    description: "specify a board size to be show"
+    properties:
+      left:
+        name: "x_min"
+        in: "query"
+        description: "Min of X axis (left)"
+        required: true
+        type: "number"
+      right:
+        name: "x_max"
+        in: "query"
+        description: "Max of X axis (right)"
+        required: true
+        type: "number"
+      bottom:
+        name: "y_min"
+        in: "query"
+        description: "Min of Y axis (bottom)"
+        required: true
+        type: "number"
+      top:
+        name: "y_max"
+        in: "query"
+        description: "Max of X axis (top)"
+        required: true
+        type: "number"

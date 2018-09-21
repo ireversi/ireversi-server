@@ -213,17 +213,17 @@ describe('play', () => {
       // Given
       const pieces = array2pieces(
         [
-          '1:6', '2:4', '1:1', 0,
-          '2:2', 0, 0, 0,
-          '3:3', 0, 0, 0,
-          '1:5', 0, 0, 0,
+          '1:1', '4:3', '5:5', '1:8',
+          '2:2', '6:6', 0, 0,
+          '3:4', 0, '1:9', 0,
+          '1:7', 0, 0, 0,
         ],
       );
       const matchers = array2matchers(
         [
-          1, 1, 1, 0,
-          1, 0, 0, 0,
-          1, 0, 0, 0,
+          1, 1, 1, 1,
+          1, 1, 0, 0,
+          1, 0, 1, 0,
           1, 0, 0, 0,
         ],
       );
@@ -240,16 +240,91 @@ describe('play', () => {
 
       // Then
       // expressの検証
-      expect(response.body).toHaveLength(pieces.length);
+      expect(response.body).toHaveLength(matchers.length);
       expect(response.body).toEqual(expect.arrayContaining(matchers));
 
       // mongodbの検証
       const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
-      expect(pieceData).toHaveLength(pieces.length);
+      expect(pieceData).toHaveLength(matchers.length);
       expect(pieceData).toEqual(expect.arrayContaining(matchers));
     });
 
     // はなれたところにおけないテスト
+    it('cannot put piece on remote position', async () => {
+      // Given
+      const pieces = array2pieces(
+        [
+          '1:1', 0, 0,
+          0, 0, 0,
+          '2:2', 0, 0,
+        ],
+      );
+      const matchers = array2matchers(
+        [
+          1, 0, 0,
+          0, 0, 0,
+          0, 0, 0,
+        ],
+      );
+
+      // When
+      let response;
+
+      for (let i = 0; i < pieces.length; i += 1) {
+        response = await chai.request(app)
+          .post(`${basePath}/kohski/playing`)
+          .set('content-type', 'application/x-www-form-urlencoded')
+          .send(pieces[i]);
+      }
+
+      // Then
+      // expressの検証
+      expect(response.body).toHaveLength(matchers.length);
+      expect(response.body).toEqual(expect.arrayContaining(matchers));
+
+      // mongodbの検証
+      const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(matchers.length);
+      expect(pieceData).toEqual(expect.arrayContaining(matchers));
+    });
+
     // 自分のがあったらめくれるところにしかおけない
+    it('cannot put on the cell only when you turnover some pieces', async () => {
+      // Given
+      const pieces = array2pieces(
+        [
+          '1:1', '1:1', 0,
+          '2:2', 0, 0,
+          0, 0, 0,
+        ],
+      );
+      const matchers = array2matchers(
+        [
+          1, 0, 0,
+          2, 0, 0,
+          0, 0, 0,
+        ],
+      );
+
+      // When
+      let response;
+
+      for (let i = 0; i < pieces.length; i += 1) {
+        response = await chai.request(app)
+          .post(`${basePath}/kohski/playing`)
+          .set('content-type', 'application/x-www-form-urlencoded')
+          .send(pieces[i]);
+      }
+
+      // Then
+      // expressの検証
+      expect(response.body).toHaveLength(matchers.length);
+      expect(response.body).toEqual(expect.arrayContaining(matchers));
+
+      // mongodbの検証
+      const pieceData = JSON.parse(JSON.stringify(await PlayingModel.find({}, propFilter)));
+      expect(pieceData).toHaveLength(matchers.length);
+      expect(pieceData).toEqual(expect.arrayContaining(matchers));
+    });
   });
 });
