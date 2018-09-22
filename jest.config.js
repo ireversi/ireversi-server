@@ -6,4 +6,5 @@ module.exports = {
   setupFiles: ['<rootDir>/tests/setup.js'],
   testEnvironment: 'node',
   testPathIgnorePatterns: jestIgnore,
+  coveragePathIgnorePatterns: ['<rootDir>/src/utils/db.js'],
 };
