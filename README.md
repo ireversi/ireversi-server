@@ -11,3 +11,6 @@ Show src/config.js
 ## API document (staging)
 [iReversi API v1 - Swagger](https://ireversi-server.now.sh/api-docs/v1/)  
 [iReversi API v2 - Swagger](https://ireversi-server.now.sh/api-docs/v2/)  
+
+## iReversi Client
+[GitHub repository](https://github.com/ireversi/ireversi-client)
