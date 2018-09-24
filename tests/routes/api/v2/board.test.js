@@ -3,10 +3,10 @@ const chai = require('chai');
 
 const app = require('../../../../src/routes/app.js');
 // const PieceModel = require('../../../../src/models/v2/BoardStateModel.js');
-const {
-  prepareDB,
-  deleteAllDataFromDB,
-} = require('../../../../src/utils/db.js');
+// const {
+//   prepareDB,
+//   deleteAllDataFromDB,
+// } = require('../../../../src/utils/db.js');
 
 const basePath = '/api/v2';
 
@@ -18,7 +18,7 @@ function convertComparisonResult(result) {
       const piece = {
         x: Math.floor(i % size),
         y: Math.floor(i / size),
-        userid: result[i],
+        userId: result[i],
       };
       pieces.push(piece);
     }
@@ -28,8 +28,8 @@ function convertComparisonResult(result) {
 
 
 describe('board', () => {
-  beforeAll(prepareDB);
-  afterEach(deleteAllDataFromDB);
+  // beforeAll(prepareDB);
+  // afterEach(deleteAllDataFromDB);
 
   // 一つ駒を置く
   it('gets all', async () => {
@@ -43,13 +43,13 @@ describe('board', () => {
     ];
 
     const matchers = convertComparisonResult(result);
-    await Promise.all(matchers.map(m => PieceModel(m).save()));
+    // await Promise.all(matchers.map(m => PieceModel(m).save()));
 
     // When
-    const response = await chai.request(app).get(`${basePath}/board/index`);
+    const response = await chai.request(app).get(`${basePath}/board`);
 
     // Then
-    expect(response.body).toHaveLength(matchers.length);
-    expect(response.body).toEqual(expect.arrayContaining(matchers));
+    expect(response.body.pieces).toHaveLength(matchers.length);
+    expect(response.body.pieces).toEqual(expect.arrayContaining(matchers));
   });
 });

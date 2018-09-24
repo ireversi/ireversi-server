@@ -1,10 +1,10 @@
 const pieces = [];
 
 module.exports = {
-  addPiece(piece){
+  addPiece(piece) {
     pieces.push(piece);
   },
-  getPieces(){
+  getPieces() {
     return {
       pieces,
     };
