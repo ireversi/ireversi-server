@@ -1,58 +1,73 @@
-let pieces = [];
+const pieces = [];
 
 module.exports = {
   addPiece(piece) {
     pieces.push(piece);
   },
+  updatePieces(piece) {
+    pieces.find((p, i) => {
+      if (p.x === piece.x && p.y === piece.y) {
+        pieces.splice(i, 1);
+        pieces.push(piece);
+        return pieces;
+      }
+      return false;
+    });
+  },
+  deletePieces() {
+    pieces.length = 0;
+  },
   getPieces() {
-    return {
-      pieces,
-    };
+    return pieces;
   },
-  resetPieces() {
-    pieces = [];
-  },
-  array2Pieces(fieldSource) {
-    const field = [];
-    for (let i = 0; i < fieldSource.length; i += 1) {
-      if (Array.isArray(fieldSource[i])) {
-        field.push(fieldSource[i][0]);
-      } else {
-        field.push(fieldSource[i]);
+  convert2PieceRecord(pieceArray) {
+    const record = [];
+    for (let i = 0; i < pieceArray.length; i += 1) {
+      const size = Math.sqrt(pieceArray.length);
+      const piece = pieceArray[i];
+      if (piece !== 0 && !Array.isArray(piece)) {
+        const point = piece.indexOf(':');
+        const num = piece.slice(0, point);
+        const userId = piece.slice(point + 1);
+        const x = Math.floor(i % size);
+        const y = Math.floor(i / size);
+        record.push([num, x, y, userId]);
+      } else if (piece !== 0 && Array.isArray(piece)) {
+        for (let j = 0; j < piece.length; j += 1) {
+          const pie = piece[j];
+          const point = pie.indexOf(':');
+          const num = pie.slice(0, point);
+          const userId = pie.slice(point + 1);
+          const x = Math.floor(i % size);
+          const y = Math.floor(i / size);
+          record.push([num, x, y, userId]);
+        }
       }
     }
-    const array = [];
-    let order = []; //  配列順番
-    const sqrt = Math.sqrt(field.length); // 平方根
-    const fieldExist = field.filter(n => n !== 0); // コマだけを抽出
-    // 配列をプレイ順で並び替え
-    const playOrder = fieldExist.sort((a, b) => (parseInt(a.slice(a.indexOf(':') + 1), 10)) - (parseInt(b.slice(b.indexOf(':') + 1), 10)));
-    // それぞれが元の配列の何番目か
-    order = playOrder.map(n => field.indexOf(n, 0));
-
-    let n = 0;
-    let elm = {};
-    for (let i = 0; i < order.length; i += 1) { // x, y, userIdを生成する
-      const x = order[i] % sqrt;
-      const y = Math.floor(((field.length - 1) - order[i]) / sqrt);
-      const userId = parseInt(playOrder[n].slice(playOrder[n].indexOf(':') - 1), 10);
-      elm = { x, y, userId };
-      n += 1;
-      array.push(elm);
-    }
-    return array; // 打ち手の順で生成した配列をreturn
+    record.sort((a, b) => {
+      if (+a[0] < +b[0]) return -1;
+      if (+a[0] > +b[0]) return 1;
+      return 0;
+    });
+    return record;
   },
-  array2Matchers(field) {
-    const array = [];
-    const sqrt = Math.sqrt(field.length);
-    for (let i = 0; i < field.length; i += 1) {
-      if (field[i] !== 0) {
-        const x = i % sqrt;
-        const y = Math.floor(((field.length - 1) - i) / sqrt);
-        const userId = field[i];
-        array.push({ x, y, userId });
+  convertPiece(piece) {
+    const convert = { x: piece[1], y: piece[2], userId: piece[3] };
+    return convert;
+  },
+  convertComparisonResult(result) {
+    const resultArray = [];
+    const size = Math.sqrt(result.length);
+    for (let i = 0; i < result.length; i += 1) {
+      if (result[i] !== 0) {
+        const piece = {
+          x: Math.floor(i % size),
+          y: Math.floor(i / size),
+          userId: result[i],
+        };
+        resultArray.push(piece);
       }
     }
-    return array;
+    return resultArray;
   },
 };
