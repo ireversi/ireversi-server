@@ -17,7 +17,7 @@ tags:
         description: "y axis"
         required: true
         type: "number"
-      - name: "userID"
+      - name: "userId"
         in: "formData"
         description: "user ID"
         required: true
