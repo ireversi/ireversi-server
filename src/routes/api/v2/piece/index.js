@@ -2,17 +2,6 @@
 const router = require('express').Router();
 const PieceModel = require('../../../../models/v2/PieceModel.js');
 
-function turnOverPiece(list, result) {
-  PieceModel.addPiece(result);
-  list.forEach((p) => {
-    if (p.userId !== result.userId) {
-      const updatePiece = { x: p.x, y: p.y, userId: result.userId };
-      PieceModel.updatePieces(updatePiece);
-    }
-  });
-}
-
-
 // for CORS
 router.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -118,21 +107,21 @@ router.route('/')
         || (key === 'nw' && isOtherPiece.nw && isOwnPiece.nw)) {
         let list = PieceModel.sortList(turnlist[key], { x: -1, y: -1 });
         list = PieceModel.checkList(list, key, result);
-        turnOverPiece(list, result);
+        PieceModel.turnOverPiece(list, result);
       } else if ((key === 'e' && isOtherPiece.e && isOwnPiece.e)
         || (key === 's' && isOtherPiece.s && isOwnPiece.s)
         || (key === 'se' && isOtherPiece.se && isOwnPiece.se)) {
         let list = PieceModel.sortList(turnlist[key], { x: 1, y: 1 });
         list = PieceModel.checkList(list, key, result);
-        turnOverPiece(list, result);
+        PieceModel.turnOverPiece(list, result);
       } else if (key === 'ne' && isOtherPiece.ne && isOwnPiece.ne) {
         let list = PieceModel.sortList(turnlist[key], { x: 1, y: -1 });
         list = PieceModel.checkList(list, key, result);
-        turnOverPiece(list, result);
+        PieceModel.turnOverPiece(list, result);
       } else if (key === 'sw' && isOtherPiece.sw && isOwnPiece.sw) {
         let list = PieceModel.sortList(turnlist[key], { x: -1, y: 1 });
         list = PieceModel.checkList(list, key, result);
-        turnOverPiece(list, result);
+        PieceModel.turnOverPiece(list, result);
       }
       return true; // for lint
     });
