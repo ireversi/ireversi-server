@@ -24,12 +24,19 @@ const {
 const basePath = '/api/v1';
 const propFilter = '-_id -__v';
 // 与えたい配列
-const array2Pieces = (field) => {
+const array2Pieces = (fieldSource) => {
+  const field = [];
+  for (let i = 0; i < fieldSource.length; i += 1) {
+    if (Array.isArray(fieldSource[i])) {
+      field.push(fieldSource[i][0]);
+    } else {
+      field.push(fieldSource[i]);
+    }
+  }
   const array = [];
   let order = []; //  配列順番
   const sqrt = Math.sqrt(field.length); // 平方根
   const fieldExist = field.filter(n => n !== 0); // コマだけを抽出
-
   // 配列をプレイ順で並び替え
   const playOrder = fieldExist.sort((a, b) => (parseInt(a.slice(a.indexOf(':') + 1), 10)) - (parseInt(b.slice(b.indexOf(':') + 1), 10)));
   // それぞれが元の配列の何番目か
@@ -73,7 +80,7 @@ describe('Request piece', () => {
       const pieces = array2Pieces(
         [
           0, '2:2', '2:7', 0, 0,
-          0, '1:1', '5:5', 0, 0,
+          0, ['1:1', '6:8'], '5:5', 0, 0,
           0, '2:6', '3:3', 0, 0,
           0, 0, '4:4', '5:8', 0,
           0, 0, 0, 0, 0,
