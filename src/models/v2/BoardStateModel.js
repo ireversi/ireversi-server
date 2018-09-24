@@ -17,12 +17,6 @@ const BoardStateSchema = new Schema({
           user_id: Number,
         },
       ],
-      candidates: [
-        {
-          x: Number,
-          y: Number,
-        },
-      ],
       standbys: [
         {
           remaining: Number,
