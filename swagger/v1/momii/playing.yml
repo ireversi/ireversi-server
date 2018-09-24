@@ -17,7 +17,7 @@ tags:
       description: "y position"
       required: true
       type: "number"
-    - name: "userId"
+    - name: "userID"
       in: "formData"
       description: "USER ID"
       required: true
