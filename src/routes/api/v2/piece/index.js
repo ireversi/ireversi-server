@@ -1,18 +1,20 @@
 const router = require('express').Router();
-const boardCtrl = require('../../../../models/v2/boardController.js');
+const pieceCtrl = require('../../../../models/v2/PieceModel.js');
 
-router.use('/flip', require('./flip.js'));
+router.use('/piece', require('./piece.js'));
 
 router.route('/')
   .get((req, res) => {
     const x = +req.query.x;
     const y = +req.query.y;
     const userId = +req.query.userId;
-    boardCtrl.addPiece({
+    pieceCtrl.addPiece({
       x,
       y,
       userId,
     });
+    console.log(userId);
+
 
     res.json({
       status: 'success',
