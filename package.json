@@ -12,8 +12,8 @@
     "start": "cross-env NODE_ENV=production node src/server.js",
     "lint": "eslint src tests -f codeframe",
     "lint:fix": "eslint src tests --fix",
-    "test": "cross-env NODE_ENV=test jest --coverage",
-    "test:watch": "cross-env NODE_ENV=test jest --watch",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
     "coverage": "codecov"
   },
   "author": "m-mitsuhide <m.mitsuhide@amatelus.com>",

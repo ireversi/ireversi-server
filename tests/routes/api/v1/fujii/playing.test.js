@@ -26,13 +26,19 @@ function reformPiece(d) {
       order = +d[i].split(':')[1] - 1;
       arry.splice(order, 1, obj);
     } else if (d[i] !== 0 && Array.isArray(d[i])) { // 配列が入っている場合 = 同じ手がある場合
-      obj = {
-        x: i % r,
-        y: r - Math.floor(i / r) - 1,
-        userId: +d[i][0].split(':')[0],
-      };
-      order = +d[i][0].split(':')[1] - 1;
-      arry.splice(order, 1, obj);
+      // 配列の場合、arryに0を追加（配列の長さを追加）
+      for (let j = 0; j < d[j].length - 1; j += 1) {
+        arry.push(0);
+      }
+      for (let k = 0; k < d[i].length; k += 1) {
+        obj = {
+          x: i % r,
+          y: r - Math.floor(i / r) - 1,
+          userId: +d[i][k].split(':')[0],
+        };
+        order = +d[i][k].split(':')[1] - 1;
+        arry.splice(order, 1, obj);
+      }
     }
   }
   const newArray = arry.filter(el => el !== 0);
@@ -113,7 +119,6 @@ describe('play', () => {
       // When
       let response;
       const rPiece = reformPiece(piece);
-      // console.log(rPiece);
       for (let i = 0; i < rPiece.length; i += 1) {
         response = await chai.request(app)
           .post(`${basePath}/fujii/playing`)
