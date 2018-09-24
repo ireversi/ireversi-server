@@ -39,7 +39,7 @@ router.route('/')
     const result = {
       x: +req.body.x,
       y: +req.body.y,
-      userID: +req.body.userID,
+      userId: +req.body.userId,
     };
     // console.log("----------------------------");
     // console.log("pieces:"+pieces);
@@ -56,8 +56,8 @@ router.route('/')
     const flip = [];
 
     // piecesの中を探索してtestから送られてきたresultと同一のものを探索
-    if (pieces.find(p => p.userID === result.userID)) {
-      // console.log("piecese = p.userID === result.userID");
+    if (pieces.find(p => p.userId === result.userId)) {
+      // console.log("piecese = p.userId === result.userId");
       for (let i = 0; i < dirAll.length; i += 1) {
         // めくる候補のリスト
         const turnCandidate = [];
@@ -79,8 +79,8 @@ router.route('/')
         // dirPieceが尽きるまで試行
         while (dirPiece !== undefined) {
           // 探索セルがresultと違うIDなら
-          if (dirPiece.userID !== result.userID) {
-            // console.log("dirPiece.userID === result.userID");
+          if (dirPiece.userId !== result.userId) {
+            // console.log("dirPiece.userId === result.userId");
             turnCandidate.push(dirPiece);
             dist += 1;
 
@@ -90,14 +90,14 @@ router.route('/')
 
             // ひとます進める
             dirPiece = searchNext(pieces, nextX, nextY);
-          } else if (dirPiece.userID === result.userID) { // userIDが同じものが見つかったら
+          } else if (dirPiece.userId === result.userId) { // userIdが同じものが見つかったら
             // await new PlayingModel(result).save();
             // それまでに溜まったturnCandidateを探索
 
             for (let k = 0; k < turnCandidate.length; k += 1) {
               // turnCandidateをひっくり返す処理
               if (turnCandidate[k] !== undefined) {
-                turnCandidate[k].userID = result.userID;
+                turnCandidate[k].userId = result.userId;
                 flip.push(turnCandidate[k]);
               }
             }
@@ -114,7 +114,7 @@ router.route('/')
       // console.log("pieces.length=0");
       await new PlayingModel(result).save();
     } else {
-      // console.log("pieces.length !==0 かつ userID一致なし");
+      // console.log("pieces.length !==0 かつ userId一致なし");
       for (let i = 0; i < dirXY.length; i += 1) {
         const dirX = dirXY[i][0];
         const dirY = dirXY[i][1];
@@ -124,7 +124,7 @@ router.route('/')
         const dirPiece = pieces.find(p => p.x === toX && p.y === toY);
 
         if (dirPiece !== undefined) {
-          // console.log("length=0&&userID unique register");
+          // console.log("length=0&&userId unique register");
           await new PlayingModel(result).save();
           break;
         }
@@ -133,10 +133,10 @@ router.route('/')
     // console.log("最後");
     // const Playing = new PlayingModel(result);
     // await Playing.save();
-    // flipをmapでバラしてそれぞれの要素で第一引数でfilterかけてuserIDをupdate
+    // flipをmapでバラしてそれぞれの要素で第一引数でfilterかけてuserIdをupdate
     await Promise.all(flip.map(p => PlayingModel.updateOne(
       { x: p.x, y: p.y }, // 第一引数がfilter
-      { userID: p.userID }, // 第二引数でupdate
+      { userId: p.userId }, // 第二引数でupdate
     )));
     res.json(await PlayingModel.find({}, propFilter));
   });
