@@ -487,10 +487,8 @@ describe('play', () => {
 
   // マスが空いて飛び石になっている場合に置けないテスト
   it('the test piece cannnot skip the blank cell to flip ', async () => {
-    // Reset
     await chai.request(app).delete(`${basePath}`);
 
-    // Given
     const pieces = [
       ZERO0, '1:1', ZERO0, ZERO0, ZERO0,
       ZERO0, '2:2', '3:3', ZERO0, ZERO0,
