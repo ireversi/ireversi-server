@@ -1,17 +1,30 @@
-exports.calc = function calcCandidate(id, pieces) {
+function seeNext(pieces, nextX, nextY) {
+  const ans = pieces.find(p => p.x === nextX && p.y === nextY);
+  return ans;
+}
+
+exports.calc = function calcCandidate(userId, pieces) {
   const candidates = [];
   // x軸方向、y軸方向を定義
   const dirXY = [
     [0, 1],
-    [1, 1],
+    [1, 0],
     [0, -1],
     [-1, 0],
+  ];
+
+  const dirAll = [
+    ...dirXY,
+    [1, 1],
+    [1, -1],
+    [-1, -1],
+    [-1, 1],
   ];
 
   // 全piece検索しておいたpieceが初出かどうか取得
   let flag = false;
   pieces.forEach((elm) => {
-    if (elm.userId === id) {
+    if (elm.userId === userId) {
       flag = true;
     }
   });
@@ -32,8 +45,9 @@ exports.calc = function calcCandidate(id, pieces) {
         const dirPiece = {
           x: toX,
           y: toY,
-          userId: id,
+          userId,
         };
+
         // dirPieceがすでにおいてあるセルと被らないか検索
         let searchFlag = true;
         pieces.forEach((p) => {
@@ -50,6 +64,8 @@ exports.calc = function calcCandidate(id, pieces) {
             }
           });
           if (count === 0) {
+            // userIdを削除して格納
+            delete dirPiece.userId;
             candidates.push(dirPiece);
           }
         }
@@ -57,8 +73,47 @@ exports.calc = function calcCandidate(id, pieces) {
     });
   } else {
   // id既出時
+    pieces.forEach((elm) => {
+      if (elm.userId === userId) {
+        for (let i = 0; i < dirAll.length; i += 1) {
+          let dist = 1;
+          // ひっくり返るものがあったら貯めておく配列
+          const turnCandidate = [];
 
+          // x軸方向、y軸方向に検索
+          const dirX = dirAll[i][0];
+          const dirY = dirAll[i][1];
 
+          // 基準セルから1つ先をみる
+          const toX = elm.x + dirX * dist;
+          const toY = elm.y + dirY * dist;
+
+          // 検索セルとしてパッケージ
+          let dirPiece = pieces.find(p => p.x === toX && p.y === toY);
+          let nextPiece = {
+            x: 0,
+            y: 0,
+            userId: 0,
+          };
+          while (dirPiece !== undefined) {
+            if (elm.userId !== dirPiece.userId) {
+              turnCandidate.push(dirPiece);
+            }
+            dist += 1;
+            const nextX = elm.x + dirX * dist;
+            const nextY = elm.y + dirY * dist;
+            nextPiece = {
+              x: nextX,
+              y: nextY,
+            };
+            dirPiece = seeNext(pieces, nextX, nextY);
+          }
+          if (turnCandidate.length > 0) {
+            candidates.push(nextPiece);
+          }
+        }
+      }
+    });
   }
   return candidates;
 };

@@ -4,12 +4,6 @@ module.exports = {
   addPiece(piece) {
     pieces.push(piece);
   },
-<<<<<<< HEAD
-  getPieces() {
-    return {
-      pieces,
-    };
-=======
   updatePieces(piece) {
     pieces.find((p, i) => {
       if (p.x === piece.x && p.y === piece.y) {
@@ -146,6 +140,5 @@ module.exports = {
         this.updatePieces(updatePiece);
       }
     });
->>>>>>> f2542c3c845b354625c19a2075a4889978be6de4
   },
 };
