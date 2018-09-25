@@ -16,7 +16,7 @@ router.route('/').get(async (req, res) => {
   const entireBoard = boardCtrl.getBoard().pieces;
   const ans = calcCandidate.calc(userId, entireBoard);
   ans.forEach((elm) => {
-    boardCtrl.addCandaites(elm);
+    boardCtrl.addCandidates(elm);
   });
   const score = calcScore.calc(userId, entireBoard);
   boardCtrl.addScore(score);

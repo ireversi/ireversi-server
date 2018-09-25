@@ -36,12 +36,11 @@ describe('calcCandidate', () => {
         0, 5, 0,
       ],
     );
-
-    userId = 1;
+    userId = 2;
 
     // When
     const response = calcScore.calc(userId, testCase);
     // Then
-    expect(response).toBe(2);
+    expect(response).toBe(1);
   });
 });

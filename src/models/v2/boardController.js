@@ -3,6 +3,7 @@
 const pieces = [];
 const candidates = [];
 const standbys = [];
+let score = 0;
 
 function convertComparisonResult(result) {
   const fPieces = [];
@@ -37,17 +38,18 @@ module.exports = {
   addPiece(piece) {
     pieces.push(piece);
   },
-  addCandaites(candidate) {
+  addCandidates(candidate) {
     candidates.push(candidate);
   },
-  addScore(score) {
-    candidates.push(score);
+  addScore(valscore) {
+    score = valscore;
   },
   getBoard() {
     return {
       pieces,
       candidates,
       standbys,
+      score,
     };
   },
 };
