@@ -7,30 +7,30 @@ exports.calc = function calcSize(userId, pieces) {
   let counter = 0;
   pieces.forEach((elm) => {
     // piecesの各要素のうちuserIdに該当するもの
-    if (elm.userId === userId) {
-      if (counter === 0) {
-        xMin = elm.x;
+    // if (elm.userId === userId) {
+    if (counter === 0) {
+      xMin = elm.x;
+      xMax = elm.x;
+      yMin = elm.y;
+      yMax = elm.y;
+      counter += 1;
+    } else {
+      // xの条件式
+      if (elm.x > xMax) {
         xMax = elm.x;
-        yMin = elm.y;
-        yMax = elm.y;
-        counter += 1;
-      } else {
-        // xの条件式
-        if (elm.x > xMax) {
-          xMax = elm.x;
-        }
-        if (elm.x < xMin) {
-          xMin = elm.x;
-        }
-
-        // yの条件式
-        if (elm.y > yMax) {
-          yMax = elm.y;
-        }
-        if (elm.y < yMin) {
-          yMin = elm.y;
-        }
       }
+      if (elm.x < xMin) {
+        xMin = elm.x;
+      }
+
+      // yの条件式
+      if (elm.y > yMax) {
+        yMax = elm.y;
+      }
+      if (elm.y < yMin) {
+        yMin = elm.y;
+      }
+    // }
     }
   });
   const ans = {
@@ -38,7 +38,6 @@ exports.calc = function calcSize(userId, pieces) {
     xMax,
     yMin,
     yMax,
-    userId,
   };
   return ans;
 };

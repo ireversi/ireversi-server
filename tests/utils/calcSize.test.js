@@ -41,11 +41,10 @@ describe('calcSize', () => {
     );
 
     const answer = {
-      xMin: 2,
-      xMax: 3,
+      xMin: 1,
+      xMax: 4,
       yMin: 1,
       yMax: 4,
-      userId,
     };
 
     // When
