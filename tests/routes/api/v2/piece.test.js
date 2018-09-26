@@ -484,4 +484,51 @@ describe('play', () => {
     // expect(pieceData).toHaveLength(rpieces.length);
     // expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
+
+  // マスが空いて飛び石になっている場合に置けないテスト
+  it('the test piece cannnot skip the blank cell to flip ', async () => {
+    // Reset
+    await chai.request(app).delete(`${basePath}`);
+
+    // Given
+    const pieces = [
+      ZERO0, '1:1', ZERO0, ZERO0, ZERO0,
+      ZERO0, '2:2', '3:3', ZERO0, ZERO0,
+      ZERO0, ZERO0, '4:4', ZERO0, ZERO0,
+      ZERO0, '6:6', '5:5', ZERO0, ZERO0,
+      ZERO0, '7:1', ZERO0, ZERO0, ZERO0,
+    ];
+
+    const result = [
+      0, 1, 0, 0, 0,
+      0, 2, 3, 0, 0,
+      0, 0, 4, 0, 0,
+      0, 6, 5, 0, 0,
+      0, 0, 0, 0, 0,
+    ];
+
+    // When
+    let response;
+    const record = PieceModel.convert2PieceRecord(pieces);
+
+    for (let i = 0; i < record.length; i += 1) {
+      let piece = record[i];
+      piece = PieceModel.convertPiece(piece);
+      response = await chai.request(app)
+        .post(`${basePath}`)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(piece);
+    }
+
+    // Then
+    // check express result
+    const rpieces = PieceModel.convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+    // // check mongoDB result
+    // const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    // expect(pieceData).toHaveLength(rpieces.length);
+    // expect(pieceData).toEqual(expect.arrayContaining(rpieces));
+  });
 });
