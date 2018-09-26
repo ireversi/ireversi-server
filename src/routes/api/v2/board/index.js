@@ -2,6 +2,7 @@ const router = require('express').Router();
 const boardCtrl = require('../../../../models/v2/boardController.js');
 const calcCandidate = require('./calcCandidate.js');
 const calcScore = require('./calcScore.js');
+const calcSize = require('./calcSize.js');
 router.use('/specified_range', require('./specified_range.js'));
 
 // for CORS
@@ -20,6 +21,8 @@ router.route('/').get(async (req, res) => {
   });
   const score = calcScore.calc(userId, entireBoard);
   boardCtrl.addScore(score);
+  const size = calcSize.calc(userId, entireBoard);
+  boardCtrl.addSize(size);
   res.json(boardCtrl.getBoard());
 });
 

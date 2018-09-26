@@ -4,6 +4,7 @@ const pieces = [];
 const candidates = [];
 const standbys = [];
 let score = 0;
+let gSize = {};
 
 function convertComparisonResult(result) {
   const fPieces = [];
@@ -44,12 +45,16 @@ module.exports = {
   addScore(valscore) {
     score = valscore;
   },
+  addSize(boardSize) {
+    gSize = boardSize;
+  },
   getBoard() {
     return {
       pieces,
       candidates,
       standbys,
       score,
+      size: gSize,
     };
   },
 };
