@@ -46,14 +46,14 @@ function array2pieces(testCase) {
   tempResult.forEach((elm) => {
     if (elm.content !== 0) {
       const ans = elm.content.split(':');
-      const userID = ans[0];
+      const userId = ans[0];
       const turn = ans[1];
       const posX = elm.position % square;
       const posY = Math.floor(elm.position / square);
       const ansObj = {
         x: posX,
         y: posY,
-        userID: Number(userID),
+        userId: Number(userId),
         turn: Number(turn),
       };
       resultArray.push(ansObj);
@@ -92,7 +92,7 @@ function array2matchers(testCase) {
       const tempObj = {
         x: posX,
         y: posY,
-        userID: elm,
+        userId: elm,
       };
       resultArray.push(tempObj);
     }
