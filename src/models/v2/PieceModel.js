@@ -20,125 +20,51 @@ module.exports = {
   getPieces() {
     return pieces;
   },
-  convert2PieceRecord(pieceArray) {
-    const record = [];
-    for (let i = 0; i < pieceArray.length; i += 1) {
-      const size = Math.sqrt(pieceArray.length);
-      const piece = pieceArray[i];
-      if (piece !== 0 && !Array.isArray(piece)) {
-        const point = piece.indexOf(':');
-        const num = piece.slice(0, point);
-        const userId = piece.slice(point + 1);
-        const x = Math.floor(i % size);
-        const y = Math.floor(i / size);
-        record.push([num, x, y, userId]);
-      } else if (piece !== 0 && Array.isArray(piece)) {
-        for (let j = 0; j < piece.length; j += 1) {
-          const pie = piece[j];
-          const point = pie.indexOf(':');
-          const num = pie.slice(0, point);
-          const userId = pie.slice(point + 1);
-          const x = Math.floor(i % size);
-          const y = Math.floor(i / size);
-          record.push([num, x, y, userId]);
+  array2Pieces(source) {
+    const array = []; // 返す配列
+    const sqrt = Math.sqrt(source.length); // 平方根
+    const fieldExist = [];
+    for (let i = 0; i < source.length; i += 1) {
+      const f = source[i];
+
+      if (Array.isArray(f)) {
+        for (let j = 0; j < f.length; j += 1) {
+          const g = [i, f[j]];
+          fieldExist.push(g);
         }
+      } else if (f !== 0) {
+        const g = [i, f];
+        fieldExist.push(g);
       }
     }
-    record.sort((a, b) => {
-      if (+a[0] < +b[0]) return -1;
-      if (+a[0] > +b[0]) return 1;
-      return 0;
-    });
-    return record;
+    const playOrder = fieldExist.sort((a, b) => (parseInt(a[1].slice(a[1].indexOf(':') + 1), 10)) - (parseInt(b[1].slice(b[1].indexOf(':') + 1), 10)));
+    let n = 0;
+    let elm = {};
+    for (let i = 0; i < playOrder.length; i += 1) { // x, y, userIdを生成する
+      const order = playOrder[i][0];
+      const x = order % sqrt;
+      const y = Math.floor(((source.length - 1) - order) / sqrt);
+      const userId = parseInt(playOrder[n][1].slice(playOrder[n][1].indexOf(':') - 1), 10);
+      elm = { x, y, userId };
+      n += 1;
+      array.push(elm);
+    }
+    return array;
   },
-  convertPiece(piece) {
-    const convert = { x: piece[1], y: piece[2], userId: piece[3] };
-    return convert;
-  },
-  convertComparisonResult(result) {
-    const resultArray = [];
-    const size = Math.sqrt(result.length);
-    for (let i = 0; i < result.length; i += 1) {
-      if (result[i] !== 0) {
-        const piece = {
-          x: Math.floor(i % size),
-          y: Math.floor(i / size),
-          userId: result[i],
-        };
-        resultArray.push(piece);
+  array2Matchers(field) {
+    const array = [];
+    const sqrt = Math.sqrt(field.length);
+    for (let i = 0; i < field.length; i += 1) {
+      if (field[i] !== 0) {
+        const x = i % sqrt;
+        const y = Math.floor(((field.length - 1) - i) / sqrt);
+        const userId = field[i];
+        array.push({ x, y, userId });
       }
     }
-    return resultArray;
+    return array;
   },
-  sortList(list, sort) {
-    list.sort((a, b) => {
-      if (a.x < b.x) return -1 * sort.x;
-      if (a.x > b.x) return 1 * sort.x;
-      if (a.y < b.y) return -1 * sort.y;
-      if (a.y > b.y) return 1 * sort.y;
-      return 0; // for lint
-    });
-    return list;
-  },
-  checkList(list, key, result) {
-    const newList = [];
-    if (key === 'n' || key === 's') {
-      for (let i = 0; i < list.length; i += 1) {
-        if (i === 0) {
-          newList.push(list[i]);
-        } else if (list[i].userId !== result.userId
-          && Math.abs(list[i].y - list[i - 1].y) === 1) {
-          newList.push(list[i]);
-        } else if (list[i].userId === result.userId
-          && Math.abs(list[i].y - list[i - 1].y) === 1) {
-          return newList;
-        } else {
-          newList.length = 0;
-          return newList;
-        }
-      }
-    } else if (key === 'w' || key === 'e') {
-      for (let i = 0; i < list.length; i += 1) {
-        if (i === 0) {
-          newList.push(list[i]);
-        } else if (i > 0 && list[i].userId !== result.userId
-          && Math.abs(list[i].x - list[i - 1].x) === 1) {
-          newList.push(list[i]);
-        } else if (i > 0 && list[i].userId === result.userId
-          && Math.abs(list[i].x - list[i - 1].x) === 1) {
-          return newList;
-        } else {
-          newList.length = 0;
-          return newList;
-        }
-      }
-    } else {
-      for (let i = 0; i < list.length; i += 1) {
-        if (i === 0) {
-          newList.push(list[i]);
-        } else if (i > 0 && list[i].userId !== result.userId
-          && (Math.abs(list[i].x - list[i - 1].x) === 1)
-          && (Math.abs(list[i].y - list[i - 1].y) === 1)) {
-          newList.push(list[i]);
-        } else if (i > 0 && list[i].userId === result.userId
-          && (Math.abs(list[i].x - list[i - 1].x) === 1)
-          && (Math.abs(list[i].y - list[i - 1].y) === 1)) {
-          return newList;
-        } else {
-          newList.length = 0;
-          return newList;
-        }
-      }
-    }
-    return newList;
-  },
-  turnOverPiece(list, result) {
-    this.addPiece(result);
-    list.forEach((p) => {
-      if (p.userId !== result.userId) {
-        const updatePiece = { x: p.x, y: p.y, userId: result.userId };
-        this.updatePieces(updatePiece);
-      }
-    });
+  seeNext(array, nextPieceX, nextPieceY) {
+    return array.find(p => p.x === nextPieceX && p.y === nextPieceY);
   },
 };
