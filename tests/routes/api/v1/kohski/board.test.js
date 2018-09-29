@@ -57,7 +57,7 @@ describe('play', () => {
       // Then
       const { body } = await chai.request(app).get(`${basePath}/kohski/board`);
       expect(body).toHaveLength(matchers.length);
-      expect(body).toMatchObject(matchers);
+      expect(body).toEqual(expect.arrayContaining(matchers));
     });
   });
 });
