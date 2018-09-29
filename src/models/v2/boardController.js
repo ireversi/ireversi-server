@@ -14,7 +14,7 @@ function convertComparisonResult(result) {
       const piece = {
         x: Math.floor(i % size),
         y: Math.floor(i / size),
-        userId: result[i],
+        userId: result[i].userId,
       };
       fPieces.push(piece);
     }
@@ -22,11 +22,12 @@ function convertComparisonResult(result) {
   return fPieces;
 }
 
+// いったん数値仮置き
 const result = [
   0, 0, 0, 0, 0,
   0, 1, 2, 1, 0,
   4, 5, 6, 7, 1,
-  0, 9, 0, 0, 0,
+  0, 9, 0, 2, 0,
   0, 0, 0, 0, 0,
 ];
 

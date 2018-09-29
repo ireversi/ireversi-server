@@ -13,14 +13,19 @@ router.use((req, res, next) => {
 });
 
 router.route('/').get(async (req, res) => {
+  // userIdを取得
   const userId = +req.query.user_id;
+  // boardCtrlより全体盤面を取得
   const entireBoard = boardCtrl.getBoard().pieces;
+  // candidatesの取得
   const ans = calcCandidate.calc(userId, entireBoard);
   ans.forEach((elm) => {
     boardCtrl.addCandidates(elm);
   });
+  // scoreの取得
   const score = calcScore.calc(userId, entireBoard);
   boardCtrl.addScore(score);
+  // sizeの取得
   const size = calcSize.calc(userId, entireBoard);
   boardCtrl.addSize(size);
   res.json(boardCtrl.getBoard());
