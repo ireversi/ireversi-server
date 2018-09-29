@@ -2,6 +2,21 @@
 const router = require('express').Router();
 const PieceModel = require('../../../../models/v2/PieceModel.js');
 
+const dirXY = [
+  [0, 1],
+  [1, 0],
+  [0, -1],
+  [-1, 0],
+];
+
+const dirAll = [
+  ...dirXY,
+  [-1, 1],
+  [1, 1],
+  [1, -1],
+  [-1, -1],
+];
+
 // for CORS
 router.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -12,124 +27,80 @@ router.use((req, res, next) => {
 router.route('/')
   .post((req, res) => {
     const pieces = PieceModel.getPieces();
-    const result = {
+
+    const piece = {
       x: +req.body.x,
       y: +req.body.y,
       userId: +req.body.userId,
     };
 
-    // check to exist piece had already set one
-    if (pieces.find(p => p.x === result.x && p.y === result.y)) {
+    if (pieces.find(p => p.x === piece.x && p.y === piece.y)) {
       return res.json(PieceModel.getPieces());
     }
 
-    // 本来はfirst_pieceで処理するので必要ない、フロントとの連携確認できたら削除
-    // check it about first one for all_user
-    if (pieces.length === 0) {
-      PieceModel.addPiece(result);
-      return res.json(PieceModel.getPieces());
-    }
+    const flip = [];
+    if (pieces.find(p => p.userId === piece.userId)) {
+      for (let i = 0; i < dirAll.length; i += 1) {
+        const rslt = [];
+        const dirX = dirAll[i][0];
+        const dirY = dirAll[i][1];
+        const aroundX = piece.x + dirX;
+        const aroundY = piece.y + dirY;
 
-    // check it about first one about several user
-    let existPiece = false;
-    if (pieces.find(p => p.userId === result.userId)) {
-      existPiece = true;
-    }
+        let n = 1;
+        let dirPiece = PieceModel.seeNext(pieces, aroundX, aroundY);
 
-    // check turn over
-    // ============================================================
-    // pick up
-    const turnlist = {
-      n: [], e: [], s: [], w: [], ne: [], se: [], sw: [], nw: [],
-    };
-    const isOtherPiece = {
-      n: false, e: false, s: false, w: false, ne: false, se: false, sw: false, nw: false,
-    };
-    const isOwnPiece = {
-      n: false, e: false, s: false, w: false, ne: false, se: false, sw: false, nw: false,
-    };
-
-    // make list to turn over about eight direction from recent one
-    pieces.forEach((p) => {
-      if (p.x === result.x && p.y < result.y) {
-        if (p.y === result.y - 1 && p.userId !== result.userId) { isOtherPiece.n = true; }
-        if (p.userId === result.userId) { isOwnPiece.n = true; }
-        turnlist.n.push(p);
-      } else if (p.x > result.x && p.y === result.y) {
-        if (p.x === result.x + 1 && p.userId !== result.userId) { isOtherPiece.e = true; }
-        if (p.userId === result.userId) { isOwnPiece.e = true; }
-        turnlist.e.push(p);
-      } else if (p.x === result.x && p.y > result.y) {
-        if (p.y === result.y + 1 && p.userId !== result.userId) { isOtherPiece.s = true; }
-        if (p.userId === result.userId) { isOwnPiece.s = true; }
-        turnlist.s.push(p);
-      } else if (p.x < result.x && p.y === result.y) {
-        if (p.x === result.x - 1 && p.userId !== result.userId) { isOtherPiece.w = true; }
-        if (p.userId === result.userId) { isOwnPiece.w = true; }
-        turnlist.w.push(p);
-      } else if (p.x > result.x && p.y < result.y
-        && Math.abs(p.x - result.x) === Math.abs(p.y - result.y)) {
-        if (p.x === result.x + 1 && p.y === result.y - 1
-          && p.userId !== result.userId) { isOtherPiece.ne = true; }
-        if (p.userId === result.userId) { isOwnPiece.ne = true; }
-        turnlist.ne.push(p);
-      } else if (p.x > result.x && p.y > result.y
-        && Math.abs(p.x - result.x) === Math.abs(p.y - result.y)) {
-        if (p.x === result.x + 1 && p.y === result.y + 1
-          && p.userId !== result.userId) { isOtherPiece.se = true; }
-        if (p.userId === result.userId) { isOwnPiece.se = true; }
-        turnlist.se.push(p);
-      } else if (p.x < result.x && p.y > result.y
-        && Math.abs(p.x - result.x) === Math.abs(p.y - result.y)) {
-        if (p.x === result.x - 1 && p.y === result.y + 1
-          && p.userId !== result.userId) { isOtherPiece.sw = true; }
-        if (p.userId === result.userId) { isOwnPiece.sw = true; }
-        turnlist.sw.push(p);
-      } else if (p.x < result.x && p.y < result.y
-        && Math.abs(p.x - result.x) === Math.abs(p.y - result.y)) {
-        if (p.x === result.x - 1 && p.y === result.y - 1
-          && p.userId !== result.userId) { isOtherPiece.nw = true; }
-        if (p.userId === result.userId) { isOwnPiece.nw = true; }
-        turnlist.nw.push(p);
+        if (dirPiece) {
+          if (dirPiece.userId !== piece.userId) {
+            while (dirPiece) {
+              if (dirPiece.userId !== piece.userId) {
+                rslt.push(dirPiece);
+                n += 1;
+                const nextPieceX = piece.x + dirX * n;
+                const nextPieceY = piece.y + dirY * n;
+                dirPiece = PieceModel.seeNext(pieces, nextPieceX, nextPieceY);
+              } else if (dirPiece.userId === piece.userId) {
+                pieces.push(piece);
+                for (let j = 0; j < rslt.length; j += 1) {
+                  if (rslt[j] !== undefined) {
+                    rslt[j].userId = piece.userId;
+                    flip.push(rslt[j]);
+                  }
+                }
+                break;
+              }
+            }
+          }
+        }
       }
-    });
-
-    // set first piece for several user
-    if (!existPiece && (isOtherPiece.n || isOtherPiece.e || isOtherPiece.s || isOtherPiece.w)) {
-      PieceModel.addPiece(result);
-      return res.json(PieceModel.getPieces());
-    }
-
-    // turn over piece
-    Object.keys(turnlist).map((key) => {
-      if ((key === 'n' && isOtherPiece.n && isOwnPiece.n)
-        || (key === 'w' && isOtherPiece.w && isOwnPiece.w)
-        || (key === 'nw' && isOtherPiece.nw && isOwnPiece.nw)) {
-        let list = PieceModel.sortList(turnlist[key], { x: -1, y: -1 });
-        list = PieceModel.checkList(list, key, result);
-        PieceModel.turnOverPiece(list, result);
-      } else if ((key === 'e' && isOtherPiece.e && isOwnPiece.e)
-        || (key === 's' && isOtherPiece.s && isOwnPiece.s)
-        || (key === 'se' && isOtherPiece.se && isOwnPiece.se)) {
-        let list = PieceModel.sortList(turnlist[key], { x: 1, y: 1 });
-        list = PieceModel.checkList(list, key, result);
-        PieceModel.turnOverPiece(list, result);
-      } else if (key === 'ne' && isOtherPiece.ne && isOwnPiece.ne) {
-        let list = PieceModel.sortList(turnlist[key], { x: 1, y: -1 });
-        list = PieceModel.checkList(list, key, result);
-        PieceModel.turnOverPiece(list, result);
-      } else if (key === 'sw' && isOtherPiece.sw && isOwnPiece.sw) {
-        let list = PieceModel.sortList(turnlist[key], { x: -1, y: 1 });
-        list = PieceModel.checkList(list, key, result);
-        PieceModel.turnOverPiece(list, result);
+    } else if (pieces.length === 0) {
+      pieces.push(piece);
+    } else {
+      for (let i = 0; i < dirXY.length; i += 1) {
+        const dirX = dirXY[i][0];
+        const dirY = dirXY[i][1];
+        const aroundX = piece.x + dirX;
+        const aroundY = piece.y + dirY;
+        const dirPiece = pieces.find(p => p.x === aroundX && p.y === aroundY);
+        if (dirPiece !== undefined) {
+          pieces.push(piece);
+          break;
+        }
       }
-      return true; // for lint
-    });
+    }
+    for (let i = 0; i < pieces.length; i += 1) {
+      const p = pieces[i];
+      for (let j = 0; j < flip.length; j += 1) {
+        const f = flip[j];
+        if (f.x === p.x && f.y === p.y) {
+          p.userId = f.userId;
+        }
+      }
+    }
     return res.json(PieceModel.getPieces());
   })
   .delete((req, res) => {
     PieceModel.deletePieces();
     res.sendStatus(204);
   });
-
 module.exports = router;
