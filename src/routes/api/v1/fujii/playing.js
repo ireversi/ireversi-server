@@ -42,7 +42,6 @@ router.route('/')
   })
   // データ登録処理
   .post(async (req, res) => {
-    // console.log(req);
     const data = await PlayingModel.find({}, propfilter);
     const result = {
       x: +req.body.x,

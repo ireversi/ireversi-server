@@ -1,5 +1,6 @@
 const router = require('express').Router();
-const boardCtrl = require('../../../../models/v2/boardController.js');
+const boardStore = require('../../../../models/v2/BoardStore.js');
+const pieceModel = require('../../../../models/v2/PieceModel.js');
 const calcCandidate = require('./calcCandidate.js');
 const calcScore = require('./calcScore.js');
 const calcSize = require('./calcSize.js');
@@ -15,20 +16,20 @@ router.use((req, res, next) => {
 router.route('/').get(async (req, res) => {
   // userIdを取得
   const userId = +req.query.user_id;
-  // boardCtrlより全体盤面を取得
-  const entireBoard = boardCtrl.getBoard().pieces;
+  // boardStoreより全体盤面を取得
+  const entireBoard = pieceModel.getPieces();
   // candidatesの取得
   const ans = calcCandidate.calc(userId, entireBoard);
   ans.forEach((elm) => {
-    boardCtrl.addCandidates(elm);
+    boardStore.addCandidates(elm);
   });
   // scoreの取得
   const score = calcScore.calc(userId, entireBoard);
-  boardCtrl.addScore(score);
+  boardStore.addScore(score);
   // sizeの取得
   const size = calcSize.calc(userId, entireBoard);
-  boardCtrl.addSize(size);
-  res.json(boardCtrl.getBoard());
+  boardStore.addSize(size);
+  res.json(boardStore.getBoard());
 });
 
 module.exports = router;
