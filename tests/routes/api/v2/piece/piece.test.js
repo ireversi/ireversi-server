@@ -1,5 +1,5 @@
 const chai = require('chai');
-const PieceModel = require('../../../../../src/models/v2/PieceModel.js');
+const PieceStore = require('../../../../../src/models/v2/PieceStore.js');
 const app = require('../../../../../src/routes/app.js');
 
 const basePath = '/api/v2/piece/';
@@ -11,14 +11,14 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceModel.array2Pieces(
+    const pieces = PieceStore.array2Pieces(
       [
         '1:1', 0,
         0, 0,
       ],
     );
 
-    const matches = PieceModel.array2Matchers(
+    const matches = PieceStore.array2Matchers(
       [
         1, 0,
         0, 0,
@@ -49,14 +49,14 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceModel.array2Pieces(
+    const pieces = PieceStore.array2Pieces(
       [
         0, 0,
         '1:1', '2:2',
       ],
     );
 
-    const matches = PieceModel.array2Matchers(
+    const matches = PieceStore.array2Matchers(
       [
         0, 0,
         1, 2,
@@ -83,14 +83,14 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceModel.array2Pieces(
+    const pieces = PieceStore.array2Pieces(
       [
         0, 0,
         '1:1', ['2:2', '1:3'],
       ],
     );
 
-    const matches = PieceModel.array2Matchers(
+    const matches = PieceStore.array2Matchers(
       [
         0, 0,
         1, 2,
@@ -117,7 +117,7 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceModel.array2Pieces(
+    const pieces = PieceStore.array2Pieces(
       [
         '1:5', 0, 0,
         '2:4', 0, 0,
@@ -125,7 +125,7 @@ describe('play', () => {
       ],
     );
 
-    const matches = PieceModel.array2Matchers(
+    const matches = PieceStore.array2Matchers(
       [
         1, 0, 0,
         1, 0, 0,
@@ -153,7 +153,7 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceModel.array2Pieces(
+    const pieces = PieceStore.array2Pieces(
       [
         '1:3', '2:2', '1:1',
         0, 0, '2:4',
@@ -161,7 +161,7 @@ describe('play', () => {
       ],
     );
 
-    const matches = PieceModel.array2Matchers(
+    const matches = PieceStore.array2Matchers(
       [
         1, 1, 1,
         0, 0, 1,
@@ -189,7 +189,7 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceModel.array2Pieces(
+    const pieces = PieceStore.array2Pieces(
       [
         0, 0, 0, '1:6',
         '1:1', '2:2', '3:5', 0,
@@ -198,7 +198,7 @@ describe('play', () => {
       ],
     );
 
-    const matches = PieceModel.array2Matchers(
+    const matches = PieceStore.array2Matchers(
       [
         0, 0, 0, 1,
         1, 2, 1, 0,
@@ -227,7 +227,7 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceModel.array2Pieces(
+    const pieces = PieceStore.array2Pieces(
       [
         '1:6', 0, 0, 0,
         0, '3:5', '2:2', '1:1',
@@ -236,7 +236,7 @@ describe('play', () => {
       ],
     );
 
-    const matches = PieceModel.array2Matchers(
+    const matches = PieceStore.array2Matchers(
       [
         1, 0, 0, 0,
         0, 1, 2, 1,
@@ -265,7 +265,7 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceModel.array2Pieces(
+    const pieces = PieceStore.array2Pieces(
       [
         0, 0, '4:5', 0,
         0, '3:3', 0, 0,
@@ -275,7 +275,7 @@ describe('play', () => {
     );
 
 
-    const matches = PieceModel.array2Matchers(
+    const matches = PieceStore.array2Matchers(
       [
         0, 0, 0, 0,
         0, 3, 0, 0,
@@ -303,7 +303,7 @@ describe('play', () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
     // Given
-    const pieces = PieceModel.array2Pieces(
+    const pieces = PieceStore.array2Pieces(
       [
         0, '1:4', '3:6', 0,
         0, '3:3', 0, 0,
@@ -312,7 +312,7 @@ describe('play', () => {
       ],
     );
 
-    const matches = PieceModel.array2Matchers(
+    const matches = PieceStore.array2Matchers(
       [
         0, 1, 3, 0,
         0, 1, 0, 0,
@@ -341,7 +341,7 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceModel.array2Pieces(
+    const pieces = PieceStore.array2Pieces(
       [
         '1:15', '1:14', '1:13', '1:12', '1:11',
         '1:16', 0, '4:4', 0, '1:10',
@@ -351,7 +351,7 @@ describe('play', () => {
       ],
     );
 
-    const matches = PieceModel.array2Matchers(
+    const matches = PieceStore.array2Matchers(
       [
         0, 0, 1, 0, 0,
         0, 0, 1, 0, 0,
@@ -381,7 +381,7 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceModel.array2Pieces(
+    const pieces = PieceStore.array2Pieces(
       [
         '1:15', 0, 0, 0, '1:14',
         '1:16', '8:8', '4:4', '7:7', '1:13',
@@ -391,7 +391,7 @@ describe('play', () => {
       ],
     );
 
-    const matches = PieceModel.array2Matchers(
+    const matches = PieceStore.array2Matchers(
       [
         1, 0, 0, 0, 1,
         0, 1, 4, 1, 0,
@@ -419,7 +419,7 @@ describe('play', () => {
   it('the test piece cannnot skip the blank cell to flip ', async () => {
     await chai.request(app).delete(`${basePath}`);
 
-    const pieces = PieceModel.array2Pieces(
+    const pieces = PieceStore.array2Pieces(
       [
         0, '1:7', 0, 0, 0,
         0, '6:6', '5:5', 0, 0,
@@ -429,7 +429,7 @@ describe('play', () => {
       ],
     );
 
-    const matches = PieceModel.array2Matchers(
+    const matches = PieceStore.array2Matchers(
       [
         0, 0, 0, 0, 0,
         0, 6, 5, 0, 0,
