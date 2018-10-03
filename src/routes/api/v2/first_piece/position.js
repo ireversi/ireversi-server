@@ -3,7 +3,7 @@ const router = require('express').Router();
 const PieceStore = require('../../../../models/v2/PieceStore.js');
 
 // const waitTime = 3500;
-const dateNow = Date.now();
+// const dateNow = Date.now();
 
 // for CORS
 router.use((req, res, next) => {
@@ -21,10 +21,11 @@ router.route('/')
       y: +req.body.y,
       userId: +req.body.userId,
     };
+    console.log(piece);
 
-    console.log(dateNow);
-    console.log(dateNow - Date.now());
 
+    // console.log(dateNow);
+    // console.log(dateNow - Date.now());
 
     PieceStore.addPiece(piece); // コマを置く
     res.send(pieces);

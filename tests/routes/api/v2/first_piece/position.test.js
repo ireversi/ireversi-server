@@ -20,6 +20,20 @@ describe('play', () => {
   //   }
   // }
 
+  function array2Standby(array) {
+    const standbys = [];
+    const matchArray = PieceStore.array2Matchers(array);
+    for (let i = 0; i < matchArray.length; i += 1) {
+      const match = matchArray[i];
+      const standby = {
+        remaining: 0,
+        piece: match,
+      };
+      standbys.push(standby);
+    }
+    return standbys;
+  }
+
   it('start remaining timer', async () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
@@ -27,17 +41,19 @@ describe('play', () => {
     // Given
     const pieces = PieceStore.array2Pieces(
       [
-        '1:1', 0,
+        '1:1', '2:2',
         0, 0,
       ],
     );
 
-    const matches = PieceStore.array2Matchers(
+    const matches = array2Standby(
       [
-        1, 0,
+        1, 2,
         0, 0,
       ],
     );
+    console.log(matches);
+
 
     // When
     let response;
@@ -59,3 +75,9 @@ describe('play', () => {
     // expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 });
+
+// 1つの値を送る
+// response
+// swagger:
+// postで送ったらstatusとpiece(自分の結果だけ表示)
+// direction: piece, directionだけ返す
