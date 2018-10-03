@@ -73,8 +73,8 @@
           properties:
             status:
               $ref: "#/definitions/Status"
-            board:
-              $ref: "#/definitions/Board"
+            piece:
+              $ref: "#/definitions/Piece"
   delete:
     tags:
       - piece
@@ -98,8 +98,6 @@
           properties:
             status:
               $ref: "#/definitions/Status"
-            board:
-              $ref: "#/definitions/Board"
 /first_piece/position:
   post:
     tags:
@@ -146,8 +144,11 @@
           properties:
             status:
               $ref: "#/definitions/Status"
-            board:
-              $ref: "#/definitions/Board"
+            piece:
+              $ref: "#/definitions/Piece"
+            direction:
+              type: "string"
+              example: "nw"
 
 definitions:
   Standbys:
@@ -232,12 +233,12 @@ definitions:
     properties:
       x:
         name: "x"
-        type: number
+        type: "number"
         example: 1
         in: "formData"
       y:
         name: "y"
-        type: number
+        type: "number"
         example: 1
         in: "formData"
   Size:
