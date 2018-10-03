@@ -37,9 +37,7 @@ const array2Pieces = (fieldSource) => {
   let order = []; //  配列順番
   const sqrt = Math.sqrt(field.length); // 平方根
   const fieldExist = field.filter(n => n !== 0); // コマだけを抽出
-  // 配列をプレイ順で並び替え
   const playOrder = fieldExist.sort((a, b) => (parseInt(a.slice(a.indexOf(':') + 1), 10)) - (parseInt(b.slice(b.indexOf(':') + 1), 10)));
-  // それぞれが元の配列の何番目か
   order = playOrder.map(n => field.indexOf(n, 0));
 
   let n = 0;
