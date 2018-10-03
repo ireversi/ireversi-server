@@ -1,4 +1,4 @@
-const pieceModel = require('./PieceModel.js');
+const pieceModel = require('./PieceStore.js');
 // ありとあらゆる配列が入る
 // 取りあえず初期値
 const pieces = pieceModel.getPieces();

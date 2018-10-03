@@ -19,9 +19,9 @@
       - size
         - フィールド全体のうち、上下左右の終端の位置情報
     parameters:
-      - name: user_id
+      - name: userId
         in: "query"
-        description: "user_id"
+        description: "userId"
         type: number
         example: 1
         required: true
@@ -42,9 +42,9 @@
       - $ref: "#/definitions/Size/properties/right"
       - $ref: "#/definitions/Size/properties/bottom"
       - $ref: "#/definitions/Size/properties/top"
-      - name: "user_id"
+      - name: "userId"
         in: "query"
-        description: "your user_id"
+        description: "your userId"
         required: true
         type: "number"
     responses:
@@ -64,7 +64,7 @@
     parameters:
       - $ref: "#/definitions/Piece/properties/x"
       - $ref: "#/definitions/Piece/properties/y"
-      - $ref: "#/definitions/Piece/properties/user_id"
+      - $ref: "#/definitions/Piece/properties/userId"
     responses:
       200:
         description: "show specified board size"
@@ -73,8 +73,8 @@
           properties:
             status:
               $ref: "#/definitions/Status"
-            board:
-              $ref: "#/definitions/Board"
+            piece:
+              $ref: "#/definitions/Piece"
   delete:
     tags:
       - piece
@@ -98,8 +98,6 @@
           properties:
             status:
               $ref: "#/definitions/Status"
-            board:
-              $ref: "#/definitions/Board"
 /first_piece/position:
   post:
     tags:
@@ -108,7 +106,7 @@
     parameters:
       - $ref: "#/definitions/Piece/properties/x"
       - $ref: "#/definitions/Piece/properties/y"
-      - $ref: "#/definitions/Piece/properties/user_id"
+      - $ref: "#/definitions/Piece/properties/userId"
     responses:
       200:
         description: "return a place second piece has put"
@@ -127,11 +125,11 @@
     parameters:
     - in: "number"
       required: true
-      name: "user_id"
-      description: "user_id"
+      name: "userId"
+      description: "userId"
       type: "number"
       schema:
-        $ref: "#/definitions/Piece/properties/user_id"
+        $ref: "#/definitions/Piece/properties/userId"
     - in: "string"
       required: true
       name: "direction"
@@ -146,8 +144,11 @@
           properties:
             status:
               $ref: "#/definitions/Status"
-            board:
-              $ref: "#/definitions/Board"
+            piece:
+              $ref: "#/definitions/Piece"
+            direction:
+              type: "string"
+              example: "nw"
 
 definitions:
   Standbys:
@@ -214,30 +215,30 @@ definitions:
         example: 1
         in: "formData"
         required: true
-      user_id:
-        name: user_id
+      userId:
+        name: userId
         in: "query"
-        description: "user_id"
+        description: "userId"
         type: number
         example: 1
         required: true
   Positions:
     type: array
-    description: "just show piece locations (not include user_id information)"
+    description: "just show piece locations (not include userId information)"
     items:
       $ref: "#/definitions/Position"
   Position:
     type: "object"
-    description: "just show piece location (not include user_id information)"
+    description: "just show piece location (not include userId information)"
     properties:
       x:
         name: "x"
-        type: number
+        type: "number"
         example: 1
         in: "formData"
       y:
         name: "y"
-        type: number
+        type: "number"
         example: 1
         in: "formData"
   Size:

@@ -1,6 +1,6 @@
 
 const router = require('express').Router();
-const PieceModel = require('../../../../models/v2/PieceModel.js');
+const PieceStore = require('../../../../models/v2/PieceStore.js');
 
 const dirXY = [
   [0, 1],
@@ -26,7 +26,7 @@ router.use((req, res, next) => {
 
 router.route('/')
   .post((req, res) => {
-    const pieces = PieceModel.getPieces();
+    const pieces = PieceStore.getPieces();
 
     const piece = {
       x: +req.body.x,
@@ -35,7 +35,7 @@ router.route('/')
     };
 
     if (pieces.find(p => p.x === piece.x && p.y === piece.y)) {
-      return res.json(PieceModel.getPieces());
+      return res.json(PieceStore.getPieces());
     }
 
     const flip = [];
@@ -48,7 +48,7 @@ router.route('/')
         const aroundY = piece.y + dirY;
 
         let n = 1;
-        let dirPiece = PieceModel.seeNext(pieces, aroundX, aroundY);
+        let dirPiece = PieceStore.seeNext(pieces, aroundX, aroundY);
 
         if (dirPiece) {
           if (dirPiece.userId !== piece.userId) {
@@ -58,7 +58,7 @@ router.route('/')
                 n += 1;
                 const nextPieceX = piece.x + dirX * n;
                 const nextPieceY = piece.y + dirY * n;
-                dirPiece = PieceModel.seeNext(pieces, nextPieceX, nextPieceY);
+                dirPiece = PieceStore.seeNext(pieces, nextPieceX, nextPieceY);
               } else if (dirPiece.userId === piece.userId) {
                 pieces.push(piece);
                 for (let j = 0; j < rslt.length; j += 1) {
@@ -97,10 +97,10 @@ router.route('/')
         }
       }
     }
-    return res.json(PieceModel.getPieces());
+    return res.json(PieceStore.getPieces());
   })
   .delete((req, res) => {
-    PieceModel.deletePieces();
+    PieceStore.deletePieces();
     res.sendStatus(204);
   });
 module.exports = router;

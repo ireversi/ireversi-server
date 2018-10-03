@@ -1,7 +1,7 @@
 const chai = require('chai');
 const app = require('../../../../../src/routes/app.js');
 // const boardStore = require('../../../../../src/models/v2/BoardStore.js');
-const pieceModel = require('../../../../../src/models/v2/PieceModel.js');
+const pieceStore = require('../../../../../src/models/v2/PieceStore.js');
 
 const basePath = '/api/v2';
 
@@ -47,10 +47,10 @@ describe('board', () => {
           y: Math.floor(index / size),
           userId: elm,
         };
-        pieceModel.addPiece(ans);
+        pieceStore.addPiece(ans);
       }
     });
-    // await Promise.all(matchers.map(m => PieceModel(m).save()));
+    // await Promise.all(matchers.map(m => PieceStore(m).save()));
 
     // When
     const response = await chai.request(app).get(`${basePath}/board?user_id=${userId}`);
