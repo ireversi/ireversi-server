@@ -85,7 +85,6 @@ describe('play', () => {
     for (let i = 0; i < record.length; i += 1) {
       let piece = record[i];
       piece = convertPiece(piece);
-      console.log(piece);
 
       response = await chai.request(app)
         .post(`${basePath}`)

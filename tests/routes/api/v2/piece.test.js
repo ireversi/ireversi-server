@@ -1,10 +1,62 @@
 const chai = require('chai');
-const PieceModel = require('../../../../src/models/v2/PieceModel.js');
 const app = require('../../../../src/routes/app.js');
 
 const ZERO0 = 0;
 
 const basePath = '/api/v2/piece/';
+
+function convert2PieceRecord(pieces) {
+  const record = [];
+  for (let i = 0; i < pieces.length; i += 1) {
+    const size = Math.sqrt(pieces.length);
+    const piece = pieces[i];
+    if (piece !== 0 && !Array.isArray(piece)) {
+      const point = piece.indexOf(':');
+      const num = piece.slice(0, point);
+      const userId = piece.slice(point + 1);
+      const x = Math.floor(i % size);
+      const y = Math.floor(i / size);
+      record.push([num, x, y, userId]);
+    } else if (piece !== 0 && Array.isArray(piece)) {
+      for (let j = 0; j < piece.length; j += 1) {
+        const pie = piece[j];
+        const point = pie.indexOf(':');
+        const num = pie.slice(0, point);
+        const userId = pie.slice(point + 1);
+        const x = Math.floor(i % size);
+        const y = Math.floor(i / size);
+        record.push([num, x, y, userId]);
+      }
+    }
+  }
+  record.sort((a, b) => {
+    if (+a[0] < +b[0]) return -1;
+    if (+a[0] > +b[0]) return 1;
+    return 0;
+  });
+  return record;
+}
+
+function convertPiece(piece) {
+  const convert = { x: piece[1], y: piece[2], userId: piece[3] };
+  return convert;
+}
+
+function convertComparisonResult(result) {
+  const pieces = [];
+  const size = Math.sqrt(result.length);
+  for (let i = 0; i < result.length; i += 1) {
+    if (result[i] !== 0) {
+      const piece = {
+        x: Math.floor(i % size),
+        y: Math.floor(i / size),
+        userId: result[i],
+      };
+      pieces.push(piece);
+    }
+  }
+  return pieces;
+}
 
 describe('play', () => {
   // 一つ駒を置く
@@ -25,19 +77,22 @@ describe('play', () => {
 
     // When
     let response;
-    const record = PieceModel.convert2PieceRecord(pieces);
+    const record = convert2PieceRecord(pieces);
 
     for (let i = 0; i < record.length; i += 1) {
       let piece = record[i];
-      piece = PieceModel.convertPiece(piece);
+      piece = convertPiece(piece);
+      console.log(piece);
+
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: piece.userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
 
     // Then
-    const rpieces = PieceModel.convertComparisonResult(result);
+    const rpieces = convertComparisonResult(result);
 
     expect(response.body).toHaveLength(rpieces.length);
     expect(response.body).toEqual(expect.arrayContaining(rpieces));
@@ -65,18 +120,19 @@ describe('play', () => {
 
     // When
     let response;
-    const record = PieceModel.convert2PieceRecord(pieces);
+    const record = convert2PieceRecord(pieces);
     for (let i = 0; i < record.length; i += 1) {
       let piece = record[i];
-      piece = PieceModel.convertPiece(piece);
+      piece = convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: piece.userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
 
     // Then
-    const rpieces = PieceModel.convertComparisonResult(result);
+    const rpieces = convertComparisonResult(result);
     expect(response.body).toHaveLength(rpieces.length);
     expect(response.body).toEqual(expect.arrayContaining(rpieces));
 
@@ -103,19 +159,20 @@ describe('play', () => {
 
     // When
     let response;
-    const record = PieceModel.convert2PieceRecord(pieces);
+    const record = convert2PieceRecord(pieces);
     for (let i = 0; i < record.length; i += 1) {
       let piece = record[i];
-      piece = PieceModel.convertPiece(piece);
+      piece = convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: piece.userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
 
     // Then
     // check express result
-    const rpieces = PieceModel.convertComparisonResult(result);
+    const rpieces = convertComparisonResult(result);
     expect(response.body).toHaveLength(rpieces.length);
     expect(response.body).toEqual(expect.arrayContaining(rpieces));
 
@@ -145,20 +202,21 @@ describe('play', () => {
 
     // When
     let response;
-    const record = PieceModel.convert2PieceRecord(pieces);
+    const record = convert2PieceRecord(pieces);
 
     for (let i = 0; i < record.length; i += 1) {
       let piece = record[i];
-      piece = PieceModel.convertPiece(piece);
+      piece = convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: piece.userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
 
     // Then
     // check express result
-    const rpieces = PieceModel.convertComparisonResult(result);
+    const rpieces = convertComparisonResult(result);
     expect(response.body).toHaveLength(rpieces.length);
     expect(response.body).toEqual(expect.arrayContaining(rpieces));
 
@@ -188,20 +246,21 @@ describe('play', () => {
 
     // When
     let response;
-    const record = PieceModel.convert2PieceRecord(pieces);
+    const record = convert2PieceRecord(pieces);
 
     for (let i = 0; i < record.length; i += 1) {
       let piece = record[i];
-      piece = PieceModel.convertPiece(piece);
+      piece = convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: piece.userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
 
     // Then
     // check express result
-    const rpieces = PieceModel.convertComparisonResult(result);
+    const rpieces = convertComparisonResult(result);
     expect(response.body).toHaveLength(rpieces.length);
     expect(response.body).toEqual(expect.arrayContaining(rpieces));
 
@@ -233,20 +292,21 @@ describe('play', () => {
 
     // When
     let response;
-    const record = PieceModel.convert2PieceRecord(pieces);
+    const record = convert2PieceRecord(pieces);
 
     for (let i = 0; i < record.length; i += 1) {
       let piece = record[i];
-      piece = PieceModel.convertPiece(piece);
+      piece = convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: piece.userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
 
     // Then
     // check express result
-    const rpieces = PieceModel.convertComparisonResult(result);
+    const rpieces = convertComparisonResult(result);
     expect(response.body).toHaveLength(rpieces.length);
     expect(response.body).toEqual(expect.arrayContaining(rpieces));
 
@@ -278,20 +338,21 @@ describe('play', () => {
 
     // When
     let response;
-    const record = PieceModel.convert2PieceRecord(pieces);
+    const record = convert2PieceRecord(pieces);
 
     for (let i = 0; i < record.length; i += 1) {
       let piece = record[i];
-      piece = PieceModel.convertPiece(piece);
+      piece = convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: piece.userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
 
     // Then
     // check express result
-    const rpieces = PieceModel.convertComparisonResult(result);
+    const rpieces = convertComparisonResult(result);
     expect(response.body).toHaveLength(rpieces.length);
     expect(response.body).toEqual(expect.arrayContaining(rpieces));
 
@@ -323,20 +384,21 @@ describe('play', () => {
 
     // When
     let response;
-    const record = PieceModel.convert2PieceRecord(pieces);
+    const record = convert2PieceRecord(pieces);
 
     for (let i = 0; i < record.length; i += 1) {
       let piece = record[i];
-      piece = PieceModel.convertPiece(piece);
+      piece = convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: piece.userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
 
     // Then
     // check express result
-    const rpieces = PieceModel.convertComparisonResult(result);
+    const rpieces = convertComparisonResult(result);
     expect(response.body).toHaveLength(rpieces.length);
     expect(response.body).toEqual(expect.arrayContaining(rpieces));
 
@@ -368,20 +430,21 @@ describe('play', () => {
 
     // When
     let response;
-    const record = PieceModel.convert2PieceRecord(pieces);
+    const record = convert2PieceRecord(pieces);
 
     for (let i = 0; i < record.length; i += 1) {
       let piece = record[i];
-      piece = PieceModel.convertPiece(piece);
+      piece = convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: piece.userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
 
     // Then
     // check express result
-    const rpieces = PieceModel.convertComparisonResult(result);
+    const rpieces = convertComparisonResult(result);
     expect(response.body).toHaveLength(rpieces.length);
     expect(response.body).toEqual(expect.arrayContaining(rpieces));
 
@@ -415,20 +478,21 @@ describe('play', () => {
 
     // When
     let response;
-    const record = PieceModel.convert2PieceRecord(pieces);
+    const record = convert2PieceRecord(pieces);
 
     for (let i = 0; i < record.length; i += 1) {
       let piece = record[i];
-      piece = PieceModel.convertPiece(piece);
+      piece = convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: piece.userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
 
     // Then
     // check express result
-    const rpieces = PieceModel.convertComparisonResult(result);
+    const rpieces = convertComparisonResult(result);
     expect(response.body).toHaveLength(rpieces.length);
     expect(response.body).toEqual(expect.arrayContaining(rpieces));
 
@@ -462,20 +526,21 @@ describe('play', () => {
 
     // When
     let response;
-    const record = PieceModel.convert2PieceRecord(pieces);
+    const record = convert2PieceRecord(pieces);
 
     for (let i = 0; i < record.length; i += 1) {
       let piece = record[i];
-      piece = PieceModel.convertPiece(piece);
+      piece = convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: piece.userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(piece);
     }
 
     // Then
     // check express result
-    const rpieces = PieceModel.convertComparisonResult(result);
+    const rpieces = convertComparisonResult(result);
     expect(response.body).toHaveLength(rpieces.length);
     expect(response.body).toEqual(expect.arrayContaining(rpieces));
 
