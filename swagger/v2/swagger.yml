@@ -117,7 +117,6 @@
               $ref: "#/definitions/Status"
             standby:
               $ref: "#/definitions/Standby"
-/first_piece/position:
   delete:
     tags:
       - first_piece
@@ -134,7 +133,6 @@
               $ref: "#/definitions/Status"
             standby:
               $ref: "#/definitions/Standby"
-
 /first_piece/direction:
   post:
     tags:

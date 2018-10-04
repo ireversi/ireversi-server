@@ -15,7 +15,7 @@ router.route('/')
     const result = {
       x: +req.body.x,
       y: +req.body.y,
-      userId: +req.body.userId,
+      userId: +req.query.userId,
     };
 
     // check to exist piece had already set one
