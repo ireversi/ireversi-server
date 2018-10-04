@@ -122,7 +122,12 @@
       - first_piece
     summary: "cancel the first piece"
     parameters:
-      - $ref: "#/definitions/Piece/properties/userId"
+      - name: userId
+        in: "query"
+        description: "userId"
+        type: number
+        example: 1
+        required: true
     responses:
       200:
         description: "return a standby condition"
