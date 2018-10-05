@@ -13,19 +13,10 @@
 //   describe('play', () => {
 //     // 盤面に自コマがない（１手目である）
 //     // 返り値の形式
-//     // [
-//     //   {
-//     //     "status": true, // 置けたかどうか
-//     //     "standby": {
-//     //       "remaining": 0,
-//     //       "piece": {
-//     //         "x": 1,
-//     //         "y": 1,
-//     //         "user_id": 1
-//     //       },
-//     //     },
-//     //   }
-//     // ]
+//       // {
+//       //   userId: 1,
+//       //   direction: 'nw',
+//       // }
 
 //     it('start remaining timer', async () => {
 //       // Reset
@@ -140,12 +131,6 @@
 //         ],
 //       );
 //       console.log(pieces);
-
-
-//       // {
-//       //   userId: 1,
-//       //   direction: 'nw',
-//       // }
 
 //       const matches = PieceStore.array2Standby(
 //         [
