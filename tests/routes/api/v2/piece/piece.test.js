@@ -20,7 +20,7 @@ describe('play', () => {
 
     const matches = PieceStore.array2Matchers(
       [
-        1, 0,
+        '1:1', 0,
         0, 0,
       ],
     );
@@ -28,19 +28,25 @@ describe('play', () => {
     // When
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
+      const match = matches[i];
+
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
+
+      // Then
+      expect(response.body).toEqual(match);
+      expect(response.body).toEqual(expect.objectContaining({
+        status: match.status,
+        piece: {
+          x: match.piece.x,
+          y: match.piece.y,
+          userId: match.piece.userId,
+        },
+      }));
     }
-    // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
-    // check mongoDB result
-    // const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
-    // expect(pieceData).toHaveLength(rpieces.length);
-    // expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
   // 複数駒を置く
@@ -59,23 +65,32 @@ describe('play', () => {
     const matches = PieceStore.array2Matchers(
       [
         0, 0,
-        1, 2,
+        '1:1', '2:2',
       ],
     );
 
     // When
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
+      const match = matches[i];
+
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
-    }
 
-    // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+      // Then
+      expect(response.body).toEqual(match);
+      expect(response.body).toEqual(expect.objectContaining({
+        status: match.status,
+        piece: {
+          x: match.piece.x,
+          y: match.piece.y,
+          userId: match.piece.userId,
+        },
+      }));
+    }
   });
 
   // 同じところにおけないテスト
@@ -94,23 +109,32 @@ describe('play', () => {
     const matches = PieceStore.array2Matchers(
       [
         0, 0,
-        1, 2,
+        '1:1', ['2:2', '1:3'],
       ],
     );
 
     // When
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
+      const match = matches[i];
+
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
-    }
 
-    // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+      // Then
+      expect(response.body).toEqual(match);
+      expect(response.body).toEqual(expect.objectContaining({
+        status: match.status,
+        piece: {
+          x: match.piece.x,
+          y: match.piece.y,
+          userId: match.piece.userId,
+        },
+      }));
+    }
   });
 
   // 挟んだらめくれるテスト（左方向、上方向） part1
@@ -129,25 +153,33 @@ describe('play', () => {
 
     const matches = PieceStore.array2Matchers(
       [
-        1, 0, 0,
-        1, 0, 0,
-        1, 1, 1,
+        '1:5', 0, 0,
+        '2:4', 0, 0,
+        '1:1', '2:2', '1:3',
       ],
     );
 
     // When
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
+      const match = matches[i];
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
-    }
 
-    // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+      // Then
+      expect(response.body).toEqual(match);
+      expect(response.body).toEqual(expect.objectContaining({
+        status: match.status,
+        piece: {
+          x: match.piece.x,
+          y: match.piece.y,
+          userId: match.piece.userId,
+        },
+      }));
+    }
   });
 
   // 挟んだらめくれるテスト part2（右方向、下方向）
@@ -166,25 +198,33 @@ describe('play', () => {
 
     const matches = PieceStore.array2Matchers(
       [
-        1, 1, 1,
-        0, 0, 1,
-        0, 0, 1,
+        '1:3', '2:2', '1:1',
+        0, 0, '2:4',
+        0, 0, '1:5',
       ],
     );
 
     // When
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
+      const match = matches[i];
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
-    }
 
-    // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+      // Then
+      expect(response.body).toEqual(match);
+      expect(response.body).toEqual(expect.objectContaining({
+        status: match.status,
+        piece: {
+          x: match.piece.x,
+          y: match.piece.y,
+          userId: match.piece.userId,
+        },
+      }));
+    }
   });
 
   // 挟んだらめくれるテスト part3
@@ -204,26 +244,34 @@ describe('play', () => {
 
     const matches = PieceStore.array2Matchers(
       [
-        0, 0, 0, 1,
-        1, 2, 1, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
+        0, 0, 0, '1:6',
+        '1:1', '2:2', '3:5', 0,
+        0, '3:3', 0, 0,
+        0, 0, '1:4', 0,
       ],
     );
 
     // When
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
+      const match = matches[i];
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
-    }
 
-    // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+      // Then
+      expect(response.body).toEqual(match);
+      expect(response.body).toEqual(expect.objectContaining({
+        status: match.status,
+        piece: {
+          x: match.piece.x,
+          y: match.piece.y,
+          userId: match.piece.userId,
+        },
+      }));
+    }
   });
 
   // 挟んだらめくれるテスト part4
@@ -243,26 +291,34 @@ describe('play', () => {
 
     const matches = PieceStore.array2Matchers(
       [
-        1, 0, 0, 0,
-        0, 1, 2, 1,
-        0, 0, 1, 0,
-        0, 1, 0, 0,
+        '1:6', 0, 0, 0,
+        0, '3:5', '2:2', '1:1',
+        0, 0, '3:3', 0,
+        0, '1:4', 0, 0,
       ],
     );
 
     // When
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
+      const match = matches[i];
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
-    }
 
-    // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+      // Then
+      expect(response.body).toEqual(match);
+      expect(response.body).toEqual(expect.objectContaining({
+        status: match.status,
+        piece: {
+          x: match.piece.x,
+          y: match.piece.y,
+          userId: match.piece.userId,
+        },
+      }));
+    }
   });
 
   // 場に一枚も置いてない場合の駒置きテスト（反転無し） part1
@@ -283,26 +339,34 @@ describe('play', () => {
 
     const matches = PieceStore.array2Matchers(
       [
-        0, 0, 0, 0,
-        0, 3, 0, 0,
-        0, 1, 0, 0,
-        0, 2, 0, 0,
+        0, 0, '4:5', 0,
+        0, '3:3', 0, 0,
+        0, '1:1', '1:4', 0,
+        0, '2:2', 0, 0,
       ],
     );
 
     // When
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
+      const match = matches[i];
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
-    }
 
-    // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+      // Then
+      expect(response.body).toEqual(match);
+      expect(response.body).toEqual(expect.objectContaining({
+        status: match.status,
+        piece: {
+          x: match.piece.x,
+          y: match.piece.y,
+          userId: match.piece.userId,
+        },
+      }));
+    }
   });
 
   // 場に一枚も置いてない場合の駒置きテスト（反転有り） part2
@@ -321,26 +385,34 @@ describe('play', () => {
 
     const matches = PieceStore.array2Matchers(
       [
-        0, 1, 3, 0,
-        0, 1, 0, 0,
-        0, 1, 0, 0,
-        0, 2, 0, 0,
+        0, '1:4', '3:6', 0,
+        0, '3:3', 0, 0,
+        0, '1:1', '2:5', 0,
+        0, '2:2', 0, 0,
       ],
     );
 
     // When
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
+      const match = matches[i];
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
-    }
 
-    // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+      // Then
+      expect(response.body).toEqual(match);
+      expect(response.body).toEqual(expect.objectContaining({
+        status: match.status,
+        piece: {
+          x: match.piece.x,
+          y: match.piece.y,
+          userId: match.piece.userId,
+        },
+      }));
+    }
   });
 
   // 場に駒がある場合の駒置きテスト（上下左右チェック） part1
@@ -361,27 +433,35 @@ describe('play', () => {
 
     const matches = PieceStore.array2Matchers(
       [
-        0, 0, 1, 0, 0,
-        0, 0, 1, 0, 0,
-        1, 1, 1, 1, 1,
-        0, 0, 1, 0, 0,
-        0, 0, 1, 0, 0,
+        '1:15', '1:14', '1:13', '1:12', '1:11',
+        '1:16', 0, '4:4', 0, '1:10',
+        '1:18', '5:17', '1:1', '3:3', '1:9',
+        '1:19', 0, '2:2', 0, '1:8',
+        '1:20', '1:21', '1:5', '1:6', '1:7',
       ],
     );
 
     // When
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
+      const match = matches[i];
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
-    }
 
-    // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+      // Then
+      expect(response.body).toEqual(match);
+      expect(response.body).toEqual(expect.objectContaining({
+        status: match.status,
+        piece: {
+          x: match.piece.x,
+          y: match.piece.y,
+          userId: match.piece.userId,
+        },
+      }));
+    }
   });
 
   // 場に駒がある場合の駒置きテスト（斜めの4方向チェック） part2
@@ -402,27 +482,35 @@ describe('play', () => {
 
     const matches = PieceStore.array2Matchers(
       [
-        1, 0, 0, 0, 1,
-        0, 1, 4, 1, 0,
-        1, 1, 1, 1, 1,
-        0, 1, 2, 1, 0,
-        1, 0, 0, 0, 1,
+        '1:15', 0, 0, 0, '1:14',
+        '1:16', '8:8', '4:4', '7:7', '1:13',
+        '1:17', '5:5', '1:1', '3:3', '1:12',
+        0, '9:9', '2:2', '6:6', '1:11',
+        '1:18', 0, 0, 0, '1:10',
       ],
     );
 
     // When
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
+      const match = matches[i];
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
-    }
 
-    // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+      // Then
+      expect(response.body).toEqual(match);
+      expect(response.body).toEqual(expect.objectContaining({
+        status: match.status,
+        piece: {
+          x: match.piece.x,
+          y: match.piece.y,
+          userId: match.piece.userId,
+        },
+      }));
+    }
   });
 
   // マスが空いて飛び石になっている場合に置けないテスト
@@ -441,26 +529,77 @@ describe('play', () => {
 
     const matches = PieceStore.array2Matchers(
       [
-        0, 0, 0, 0, 0,
-        0, 6, 5, 0, 0,
-        0, 0, 4, 0, 0,
-        0, 2, 3, 0, 0,
-        0, 1, 0, 0, 0,
+        0, '1:7', 0, 0, 0,
+        0, '6:6', '5:5', 0, 0,
+        0, 0, '4:4', 0, 0,
+        0, '2:2', '3:3', 0, 0,
+        0, '1:1', 0, 0, 0,
       ],
     );
 
     // When
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
+      const match = matches[i];
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
-    }
 
-    // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+      // Then
+      expect(response.body).toEqual(match);
+      expect(response.body).toEqual(expect.objectContaining({
+        status: match.status,
+        piece: {
+          x: match.piece.x,
+          y: match.piece.y,
+          userId: match.piece.userId,
+        },
+      }));
+    }
+  });
+
+  // 同じところに全然置けないテスト
+  it('the test piece cannnot skip the blank cell to flip ', async () => {
+    await chai.request(app).delete(`${basePath}`);
+
+    const pieces = PieceStore.array2Pieces(
+      [
+        0, ['3:3', '5:5'], 0,
+        0, ['1:1', '2:2'], 0,
+        '4:4', '2:3', 0,
+      ],
+    );
+
+    const matches = PieceStore.array2Matchers(
+      [
+        0, ['3:3', '5:5'], 0,
+        0, ['1:1', '2:2'], 0,
+        '4:4', '2:3', 0,
+      ],
+    );
+
+    // When
+    let response;
+    for (let i = 0; i < pieces.length; i += 1) {
+      const match = matches[i];
+      response = await chai.request(app)
+        .post(`${basePath}`)
+        .query({ userId: pieces[i].userId })
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(pieces[i]);
+
+      // Then
+      expect(response.body).toEqual(match);
+      expect(response.body).toEqual(expect.objectContaining({
+        status: match.status,
+        piece: {
+          x: match.piece.x,
+          y: match.piece.y,
+          userId: match.piece.userId,
+        },
+      }));
+    }
   });
 });

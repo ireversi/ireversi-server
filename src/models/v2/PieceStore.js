@@ -1,34 +1,48 @@
-const pieces = [];
+const board = {
+  pieces: [],
+  candidates: [],
+  standbys: [],
+  score: Number,
+  size: {},
+};
 const waitTime = 3000; // remainingに設定する待ち時間
 
 module.exports = {
   addPiece(piece) { // 盤面にコマを追加する
-    pieces.push(piece);
+    board.pieces.push(piece);
+  },
+  addStandby(standby) {
+    board.standbys.push(standby);
   },
   deletePieces() {
-    pieces.length = 0;
+    board.pieces.length = 0;
+  },
+  getBoard() {
+    return board;
   },
   getPieces() {
-    return pieces;
+    return board.pieces;
+  },
+  getStandbys() {
+    return board.standbys;
   },
   array2Pieces(source) {
     const array = []; // 返す配列
     const sqrt = Math.sqrt(source.length); // 平方根
-    const fieldExist = [];
+    const sourceExist = [];
     for (let i = 0; i < source.length; i += 1) {
       const f = source[i];
-
       if (Array.isArray(f)) {
         for (let j = 0; j < f.length; j += 1) {
           const g = [i, f[j]];
-          fieldExist.push(g);
+          sourceExist.push(g);
         }
       } else if (f !== 0) {
         const g = [i, f];
-        fieldExist.push(g);
+        sourceExist.push(g);
       }
     }
-    const playOrder = fieldExist.sort((a, b) => (parseInt(a[1].slice(a[1].indexOf(':') + 1), 10)) - (parseInt(b[1].slice(b[1].indexOf(':') + 1), 10)));
+    const playOrder = sourceExist.sort((a, b) => (parseInt(a[1].slice(a[1].indexOf(':') + 1), 10)) - (parseInt(b[1].slice(b[1].indexOf(':') + 1), 10)));
     let n = 0;
     let elm = {};
     for (let i = 0; i < playOrder.length; i += 1) { // x, y, userIdを生成する
@@ -42,16 +56,43 @@ module.exports = {
     }
     return array;
   },
-  array2Matchers(field) {
-    const array = [];
-    const sqrt = Math.sqrt(field.length);
-    for (let i = 0; i < field.length; i += 1) {
-      if (field[i] !== 0) {
-        const x = i % sqrt;
-        const y = Math.floor(((field.length - 1) - i) / sqrt);
-        const userId = field[i];
-        array.push({ x, y, userId });
+  array2Matchers(source) {
+    const array = []; // 返す配列
+    const sqrt = Math.sqrt(source.length); // 平方根
+    const sourceExist = [];
+    for (let i = 0; i < source.length; i += 1) {
+      const f = source[i];
+      if (Array.isArray(f)) {
+        const g = [i, f[0], true];
+        sourceExist.push(g);
+        for (let j = 1; j < f.length; j += 1) {
+          const h = [i, f[j], false];
+          sourceExist.push(h);
+        }
+      } else if (f !== 0) {
+        const g = [i, f, true];
+        sourceExist.push(g);
       }
+    }
+    const playOrder = sourceExist.sort((a, b) => (parseInt(a[1].slice(a[1].indexOf(':') + 1), 10)) - (parseInt(b[1].slice(b[1].indexOf(':') + 1), 10)));
+    let n = 0;
+    let elm = {};
+    for (let i = 0; i < playOrder.length; i += 1) { // x, y, userIdを生成する
+      const order = playOrder[i][0];
+      const x = order % sqrt;
+      const y = Math.floor(((source.length - 1) - order) / sqrt);
+      const userId = parseInt(playOrder[n][1].slice(playOrder[n][1].indexOf(':') - 1), 10);
+      const status = playOrder[i][2];
+      elm = {
+        status,
+        piece: {
+          x,
+          y,
+          userId,
+        },
+      };
+      n += 1;
+      array.push(elm);
     }
     return array;
   },
