@@ -30,6 +30,10 @@ router.route('/').get(async (req, res) => {
   const size = calcSize.calc(userId, entireBoard);
   boardStore.addSize(size);
   res.json(boardStore.getBoard());
-});
+})
+  .delete((req, res) => {
+    pieceStore.deletePieces();
+    res.sendStatus(204);
+  });
 
 module.exports = router;
