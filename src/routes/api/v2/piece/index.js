@@ -27,15 +27,18 @@ router.use((req, res, next) => {
 router.route('/')
   .post((req, res) => {
     const pieces = PieceStore.getPieces();
-
     const piece = {
       x: +req.body.x,
       y: +req.body.y,
       userId: +req.query.userId,
     };
+    let status;
 
     if (pieces.find(p => p.x === piece.x && p.y === piece.y)) {
-      return res.json(PieceStore.getPieces());
+      status = false;
+      res.json({ status, piece });
+    } else {
+      status = true;
     }
 
     const flip = [];
@@ -97,7 +100,7 @@ router.route('/')
         }
       }
     }
-    return res.json(PieceStore.getPieces());
+    return res.json({ status, piece });
   })
   .delete((req, res) => {
     PieceStore.deletePieces();
