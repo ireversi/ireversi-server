@@ -4,7 +4,7 @@ const pieceStore = require('../../../../models/v2/PieceStore.js');
 const calcCandidate = require('./calcCandidate.js');
 const calcScore = require('./calcScore.js');
 const calcSize = require('./calcSize.js');
-router.use('/specified_range', require('./specified_range.js'));
+router.use('/specified_range', require('./specified_size.js'));
 
 // for CORS
 router.use((req, res, next) => {

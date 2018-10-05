@@ -1,9 +1,9 @@
 const chai = require('chai');
 const app = require('../../../../../src/routes/app.js');
 // const boardStore = require('../../../../../src/models/v2/BoardStore.js');
-const pieceStore = require('../../../../../src/models/v2/PieceStore.js');
+// const pieceStore = require('../../../../../src/models/v2/PieceStore.js');
 
-const basePath = '/api/v2/board';
+const basePath = '/api/v2';
 
 function convertComparisonResult(result) {
   const fPieces = [];
@@ -21,40 +21,39 @@ function convertComparisonResult(result) {
   return fPieces;
 }
 
-describe('board', () => {
-  beforeAll(prepareDB);
-  afterEach(deleteAllDataFromDB);
+describe('board/specified_size', () => {
+  // beforeAll(prepareDB);
+  // afterEach(deleteAllDataFromDB);
 
   // 一つ駒を置く
-  it('gets all', async () => {
-    await chai.request(app).delete(`${basePath}`);
+  it('gets specified range', async () => {
     // Given
+    const xMin = 1;
+    const xMax = 3;
+    const yMin = 1;
+    const yMax = 3;
     const userId = 1;
+
+    // const testCase = [
+    //   0, 0, 0, 0, 0,
+    //   0, 1, 2, 0, 0,
+    //   4, 5, 0, 7, 1,
+    //   0, 9, 0, 2, 0,
+    //   0, 0, 0, 0, 0,
+    // ];
+
     const result = [
-      0, 0, 0, 0, 0,
-      0, 1, 2, 1, 0,
-      4, 5, 6, 7, 1,
-      0, 9, 0, 2, 0,
-      0, 0, 0, 0, 0,
+      1, 2, 0,
+      5, 0, 7,
+      9, 0, 2,
     ];
     // const result = boardStore.getBoard().pieces;
     const matchers = convertComparisonResult(result);
-    const size = Math.sqrt(result.length);
 
-    result.forEach((elm, index) => {
-      if (elm !== 0) {
-        const ans = {
-          x: Math.floor(index % size),
-          y: Math.floor(index / size),
-          userId: elm,
-        };
-        pieceStore.addPiece(ans);
-      }
-    });
     // await Promise.all(matchers.map(m => PieceStore(m).save()));
 
     // When
-    const response = await chai.request(app).get(`${basePath}/?userId=${userId}`);
+    const response = await chai.request(app).get(`${basePath}/board/specified_size?x_min=${xMin}&x_max=${xMax}&y_min=${yMin}&y_max=${yMax}&userId=${userId}`);
     // Then
     expect(response.body.pieces).toHaveLength(matchers.length);
     expect(response.body.pieces).toEqual(expect.arrayContaining(matchers));
