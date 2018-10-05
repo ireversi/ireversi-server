@@ -109,7 +109,28 @@
       - $ref: "#/definitions/Piece/properties/userId"
     responses:
       200:
-        description: "return a place second piece has put"
+        description: "return a place being standby"
+        schema:
+          type: "object"
+          properties:
+            status:
+              $ref: "#/definitions/Status"
+            standby:
+              $ref: "#/definitions/Standby"
+  delete:
+    tags:
+      - first_piece
+    summary: "cancel the first piece"
+    parameters:
+      - name: userId
+        in: "query"
+        description: "userId"
+        type: number
+        example: 1
+        required: true
+    responses:
+      200:
+        description: "return a standby condition"
         schema:
           type: "object"
           properties:
