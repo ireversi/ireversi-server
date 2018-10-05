@@ -2,8 +2,6 @@
 const router = require('express').Router();
 const PieceStore = require('../../../../models/v2/PieceStore.js');
 
-// const waitTime = 3500;
-// const dateNow = Date.now();
 
 // for CORS
 router.use((req, res, next) => {
@@ -15,19 +13,42 @@ router.use((req, res, next) => {
 router.route('/')
   .post((req, res) => {
     const pieces = PieceStore.getPieces();
+    let status;
+    const dateNow = Date.now(); // 受け取った時刻
 
     const piece = {
+      pieceNow: dateNow,
       x: +req.body.x,
       y: +req.body.y,
-      userId: +req.body.userId,
+      userId: +req.query.userId,
     };
-    console.log(piece);
 
+    // 置ける状態であればtrueを返す
+    if (pieces.find(p => p.standby.piece.x === piece.x && p.standby.piece.y === piece.y)) {
+      status = false;
+      res.json(PieceStore.getPieces());
+    } else {
+      status = true;
+    }
 
-    // console.log(dateNow);
-    // console.log(dateNow - Date.now());
+    const pieceResult = {
+      status,
+      standby: {
+        remaining: dateNow, // サーバーに届いた時刻
+        piece: {
+          x: piece.x,
+          y: piece.y,
+          userId: piece.userId,
+        },
+      },
+    };
 
-    PieceStore.addPiece(piece); // コマを置く
+    PieceStore.addPiece(pieceResult); // コマを置く
+
     res.send(pieces);
+  })
+  .delete((req, res) => {
+    PieceStore.deletePieces();
+    res.sendStatus(204);
   });
 module.exports = router;

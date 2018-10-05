@@ -1,4 +1,5 @@
 const pieces = [];
+const waitTime = 3000; // remainingに設定する待ち時間
 
 module.exports = {
   addPiece(piece) { // 盤面にコマを追加する
@@ -56,5 +57,25 @@ module.exports = {
   },
   seeNext(array, nextPieceX, nextPieceY) {
     return array.find(p => p.x === nextPieceX && p.y === nextPieceY);
+  },
+  array2Standby(array) {
+    const results = [];
+    const status = true;
+    const matchArray = this.array2Matchers(array);
+    for (let i = 0; i < matchArray.length; i += 1) {
+      const result = {};
+      result.status = status;
+      const match = matchArray[i];
+      const standby = {
+        remaining: 3000,
+        piece: match,
+      };
+      result.standby = standby;
+      results.push(result);
+    }
+    return results;
+  },
+  getWaitTime() {
+    return waitTime;
   },
 };

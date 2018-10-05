@@ -31,7 +31,7 @@ router.route('/')
     const piece = {
       x: +req.body.x,
       y: +req.body.y,
-      userId: +req.body.userId,
+      userId: +req.query.userId,
     };
 
     if (pieces.find(p => p.x === piece.x && p.y === piece.y)) {

@@ -30,6 +30,7 @@ describe('play', () => {
     for (let i = 0; i < pieces.length; i += 1) {
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
     }
@@ -67,6 +68,7 @@ describe('play', () => {
     for (let i = 0; i < pieces.length; i += 1) {
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
     }
@@ -101,6 +103,7 @@ describe('play', () => {
     for (let i = 0; i < pieces.length; i += 1) {
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
     }
@@ -137,6 +140,7 @@ describe('play', () => {
     for (let i = 0; i < pieces.length; i += 1) {
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
     }
@@ -173,6 +177,7 @@ describe('play', () => {
     for (let i = 0; i < pieces.length; i += 1) {
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
     }
@@ -211,6 +216,7 @@ describe('play', () => {
     for (let i = 0; i < pieces.length; i += 1) {
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
     }
@@ -249,6 +255,7 @@ describe('play', () => {
     for (let i = 0; i < pieces.length; i += 1) {
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
     }
@@ -288,6 +295,7 @@ describe('play', () => {
     for (let i = 0; i < pieces.length; i += 1) {
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
     }
@@ -325,6 +333,7 @@ describe('play', () => {
     for (let i = 0; i < pieces.length; i += 1) {
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
     }
@@ -365,6 +374,7 @@ describe('play', () => {
     for (let i = 0; i < pieces.length; i += 1) {
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
     }
@@ -405,6 +415,7 @@ describe('play', () => {
     for (let i = 0; i < pieces.length; i += 1) {
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
     }
@@ -443,6 +454,7 @@ describe('play', () => {
     for (let i = 0; i < pieces.length; i += 1) {
       response = await chai.request(app)
         .post(`${basePath}`)
+        .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
     }

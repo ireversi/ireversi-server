@@ -1,7 +1,7 @@
 const chai = require('chai');
 const app = require('../../../../../src/routes/app.js');
 // const boardStore = require('../../../../../src/models/v2/BoardStore.js');
-// const pieceStore = require('../../../../../src/models/v2/PieceStore.js');
+const pieceStore = require('../../../../../src/models/v2/PieceStore.js');
 
 const basePath = '/api/v2';
 
@@ -34,13 +34,26 @@ describe('board/specified_size', () => {
     const yMax = 3;
     const userId = 1;
 
-    // const testCase = [
-    //   0, 0, 0, 0, 0,
-    //   0, 1, 2, 0, 0,
-    //   4, 5, 0, 7, 1,
-    //   0, 9, 0, 2, 0,
-    //   0, 0, 0, 0, 0,
-    // ];
+    const testCase = [
+      0, 0, 0, 0, 0,
+      0, 1, 2, 0, 0,
+      4, 5, 0, 7, 1,
+      0, 9, 0, 2, 0,
+      0, 0, 0, 0, 0,
+    ];
+
+    const size = Math.sqrt(testCase.length);
+
+    testCase.forEach((elm, index) => {
+      if (elm !== 0) {
+        const ans = {
+          x: Math.floor(index % size),
+          y: Math.floor(index / size),
+          userId: elm,
+        };
+        pieceStore.addPiece(ans);
+      }
+    });
 
     const result = [
       1, 2, 0,
@@ -49,13 +62,12 @@ describe('board/specified_size', () => {
     ];
     // const result = boardStore.getBoard().pieces;
     const matchers = convertComparisonResult(result);
-
     // await Promise.all(matchers.map(m => PieceStore(m).save()));
 
     // When
     const response = await chai.request(app).get(`${basePath}/board/specified_size?x_min=${xMin}&x_max=${xMax}&y_min=${yMin}&y_max=${yMax}&userId=${userId}`);
     // Then
-    expect(response.body.pieces).toHaveLength(matchers.length);
-    expect(response.body.pieces).toEqual(expect.arrayContaining(matchers));
+    expect(response.body).toHaveLength(matchers.length);
+    expect(response.body).toEqual(expect.arrayContaining(matchers));
   });
 });
