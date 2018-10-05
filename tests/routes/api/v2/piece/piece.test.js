@@ -1,6 +1,8 @@
 const chai = require('chai');
-const PieceStore = require('../../../../../src/models/v2/PieceStore.js');
+const PieceModel = require('../../../../../src/models/v2/PieceModel.js');
 const app = require('../../../../../src/routes/app.js');
+
+const ZERO0 = 0;
 
 const basePath = '/api/v2/piece/';
 
@@ -11,33 +13,35 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
-      [
-        '1:1', 0,
-        0, 0,
-      ],
-    );
+    const pieces = [
+      ZERO0, ZERO0,
+      '1:1', ZERO0,
+    ];
 
-    const matches = PieceStore.array2Matchers(
-      [
-        1, 0,
-        0, 0,
-      ],
-    );
+    const result = [
+      0, 0,
+      1, 0,
+    ];
 
     // When
     let response;
-    for (let i = 0; i < pieces.length; i += 1) {
+    const record = PieceModel.convert2PieceRecord(pieces);
+
+    for (let i = 0; i < record.length; i += 1) {
+      let piece = record[i];
+      piece = PieceModel.convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieces[i]);
+        .send(piece);
     }
 
     // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
-    // check mongoDB result
+    const rpieces = PieceModel.convertComparisonResult(result);
+
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
     // const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
     // expect(pieceData).toHaveLength(rpieces.length);
     // expect(pieceData).toEqual(expect.arrayContaining(rpieces));
@@ -49,32 +53,36 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
-      [
-        0, 0,
-        '1:1', '2:2',
-      ],
-    );
+    const pieces = [
+      '1:1', '2:2',
+      ZERO0, ZERO0,
+    ];
 
-    const matches = PieceStore.array2Matchers(
-      [
-        0, 0,
-        1, 2,
-      ],
-    );
+    const result = [
+      1, 2,
+      0, 0,
+    ];
 
     // When
     let response;
-    for (let i = 0; i < pieces.length; i += 1) {
+    const record = PieceModel.convert2PieceRecord(pieces);
+    for (let i = 0; i < record.length; i += 1) {
+      let piece = record[i];
+      piece = PieceModel.convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieces[i]);
+        .send(piece);
     }
 
     // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+    const rpieces = PieceModel.convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+    // const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    // expect(pieceData).toHaveLength(rpieces.length);
+    // expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
   // 同じところにおけないテスト
@@ -83,32 +91,38 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
-      [
-        0, 0,
-        '1:1', ['2:2', '1:3'],
-      ],
-    );
+    const pieces = [
+      '1:1', ['2:2', '3:1'],
+      ZERO0, ZERO0,
+    ];
 
-    const matches = PieceStore.array2Matchers(
-      [
-        0, 0,
-        1, 2,
-      ],
-    );
+    const result = [
+      1, 2,
+      0, 0,
+    ];
 
     // When
     let response;
-    for (let i = 0; i < pieces.length; i += 1) {
+    const record = PieceModel.convert2PieceRecord(pieces);
+    for (let i = 0; i < record.length; i += 1) {
+      let piece = record[i];
+      piece = PieceModel.convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieces[i]);
+        .send(piece);
     }
 
     // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+    // check express result
+    const rpieces = PieceModel.convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+  //   // check mongoDB result
+  //   const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+  //   expect(pieceData).toHaveLength(rpieces.length);
+  //   expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
   // 挟んだらめくれるテスト（左方向、上方向） part1
@@ -117,34 +131,41 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
-      [
-        '1:5', 0, 0,
-        '2:4', 0, 0,
-        '1:1', '2:2', '1:3',
-      ],
-    );
+    const pieces = [
+      '1:1', '2:2', '3:1',
+      '4:2', ZERO0, ZERO0,
+      '5:1', ZERO0, ZERO0,
+    ];
 
-    const matches = PieceStore.array2Matchers(
-      [
-        1, 0, 0,
-        1, 0, 0,
-        1, 1, 1,
-      ],
-    );
+    const result = [
+      1, 1, 1,
+      1, 0, 0,
+      1, 0, 0,
+    ];
 
     // When
     let response;
-    for (let i = 0; i < pieces.length; i += 1) {
+    const record = PieceModel.convert2PieceRecord(pieces);
+
+    for (let i = 0; i < record.length; i += 1) {
+      let piece = record[i];
+      piece = PieceModel.convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieces[i]);
+        .send(piece);
     }
 
     // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+    // check express result
+    const rpieces = PieceModel.convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+    // check mongoDB result
+    // const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    // expect(pieceData).toHaveLength(rpieces.length);
+    // expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
   // 挟んだらめくれるテスト part2（右方向、下方向）
@@ -153,34 +174,41 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
-      [
-        '1:3', '2:2', '1:1',
-        0, 0, '2:4',
-        0, 0, '1:5',
-      ],
-    );
+    const pieces = [
+      ZERO0, ZERO0, '5:1',
+      ZERO0, ZERO0, '4:2',
+      '3:1', '2:2', '1:1',
+    ];
 
-    const matches = PieceStore.array2Matchers(
-      [
-        1, 1, 1,
-        0, 0, 1,
-        0, 0, 1,
-      ],
-    );
+    const result = [
+      0, 0, 1,
+      0, 0, 1,
+      1, 1, 1,
+    ];
 
     // When
     let response;
-    for (let i = 0; i < pieces.length; i += 1) {
+    const record = PieceModel.convert2PieceRecord(pieces);
+
+    for (let i = 0; i < record.length; i += 1) {
+      let piece = record[i];
+      piece = PieceModel.convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieces[i]);
+        .send(piece);
     }
 
     // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+    // check express result
+    const rpieces = PieceModel.convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+    // check mongoDB result
+    // const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    // expect(pieceData).toHaveLength(rpieces.length);
+    // expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
   // 挟んだらめくれるテスト part3
@@ -189,36 +217,43 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
-      [
-        0, 0, 0, '1:6',
-        '1:1', '2:2', '3:5', 0,
-        0, '3:3', 0, 0,
-        0, 0, '1:4', 0,
-      ],
-    );
+    const pieces = [
+      ZERO0, ZERO0, '4:1', ZERO0,
+      ZERO0, '3:3', ZERO0, ZERO0,
+      '1:1', '2:2', '5:3', ZERO0,
+      ZERO0, ZERO0, ZERO0, '6:1',
+    ];
 
-    const matches = PieceStore.array2Matchers(
-      [
-        0, 0, 0, 1,
-        1, 2, 1, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-      ],
-    );
+    const result = [
+      0, 0, 1, 0,
+      0, 1, 0, 0,
+      1, 2, 1, 0,
+      0, 0, 0, 1,
+    ];
 
     // When
     let response;
-    for (let i = 0; i < pieces.length; i += 1) {
+    const record = PieceModel.convert2PieceRecord(pieces);
+
+    for (let i = 0; i < record.length; i += 1) {
+      let piece = record[i];
+      piece = PieceModel.convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieces[i]);
+        .send(piece);
     }
 
     // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+    // check express result
+    const rpieces = PieceModel.convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+    // check mongoDB result
+    // const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    // expect(pieceData).toHaveLength(rpieces.length);
+    // expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
   // 挟んだらめくれるテスト part4
@@ -227,36 +262,43 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
-      [
-        '1:6', 0, 0, 0,
-        0, '3:5', '2:2', '1:1',
-        0, 0, '3:3', 0,
-        0, '1:4', 0, 0,
-      ],
-    );
+    const pieces = [
+      ZERO0, '4:1', ZERO0, ZERO0,
+      ZERO0, ZERO0, '3:3', ZERO0,
+      ZERO0, '5:3', '2:2', '1:1',
+      '6:1', ZERO0, ZERO0, ZERO0,
+    ];
 
-    const matches = PieceStore.array2Matchers(
-      [
-        1, 0, 0, 0,
-        0, 1, 2, 1,
-        0, 0, 1, 0,
-        0, 1, 0, 0,
-      ],
-    );
+    const result = [
+      0, 1, 0, 0,
+      0, 0, 1, 0,
+      0, 1, 2, 1,
+      1, 0, 0, 0,
+    ];
 
     // When
     let response;
-    for (let i = 0; i < pieces.length; i += 1) {
+    const record = PieceModel.convert2PieceRecord(pieces);
+
+    for (let i = 0; i < record.length; i += 1) {
+      let piece = record[i];
+      piece = PieceModel.convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieces[i]);
+        .send(piece);
     }
 
     // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+    // check express result
+    const rpieces = PieceModel.convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+    // check mongoDB result
+    // const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    // expect(pieceData).toHaveLength(rpieces.length);
+    // expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
   // 場に一枚も置いてない場合の駒置きテスト（反転無し） part1
@@ -265,74 +307,88 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
-      [
-        0, 0, '4:5', 0,
-        0, '3:3', 0, 0,
-        0, '1:1', '1:4', 0,
-        0, '2:2', 0, 0,
-      ],
-    );
+    const pieces = [
+      ZERO0, '2:2', ZERO0, ZERO0,
+      ZERO0, '1:1', '4:1', ZERO0,
+      ZERO0, '3:3', ZERO0, ZERO0,
+      ZERO0, ZERO0, '5:4', ZERO0,
+    ];
 
-
-    const matches = PieceStore.array2Matchers(
-      [
-        0, 0, 0, 0,
-        0, 3, 0, 0,
-        0, 1, 0, 0,
-        0, 2, 0, 0,
-      ],
-    );
+    const result = [
+      0, 2, 0, 0,
+      0, 1, 0, 0,
+      0, 3, 0, 0,
+      0, 0, 0, 0,
+    ];
 
     // When
     let response;
-    for (let i = 0; i < pieces.length; i += 1) {
+    const record = PieceModel.convert2PieceRecord(pieces);
+
+    for (let i = 0; i < record.length; i += 1) {
+      let piece = record[i];
+      piece = PieceModel.convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieces[i]);
+        .send(piece);
     }
 
     // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+    // check express result
+    const rpieces = PieceModel.convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+    // check mongoDB result
+    // const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    // expect(pieceData).toHaveLength(rpieces.length);
+    // expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
   // 場に一枚も置いてない場合の駒置きテスト（反転有り） part2
   it('the case about nothing own piece, to turn over', async () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
-    // Given
-    const pieces = PieceStore.array2Pieces(
-      [
-        0, '1:4', '3:6', 0,
-        0, '3:3', 0, 0,
-        0, '1:1', '2:5', 0,
-        0, '2:2', 0, 0,
-      ],
-    );
 
-    const matches = PieceStore.array2Matchers(
-      [
-        0, 1, 3, 0,
-        0, 1, 0, 0,
-        0, 1, 0, 0,
-        0, 2, 0, 0,
-      ],
-    );
+    // Given
+    const pieces = [
+      ZERO0, '2:2', ZERO0, ZERO0,
+      ZERO0, '1:1', '5:2', ZERO0,
+      ZERO0, '3:3', ZERO0, ZERO0,
+      ZERO0, '4:1', '6:3', ZERO0,
+    ];
+
+    const result = [
+      0, 2, 0, 0,
+      0, 1, 0, 0,
+      0, 1, 0, 0,
+      0, 1, 3, 0,
+    ];
 
     // When
     let response;
-    for (let i = 0; i < pieces.length; i += 1) {
+    const record = PieceModel.convert2PieceRecord(pieces);
+
+    for (let i = 0; i < record.length; i += 1) {
+      let piece = record[i];
+      piece = PieceModel.convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieces[i]);
+        .send(piece);
     }
 
     // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+    // check express result
+    const rpieces = PieceModel.convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+    // check mongoDB result
+    // const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    // expect(pieceData).toHaveLength(rpieces.length);
+    // expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
   // 場に駒がある場合の駒置きテスト（上下左右チェック） part1
@@ -341,38 +397,45 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
-      [
-        '1:15', '1:14', '1:13', '1:12', '1:11',
-        '1:16', 0, '4:4', 0, '1:10',
-        '1:18', '5:17', '1:1', '3:3', '1:9',
-        '1:19', 0, '2:2', 0, '1:8',
-        '1:20', '1:21', '1:5', '1:6', '1:7',
-      ],
-    );
+    const pieces = [
+      '20:1', '21:1', '5:1', '6:1', '7:1',
+      '19:1', ZERO0, '2:2', ZERO0, '8:1',
+      '18:1', '17:5', '1:1', '3:3', '9:1',
+      '16:1', ZERO0, '4:4', ZERO0, '10:1',
+      '15:1', '14:1', '13:1', '12:1', '11:1',
+    ];
 
-    const matches = PieceStore.array2Matchers(
-      [
-        0, 0, 1, 0, 0,
-        0, 0, 1, 0, 0,
-        1, 1, 1, 1, 1,
-        0, 0, 1, 0, 0,
-        0, 0, 1, 0, 0,
-      ],
-    );
+    const result = [
+      0, 0, 1, 0, 0,
+      0, 0, 1, 0, 0,
+      1, 1, 1, 1, 1,
+      0, 0, 1, 0, 0,
+      0, 0, 1, 0, 0,
+    ];
 
     // When
     let response;
-    for (let i = 0; i < pieces.length; i += 1) {
+    const record = PieceModel.convert2PieceRecord(pieces);
+
+    for (let i = 0; i < record.length; i += 1) {
+      let piece = record[i];
+      piece = PieceModel.convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieces[i]);
+        .send(piece);
     }
 
     // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+    // check express result
+    const rpieces = PieceModel.convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
+
+    // // check mongoDB result
+    // const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    // expect(pieceData).toHaveLength(rpieces.length);
+    // expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 
   // 場に駒がある場合の駒置きテスト（斜めの4方向チェック） part2
@@ -381,75 +444,44 @@ describe('play', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
-      [
-        '1:15', 0, 0, 0, '1:14',
-        '1:16', '8:8', '4:4', '7:7', '1:13',
-        '1:17', '5:5', '1:1', '3:3', '1:12',
-        0, '9:9', '2:2', '6:6', '1:11',
-        '1:18', 0, 0, 0, '1:10',
-      ],
-    );
+    const pieces = [
+      '18:1', ZERO0, ZERO0, ZERO0, '10:1',
+      ZERO0, '9:9', '2:2', '6:6', '11:1',
+      '17:1', '5:5', '1:1', '3:3', '12:1',
+      '16:1', '8:8', '4:4', '7:7', '13:1',
+      '15:1', ZERO0, ZERO0, ZERO0, '14:1',
+    ];
 
-    const matches = PieceStore.array2Matchers(
-      [
-        1, 0, 0, 0, 1,
-        0, 1, 4, 1, 0,
-        1, 1, 1, 1, 1,
-        0, 1, 2, 1, 0,
-        1, 0, 0, 0, 1,
-      ],
-    );
+    const result = [
+      1, 0, 0, 0, 1,
+      0, 1, 2, 1, 0,
+      1, 1, 1, 1, 1,
+      0, 1, 4, 1, 0,
+      1, 0, 0, 0, 1,
+    ];
 
     // When
     let response;
-    for (let i = 0; i < pieces.length; i += 1) {
+    const record = PieceModel.convert2PieceRecord(pieces);
+
+    for (let i = 0; i < record.length; i += 1) {
+      let piece = record[i];
+      piece = PieceModel.convertPiece(piece);
       response = await chai.request(app)
         .post(`${basePath}`)
         .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieces[i]);
+        .send(piece);
     }
 
     // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
-  });
+    // check express result
+    const rpieces = PieceModel.convertComparisonResult(result);
+    expect(response.body).toHaveLength(rpieces.length);
+    expect(response.body).toEqual(expect.arrayContaining(rpieces));
 
-  // マスが空いて飛び石になっている場合に置けないテスト
-  it('the test piece cannnot skip the blank cell to flip ', async () => {
-    await chai.request(app).delete(`${basePath}`);
-
-    const pieces = PieceStore.array2Pieces(
-      [
-        0, '1:7', 0, 0, 0,
-        0, '6:6', '5:5', 0, 0,
-        0, 0, '4:4', 0, 0,
-        0, '2:2', '3:3', 0, 0,
-        0, '1:1', 0, 0, 0,
-      ],
-    );
-
-    const matches = PieceStore.array2Matchers(
-      [
-        0, 0, 0, 0, 0,
-        0, 6, 5, 0, 0,
-        0, 0, 4, 0, 0,
-        0, 2, 3, 0, 0,
-        0, 1, 0, 0, 0,
-      ],
-    );
-
-    // When
-    let response;
-    for (let i = 0; i < pieces.length; i += 1) {
-      response = await chai.request(app)
-        .post(`${basePath}`)
-        .set('content-type', 'application/x-www-form-urlencoded')
-        .send(pieces[i]);
-    }
-
-    // Then
-    expect(response.body).toHaveLength(matches.length);
-    expect(response.body).toEqual(expect.arrayContaining(matches));
+    // // check mongoDB result
+    // const pieceData = JSON.parse(JSON.stringify(await PieceModel.find({}, propfilter)));
+    // expect(pieceData).toHaveLength(rpieces.length);
+    // expect(pieceData).toEqual(expect.arrayContaining(rpieces));
   });
 });
