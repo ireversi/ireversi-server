@@ -1,15 +1,31 @@
-const pieces = [];
+const board = {
+  pieces: [],
+  candidates: [],
+  standbys: [],
+  score: Number,
+  size: {},
+};
+// const pieces = [];
 const waitTime = 3000; // remainingに設定する待ち時間
 
 module.exports = {
   addPiece(piece) { // 盤面にコマを追加する
-    pieces.push(piece);
+    board.pieces.push(piece);
+  },
+  addStandby(standby) {
+    board.standbys.push(standby);
   },
   deletePieces() {
-    pieces.length = 0;
+    board.pieces.length = 0;
+  },
+  getBoard() {
+    return board;
   },
   getPieces() {
-    return pieces;
+    return board.pieces;
+  },
+  getStandbys() {
+    return board.standbys;
   },
   array2Pieces(source) {
     const array = []; // 返す配列

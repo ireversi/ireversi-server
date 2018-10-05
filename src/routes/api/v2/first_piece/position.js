@@ -12,7 +12,7 @@ router.use((req, res, next) => {
 
 router.route('/')
   .post((req, res) => {
-    const pieces = PieceStore.getPieces();
+    const pieces = PieceStore.getStandbys();
     let status;
     const dateNow = Date.now(); // 受け取った時刻
 
@@ -26,7 +26,7 @@ router.route('/')
     // 置ける状態であればtrueを返す
     if (pieces.find(p => p.standby.piece.x === piece.x && p.standby.piece.y === piece.y)) {
       status = false;
-      res.json(PieceStore.getPieces());
+      // res.json(PieceStore.getPieces());
     } else {
       status = true;
     }
@@ -43,8 +43,7 @@ router.route('/')
       },
     };
 
-    PieceStore.addPiece(pieceResult); // コマを置く
-
+    PieceStore.addStandby(pieceResult); // コマを置く
     res.send(pieces);
   })
   .delete((req, res) => {
