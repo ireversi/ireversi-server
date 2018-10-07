@@ -21,6 +21,22 @@ function convertComparisonResult(result) {
   return fPieces;
 }
 
+function convertComparisonMatchers(result) {
+  const fPieces = [];
+  const size = Math.sqrt(result.length);
+  for (let i = 0; i < result.length; i += 1) {
+    if (result[i] !== 0) {
+      const piece = {
+        x: Math.floor(i % size),
+        y: Math.floor(i / size),
+      };
+      fPieces.push(piece);
+    }
+  }
+  return fPieces;
+}
+
+
 describe('board', () => {
   // beforeAll(prepareDB);
   // afterEach(deleteAllDataFromDB);
@@ -69,34 +85,56 @@ describe('board after turnover', () => {
   it('gets pieces after turnover some pieces', async () => {
     await chai.request(app).delete(`${basePath}`);
     // Given
-    const userId = 1;
-    const result = [
-      0, 0, 0, 0, 0,
-      0, 1, 1, 1, 0,
-      0, 1, 0, 0, 0,
-      0, 1, 0, 0, 0,
-      0, 0, 0, 0, 0,
+    const resultPre = [
+      0, 0, 0, 0,
+      0, 1, 0, 0,
+      0, 0, 0, 0,
+      0, 0, 0, 0,
     ];
-    // const result = boardStore.getBoard().pieces;
-    const matchers = convertComparisonResult(result);
-    const size = Math.sqrt(result.length);
-
-    result.forEach((elm, index) => {
+    // first_pieceを取り込み
+    const sizePre = Math.sqrt(resultPre.length);
+    resultPre.forEach((elm, index) => {
       if (elm !== 0) {
         const ans = {
-          x: Math.floor(index % size),
-          y: Math.floor(index / size),
+          x: Math.floor(index % sizePre),
+          y: Math.floor(index / sizePre),
           userId: elm,
         };
         pieceStore.addPiece(ans);
       }
     });
+    // 2nd piece set
+    const resultFol = [
+      0, 0, 0, 0,
+      0, 0, 2, 0,
+      0, 0, 0, 0,
+      0, 0, 0, 0,
+    ];
+    // second_pieceを取り込み
+    const sizeFol = Math.sqrt(resultFol.length);
+    resultFol.forEach((elm, index) => {
+      if (elm !== 0) {
+        const ans = {
+          x: Math.floor(index % sizeFol),
+          y: Math.floor(index / sizeFol),
+          userId: elm,
+        };
+        pieceStore.addPiece(ans);
+      }
+    });
+    const userId = 3;
+    const matchers = convertComparisonMatchers([
+      0, userId, userId, 0,
+      userId, 0, 0, userId,
+      0, userId, userId, 0,
+      0, 0, 0, 0,
+    ]);
     // await Promise.all(matchers.map(m => PieceStore(m).save()));
 
     // When
     const response = await chai.request(app).get(`${basePath}/?userId=${userId}`);
     // Then
-    expect(response.body.pieces).toHaveLength(matchers.length);
-    expect(response.body.pieces).toEqual(expect.arrayContaining(matchers));
+    expect(response.body.candidates).toHaveLength(matchers.length);
+    expect(response.body.candidates).toEqual(expect.arrayContaining(matchers));
   });
 });
