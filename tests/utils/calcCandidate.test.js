@@ -1,10 +1,5 @@
-// const chai = require('chai');
-
-// const app = require('../../src/routes/app.js');
-
-// const basePath = '/api/v2';
-
 const calcCandidate = require('../../src/routes/api/v2/board/calcCandidate.js');
+// const boardStore = require('../../src/models/v2/BoardStore.js');
 
 function convertComparisonResult(result) {
   const pieces = [];
@@ -68,14 +63,48 @@ describe('calcCandidate', () => {
     // When
     const response = calcCandidate.calc(userId, testCase);
     // Then
-    // console.log(response);
-    // console.log(matchers);
-
     expect(response).toHaveLength(matchers.length);
     expect(response).toEqual(expect.arrayContaining(matchers));
   });
-  it('calcs candidates for more than two pieces', async () => {
+});
+
+describe('calcCandidate', () => {
+  // beforeAll(prepareDB);
+  // afterEach(deleteAllDataFromDB);
+
+  // 一つ駒を置く
+  it('calcs candidates for first piece', async () => {
     // Given
+    userId = 10;
+    const testCase = convertComparisonResult(
+      [
+        0, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+      ],
+    );
+
+    const matchers = convertCandidateList(
+      [
+        0, userId, 0, 0,
+        userId, 0, userId, 0,
+        0, userId, 0, 0,
+        0, 0, 0, 0,
+      ],
+    );
+
+    // When
+    const response = calcCandidate.calc(userId, testCase);
+    // Then
+    expect(response).toHaveLength(matchers.length);
+    expect(response).toEqual(expect.arrayContaining(matchers));
+  });
+});
+
+describe('calcCandidate', () => {
+  it('calcs candidates for more than two pieces', async () => {
+  // Given
     userId = 2;
 
     const testCase = convertComparisonResult(
@@ -100,9 +129,6 @@ describe('calcCandidate', () => {
     // When
     const response = calcCandidate.calc(userId, testCase);
     // Then
-    // console.log(response);
-    // console.log(matchers);
-
     expect(response).toHaveLength(matchers.length);
     expect(response).toEqual(expect.arrayContaining(matchers));
   });
