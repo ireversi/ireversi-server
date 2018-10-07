@@ -34,11 +34,16 @@ router.route('/')
     let status;
 
     // マスに他コマがある場合
-    if (pieces.find(p => p.x === piece.x && p.y === piece.y)) {
-      status = false;
-      res.json({ status, piece }); // 他コマがある場合はfalseつけて戻す
-    } else {
-      status = true;
+    for (let i = 0; i < pieces.length; i += 1) {
+      const p = pieces[i];
+      if (p.x === piece.x && p.y === piece.y) {
+        status = false;
+        res.json({ status, piece }); // 他コマがある場合はfalseつけて戻す
+        return;
+      }
+      if (p.x !== piece.x && p.y !== piece.y) {
+        status = true;
+      }
     }
 
     const flip = [];
@@ -65,6 +70,7 @@ router.route('/')
                 dirPiece = PieceStore.seeNext(pieces, nextPieceX, nextPieceY);
               } else if (dirPiece.userId === piece.userId) {
                 PieceStore.addPiece(piece);
+                status = true;
                 for (let j = 0; j < rslt.length; j += 1) {
                   if (rslt[j] !== undefined) {
                     rslt[j].userId = piece.userId;
@@ -81,6 +87,7 @@ router.route('/')
       }
     // 盤面にコマがひとつもない場合
     } else if (pieces.length === 0) {
+      status = true;
       PieceStore.addPiece(piece);
     // 他コマばかりで自コマがない場合、
     } else {
@@ -109,7 +116,7 @@ router.route('/')
         }
       }
     }
-    return res.json({ status, piece });
+    res.json({ status, piece });
   })
   .delete((req, res) => {
     PieceStore.deletePieces();

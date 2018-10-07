@@ -14,7 +14,7 @@ describe('piece', () => {
     // Given
     const pieces = PieceStore.array2Pieces(
       [
-        0, '2:2', 0,
+        0, ['2:2', '3:4'], 0,
         0, '1:1', '1:3',
         0, 0, 0,
       ],
@@ -23,7 +23,7 @@ describe('piece', () => {
     // 置けないコマは'1:3:f'と、最後にfを付ける
     const matches = PieceStore.array2Matchers(
       [
-        0, '2:2', 0,
+        0, ['2:2', '3:4:f'], 0,
         0, '1:1', '1:3:f',
         0, 0, 0,
       ],
@@ -71,6 +71,52 @@ describe('piece', () => {
       [
         0, ['2:2', '2:4:f', '1:5:f'], 0,
         0, ['1:1', '1:3:f'], 0,
+        0, 0, 0,
+      ],
+    );
+
+    // When
+    let response;
+    for (let i = 0; i < pieces.length; i += 1) {
+      const match = matches[i];
+
+      response = await chai.request(app)
+        .post(`${basePath}`)
+        .query({ userId: pieces[i].userId })
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send(pieces[i]);
+
+      // Then
+      expect(response.body).toEqual(match);
+      expect(response.body).toEqual(expect.objectContaining({
+        status: match.status,
+        piece: {
+          x: match.piece.x,
+          y: match.piece.y,
+          userId: match.piece.userId,
+        },
+      }));
+    }
+  });
+
+  // デバッグ検証、candidates残り確認
+  it('cannot be put on the same place', async () => {
+    // Reset
+    await chai.request(app).delete(`${basePath}`);
+
+    // Given
+    const pieces = PieceStore.array2Pieces(
+      [
+        0, 0, 0,
+        '1:4', ['1:2', '2:3'], '1:1',
+        0, 0, 0,
+      ],
+    );
+
+    const matches = PieceStore.array2Matchers(
+      [
+        0, 0, 0,
+        '1:4', ['1:2:f', '2:3'], '1:1',
         0, 0, 0,
       ],
     );
