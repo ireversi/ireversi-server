@@ -1,4 +1,3 @@
-
 const router = require('express').Router();
 const PieceStore = require('../../../../models/v2/PieceStore.js');
 
@@ -34,17 +33,19 @@ router.route('/')
     };
     let status;
 
+    // マスに他コマがある場合
     if (pieces.find(p => p.x === piece.x && p.y === piece.y)) {
       status = false;
-      res.json({ status, piece });
+      res.json({ status, piece }); // 他コマがある場合はfalseつけて戻す
     } else {
       status = true;
     }
 
     const flip = [];
+    // 盤面に自コマがある場合
     if (pieces.find(p => p.userId === piece.userId)) {
       for (let i = 0; i < dirAll.length; i += 1) {
-        const rslt = [];
+        const rslt = []; // 通って来たコマを一時保存する。めくれる条件のときはflipに移す。
         const dirX = dirAll[i][0];
         const dirY = dirAll[i][1];
         const aroundX = piece.x + dirX;
@@ -63,7 +64,7 @@ router.route('/')
                 const nextPieceY = piece.y + dirY * n;
                 dirPiece = PieceStore.seeNext(pieces, nextPieceX, nextPieceY);
               } else if (dirPiece.userId === piece.userId) {
-                pieces.push(piece);
+                PieceStore.addPiece(piece);
                 for (let j = 0; j < rslt.length; j += 1) {
                   if (rslt[j] !== undefined) {
                     rslt[j].userId = piece.userId;
@@ -73,21 +74,29 @@ router.route('/')
                 break;
               }
             }
+          } else {
+            status = false;
           }
         }
       }
+    // 盤面にコマがひとつもない場合
     } else if (pieces.length === 0) {
-      pieces.push(piece);
+      PieceStore.addPiece(piece);
+    // 他コマばかりで自コマがない場合、
     } else {
+      // 上下左右を検索
       for (let i = 0; i < dirXY.length; i += 1) {
         const dirX = dirXY[i][0];
         const dirY = dirXY[i][1];
         const aroundX = piece.x + dirX;
         const aroundY = piece.y + dirY;
         const dirPiece = pieces.find(p => p.x === aroundX && p.y === aroundY);
-        if (dirPiece !== undefined) {
-          pieces.push(piece);
+        if (dirPiece !== undefined) { // 上下左右いずれかのとなりに他コマがある場合
+          status = true;
+          PieceStore.addPiece(piece);
           break;
+        } else {
+          status = false;
         }
       }
     }
