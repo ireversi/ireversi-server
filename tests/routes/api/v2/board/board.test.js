@@ -106,8 +106,8 @@ describe('board after turnover', () => {
     // 2nd piece set
     const resultFol = [
       0, 0, 0, 0,
-      0, 0, 2, 0,
       0, 0, 0, 0,
+      0, 2, 0, 0,
       0, 0, 0, 0,
     ];
     // second_pieceを取り込み
@@ -124,10 +124,10 @@ describe('board after turnover', () => {
     });
     const userId = 3;
     const matchers = convertComparisonMatchers([
-      0, userId, userId, 0,
-      userId, 0, 0, userId,
-      0, userId, userId, 0,
-      0, 0, 0, 0,
+      0, userId, 0, 0,
+      userId, 0, userId, 0,
+      userId, 0, userId, 0,
+      0, userId, 0, 0,
     ]);
     // await Promise.all(matchers.map(m => PieceStore(m).save()));
 
