@@ -10,13 +10,7 @@ const PieceStore = require('./models/v2/PieceStore.js');
 /* eslint-disable no-console */
 (async () => {
   await connectDB(); // DBに接続
-  const piece = {
-    x: 0,
-    y: 0,
-    userId: 1,
-  };
-  PieceStore.addPiece(piece);
-
+  PieceStore.initPieces();
   specs.forEach(({ version, spec }) => {
     const docsPath = `/api-docs/${version}`; // ドキュメントのURL決める
     app.use(docsPath, swaggerUi.serve, (...args) => {
