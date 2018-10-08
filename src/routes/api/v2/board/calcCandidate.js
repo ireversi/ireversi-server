@@ -28,7 +28,6 @@ exports.calc = function calcCandidate(userId, pieces) {
       flag = true;
     }
   });
-
   if (flag === false) {
   // id初出時
     pieces.forEach((elm) => {
