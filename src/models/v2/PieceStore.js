@@ -26,7 +26,18 @@ module.exports = {
   getStandbys() {
     return board.standbys;
   },
+  initPieces() {
+    this.addPiece(
+      {
+        x: 0,
+        y: 0,
+        userId: 1,
+      },
+    );
+    return board;
+  },
   array2Pieces(source) {
+    // const board = this.getBoard();
     const array = []; // 返す配列
     const sqrt = Math.sqrt(source.length); // 平方根
     const sourceExist = [];

@@ -16,13 +16,6 @@ const dirAll = [
   [-1, -1],
 ];
 
-// for CORS
-router.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
-
 router.route('/')
   .post((req, res) => {
     const pieces = PieceStore.getPieces();
@@ -32,7 +25,6 @@ router.route('/')
       userId: +req.query.userId,
     };
     let status;
-
     // マスに他コマがある場合
     for (let i = 0; i < pieces.length; i += 1) {
       const p = pieces[i];
@@ -49,6 +41,7 @@ router.route('/')
     const flip = [];
     // 盤面に自コマがある場合
     if (pieces.find(p => p.userId === piece.userId)) {
+      let around = 0; // 周回した回数。最大8回。
       for (let i = 0; i < dirAll.length; i += 1) {
         const rslt = []; // 通って来たコマを一時保存する。めくれる条件のときはflipに移す。
         const dirX = dirAll[i][0];
@@ -83,12 +76,13 @@ router.route('/')
           } else {
             status = false;
           }
+        } else {
+          around += 1;
+          if (around === 8) {
+            status = false;
+          }
         }
       }
-    // 盤面にコマがひとつもない場合
-    } else if (pieces.length === 0) {
-      status = true;
-      PieceStore.addPiece(piece);
     // 他コマばかりで自コマがない場合、
     } else {
       // 上下左右を検索
@@ -120,6 +114,7 @@ router.route('/')
   })
   .delete((req, res) => {
     PieceStore.deletePieces();
-    res.sendStatus(204);
+    const pieces = PieceStore.initPieces();
+    res.json(pieces);
   });
 module.exports = router;
