@@ -14,6 +14,9 @@ module.exports = {
   addCandidates(candidate) {
     candidates.push(candidate);
   },
+  initCandidates() {
+    candidates.length = 0;
+  },
   addScore(valscore) {
     score = valscore;
   },

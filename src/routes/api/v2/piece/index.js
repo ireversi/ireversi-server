@@ -16,13 +16,6 @@ const dirAll = [
   [-1, -1],
 ];
 
-// for CORS
-router.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
-
 router.route('/')
   .post((req, res) => {
     const pieces = PieceStore.getPieces();
@@ -32,18 +25,23 @@ router.route('/')
       userId: +req.query.userId,
     };
     let status;
-
     // マスに他コマがある場合
-    if (pieces.find(p => p.x === piece.x && p.y === piece.y)) {
-      status = false;
-      res.json({ status, piece }); // 他コマがある場合はfalseつけて戻す
-    } else {
-      status = true;
+    for (let i = 0; i < pieces.length; i += 1) {
+      const p = pieces[i];
+      if (p.x === piece.x && p.y === piece.y) {
+        status = false;
+        res.json({ status, piece }); // 他コマがある場合はfalseつけて戻す
+        return;
+      }
+      if (p.x !== piece.x && p.y !== piece.y) {
+        status = true;
+      }
     }
 
     const flip = [];
     // 盤面に自コマがある場合
     if (pieces.find(p => p.userId === piece.userId)) {
+      let around = 0; // 周回した回数。最大8回。
       for (let i = 0; i < dirAll.length; i += 1) {
         const rslt = []; // 通って来たコマを一時保存する。めくれる条件のときはflipに移す。
         const dirX = dirAll[i][0];
@@ -65,6 +63,7 @@ router.route('/')
                 dirPiece = PieceStore.seeNext(pieces, nextPieceX, nextPieceY);
               } else if (dirPiece.userId === piece.userId) {
                 PieceStore.addPiece(piece);
+                status = true;
                 for (let j = 0; j < rslt.length; j += 1) {
                   if (rslt[j] !== undefined) {
                     rslt[j].userId = piece.userId;
@@ -77,11 +76,13 @@ router.route('/')
           } else {
             status = false;
           }
+        } else {
+          around += 1;
+          if (around === 8) {
+            status = false;
+          }
         }
       }
-    // 盤面にコマがひとつもない場合
-    } else if (pieces.length === 0) {
-      PieceStore.addPiece(piece);
     // 他コマばかりで自コマがない場合、
     } else {
       // 上下左右を検索
@@ -109,10 +110,11 @@ router.route('/')
         }
       }
     }
-    return res.json({ status, piece });
+    res.json({ status, piece });
   })
   .delete((req, res) => {
     PieceStore.deletePieces();
-    res.sendStatus(204);
+    const pieces = PieceStore.initPieces();
+    res.json(pieces);
   });
 module.exports = router;
