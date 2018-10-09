@@ -5,11 +5,12 @@ const app = require('./routes/app.js');
 const { connectDB } = require('./utils/db.js');
 const { port } = require('./config.js'); // 環境変数
 const specs = require('./utils/swaggerSpecs.js'); // 連想配列の中身だけ取り出す
+const PieceStore = require('./models/v2/PieceStore.js');
 
 /* eslint-disable no-console */
 (async () => {
   await connectDB(); // DBに接続
-
+  PieceStore.initPieces();
   specs.forEach(({ version, spec }) => {
     const docsPath = `/api-docs/${version}`; // ドキュメントのURL決める
     app.use(docsPath, swaggerUi.serve, (...args) => {
