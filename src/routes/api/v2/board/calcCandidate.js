@@ -21,7 +21,7 @@ exports.calc = function calcCandidate(userId, pieces) {
     [-1, 1],
   ];
 
-  // 全piece検索しておいたpieceが初出かどうか取得
+  // 全piece検索して、おいたpieceが初出かどうか取得
   let flag = false;
   pieces.forEach((elm) => {
     if (elm.userId === userId) {
@@ -76,6 +76,7 @@ exports.calc = function calcCandidate(userId, pieces) {
       if (elm.userId === userId) {
         for (let i = 0; i < dirAll.length; i += 1) {
           let dist = 1;
+          let dupFlag = false;
           // ひっくり返るものがあったら貯めておく配列
           const turnCandidate = [];
 
@@ -98,6 +99,9 @@ exports.calc = function calcCandidate(userId, pieces) {
             if (elm.userId !== dirPiece.userId) {
               turnCandidate.push(dirPiece);
             }
+            if (dirPiece.userId === elm.userId) {
+              dupFlag = true;
+            }
             dist += 1;
             const nextX = elm.x + dirX * dist;
             const nextY = elm.y + dirY * dist;
@@ -107,7 +111,7 @@ exports.calc = function calcCandidate(userId, pieces) {
             };
             dirPiece = seeNext(pieces, nextX, nextY);
           }
-          if (turnCandidate.length > 0) {
+          if (turnCandidate.length > 0 && dupFlag === false) {
             candidates.push(nextPiece);
           }
         }
