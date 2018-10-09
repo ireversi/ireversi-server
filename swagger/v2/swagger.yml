@@ -290,3 +290,35 @@ definitions:
         description: "Max of X axis (top)"
         required: true
         type: "number"
+
+securityDefinitions:
+  tokenAuth:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+
+paths:
+  /userId_auth:
+    post:
+      x-swagger-router-controller: test
+      operationId: userId_post
+      security:
+        - tokenAuth: []
+      tags:
+      - userId_auth
+      description: Post message to userId_auth
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/SimpleRequest'
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/SimpleResponse'
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
