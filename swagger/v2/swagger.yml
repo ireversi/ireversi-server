@@ -290,3 +290,26 @@ definitions:
         description: "Max of X axis (top)"
         required: true
         type: "number"
+  userId:
+    type: "string"
+    description: "generate new userId"
+    properties:
+      userId:        
+        name: "userId"
+        type: number
+        description: "userId"
+        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        in: "formData"
+        required: true
+
+/userIdGenerate:
+  get:
+    tags:
+      - "userId"
+    summary: "generate new userId by JWT"
+    description: "userIdの新規生成"
+    responses:
+      200:
+        description: "create new userId by JWT"
+        schema:
+          $ref: "#/definitions/userId"

@@ -16,6 +16,7 @@ module.exports = {
   },
   deletePieces() {
     board.pieces.length = 0;
+    this.initPieces();
   },
   getBoard() {
     return board;
