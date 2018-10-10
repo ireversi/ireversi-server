@@ -39,8 +39,6 @@ router.route('/position')
     };
 
     PieceStore.addPiece(pieceResult); // コマを置く
-    console.log(pieces);
-
     res.send(pieces);
   })
   .delete((req, res) => {

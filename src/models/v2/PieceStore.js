@@ -17,6 +17,9 @@ module.exports = {
   deletePieces() {
     board.pieces.length = 0;
   },
+  deleteStandbys() {
+    board.standbys.length = 0;
+  },
   getBoard() {
     return board;
   },
@@ -37,7 +40,6 @@ module.exports = {
     return board;
   },
   array2Pieces(source) {
-    // const board = this.getBoard();
     const array = []; // 返す配列
     const sqrt = Math.sqrt(source.length); // 平方根
     const sourceExist = [];
@@ -124,19 +126,17 @@ module.exports = {
   seeNext(array, nextPieceX, nextPieceY) {
     return array.find(p => p.x === nextPieceX && p.y === nextPieceY);
   },
-  array2Standby(array) {
+  array2Standbys(array) {
     const results = [];
-    const status = true;
     const matchArray = this.array2Matchers(array);
     for (let i = 0; i < matchArray.length; i += 1) {
-      const result = {};
-      result.status = status;
       const match = matchArray[i];
-      const standby = {
-        remaining: 3000,
-        piece: match,
+      const result = {
+        status: match.status,
+        standby: {
+          piece: match.piece,
+        },
       };
-      result.standby = standby;
       results.push(result);
     }
     return results;

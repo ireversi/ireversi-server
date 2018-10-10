@@ -30,7 +30,7 @@ describe('position', () => {
         ],
       );
 
-      const matches = PieceStore.array2Standby(
+      const matches = PieceStore.array2Standbys(
         [
           '1:1', '2:2',
           '3:3', 0,
@@ -79,7 +79,7 @@ describe('position', () => {
         ],
       );
 
-      const matches = PieceStore.array2Standby(
+      const matches = PieceStore.array2Standbys(
         [
           '1:1', ['2:2', '4:4'],
           '3:3', 0,
@@ -128,7 +128,7 @@ describe('position', () => {
         ],
       );
 
-      const matches = PieceStore.array2Standby(
+      const matches = PieceStore.array2Standbys(
         [
           '1:1', '2:2', 0,
           0, 0, 0,
