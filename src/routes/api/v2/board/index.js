@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const boardStore = require('../../../../models/v2/BoardStore.js');
-const pieceStore = require('../../../../models/v2/PieceStore.js');
+const BoardStore = require('../../../../models/v2/BoardStore.js');
+const PieceStore = require('../../../../models/v2/PieceStore.js');
 const calcCandidate = require('./calcCandidate.js');
 const calcScore = require('./calcScore.js');
 const calcSize = require('./calcSize.js');
@@ -10,24 +10,26 @@ router.route('/').get(async (req, res) => {
   // userIdを取得
   const userId = +req.query.userId;
   // boardStoreより全体盤面を取得
-  const entireBoard = pieceStore.getPieces();
+  const entireBoard = PieceStore.getPieces();
+  console.log(entireBoard);
+
   // candidatesの初期化
-  boardStore.initCandidates();
+  BoardStore.initCandidates();
   // candidatesの取得
   const ans = calcCandidate.calc(userId, entireBoard);
   ans.forEach((elm) => {
-    boardStore.addCandidates(elm);
+    BoardStore.addCandidates(elm);
   });
   // scoreの取得
   const score = calcScore.calc(userId, entireBoard);
-  boardStore.addScore(score);
+  BoardStore.addScore(score);
   // sizeの取得
   const size = calcSize.calc(userId, entireBoard);
-  boardStore.addSize(size);
-  res.json(boardStore.getBoard());
+  BoardStore.addSize(size);
+  res.json(BoardStore.getBoard());
 })
   .delete((req, res) => {
-    pieceStore.deletePieces();
+    PieceStore.deletePieces();
     res.sendStatus(204);
   });
 

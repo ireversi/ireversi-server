@@ -1,5 +1,7 @@
 const router = require('express').Router();
 const PieceStore = require('../../../../models/v2/PieceStore.js');
+const StandbyStore = require('../../../../models/v2/StandbyStore.js');
+
 const calcScore = require('../board/calcScore.js');
 
 const dirXY = [
@@ -19,17 +21,11 @@ router.use((req, res, next) => {
 router.route('/')
   .post(async (req, res) => {
     const dateNow = Date.now(); // 受け取った時刻
-    const board = PieceStore.getBoard(); // board全体
-    const pcs = board.pieces; // 盤面のコマ。デフォルトのx:0, y:0, userId:1がいる
-    const stb = board.standbys; // スタンバイ中のマス
-    let status; // 置けたかどうか
-    const play = {
-      playNow: dateNow,
-      x: +req.body.x,
-      y: +req.body.y,
-      userId: +req.query.userId,
-    };
+    const pcs = PieceStore.getPieces(); // 盤面のコマ。テスト時はデフォルトのx:0, y:0, userId:1がいる
+    const stb = PieceStore.getStandbys(); // スタンバイ中のマス
+    const play = StandbyStore.getPlayInfo(req); // 送られてきた置きコマ
     const score = calcScore.calc(play.userId, pcs); // 置いてある自コマの数
+    let status; // 置けたかどうか
 
     // 自コマがスタンバイを置ける状態かを調べる
     if (score > 0) { // 自コマが他マスにあればfalse
@@ -57,19 +53,26 @@ router.route('/')
       }
     }
 
+    const piece = {
+      x: play.x,
+      y: play.y,
+      userId: play.userId,
+    };
+
     const playResult = { // boardに格納する形式
-      remaining: dateNow, // サーバーに届いた時刻
-      piece: {
-        x: play.x,
-        y: play.y,
-        userId: play.userId,
-      },
+      created: dateNow, // サーバーに届いた時刻
+      piece,
     };
 
     const playReturn = { // positionとして返す値
       status,
-      standby: { ...playResult },
+      standby: {
+        remaining: StandbyStore.getRemaining(dateNow),
+        piece,
+      },
     };
+    console.log(playReturn);
+
 
     if (status === true) {
       PieceStore.addStandby(playResult); // boardに追加

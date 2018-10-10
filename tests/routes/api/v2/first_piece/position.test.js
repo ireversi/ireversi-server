@@ -42,6 +42,8 @@ describe('piece', () => {
         });
 
       const res = response.body; // 返り値を１つずつ
+      console.log(res);
+
       const match = matches[i]; // 期待値を１つずつ
       const dateNow = Date.now(); // チェックする時刻
       const timeLog = dateNow - res.standby.remaining; // テストを投げた時刻とチェックする時刻との時間差

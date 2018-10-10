@@ -1,27 +1,27 @@
-const pieceModel = require('./PieceStore.js');
+const PieceStore = require('./PieceStore.js');
 // ありとあらゆる配列が入る
 // 取りあえず初期値
-const pieces = pieceModel.getPieces();
-const candidates = [];
-const standbys = [];
-let score = 0;
-let gSize = {};
+const pieces = PieceStore.getPieces();
+const candidates = PieceStore.getCandidates();
+const standbys = PieceStore.getStandbys();
+const score = PieceStore.getScore();
+const gSize = PieceStore.getSize();
 
 module.exports = {
   // addPiece(piece) {
   //   pieces.push(piece);
   // },
   addCandidates(candidate) {
-    candidates.push(candidate);
+    PieceStore.addCandidate(candidate);
   },
   initCandidates() {
-    candidates.length = 0;
+    PieceStore.deleteCandidates();
   },
   addScore(valscore) {
-    score = valscore;
+    PieceStore.addScore(valscore);
   },
   addSize(boardSize) {
-    gSize = boardSize;
+    PieceStore.addSize(boardSize);
   },
   getBoard() {
     return {

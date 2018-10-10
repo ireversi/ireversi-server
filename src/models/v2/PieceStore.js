@@ -11,14 +11,27 @@ module.exports = {
   addPiece(piece) { // 盤面にコマを追加する
     board.pieces.push(piece);
   },
+  addCandidate(candidate) {
+    board.candidates.push(candidate);
+  },
   addStandby(standby) {
     board.standbys.push(standby);
   },
+  addScore(score) {
+    board.score = score;
+  },
+  addSize(boardSize) {
+    board.size = boardSize;
+  },
   deletePieces() {
     board.pieces.length = 0;
+    this.initPieces();
   },
   deleteStandbys() {
     board.standbys.length = 0;
+  },
+  deleteCandidates() {
+    board.candidates.length = 0;
   },
   getBoard() {
     return board;
@@ -28,6 +41,15 @@ module.exports = {
   },
   getStandbys() {
     return board.standbys;
+  },
+  getCandidates() {
+    return board.candidates;
+  },
+  getScore() {
+    return board.score;
+  },
+  getSize() {
+    return board.size;
   },
   initPieces() {
     this.addPiece(
