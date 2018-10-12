@@ -1,7 +1,6 @@
 const router = require('express').Router();
 
 router.use('/fujii/playing', require('./fujii/playing.js'));
-router.use('/matsui/playing', require('./matsui/playing.js'));
 router.use('/matsuda/playing', require('./matsuda/playing.js'));
 router.use('/hi85/playing', require('./hi85/playing.js'));
 router.use('/momii/playing', require('./momii/playing.js'));
