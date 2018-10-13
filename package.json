@@ -26,6 +26,9 @@
     "klaw-sync": "4.0.0",
     "mongodb-memory-server": "2.0.1",
     "mongoose": "5.2.9",
+    "passport": "0.4.0",
+    "passport-jwt": "4.0.0",
+    "random-hash": "4.0.1",
     "swagger-jsdoc": "3.0.2",
     "swagger-ui-express": "3.0.10"
   },

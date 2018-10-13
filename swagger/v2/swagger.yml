@@ -296,20 +296,54 @@ definitions:
     properties:
       userId:        
         name: "userId"
-        type: number
+        type: "string"
         description: "userId"
         example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
         in: "formData"
         required: true
+  accessToken:
+    type: "string"
+    description: "post accessToken"
+    properties:
+      accessToken:
+        name: "accessToken"
+        type: "string"
+        description: "post accessToken"
+        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        in: "formData"
+        required: true
+
 
 /userIdGenerate:
-  get:
+  post:
     tags:
       - "userId"
     summary: "generate new userId by JWT"
     description: "userIdの新規生成"
     responses:
       200:
-        description: "create new userId by JWT"
+        description: "return a new userId"
         schema:
-          $ref: "#/definitions/userId"
+          type: "object"
+          properties:
+            userId:
+              $ref: "#/definitions/userId"
+/accessTest:
+  post:
+    tags:
+      - access test
+    summary: "set a piece on board"
+    description: |
+      - accessToken
+        - accessTokenを返す
+    parameters:
+      - name: "accessToken"
+        in: "header"
+    responses:
+      200:
+        description: "post accessToken with JWT"
+        schema:
+          type: "string"
+          properties:
+            accessToken:
+              $ref: "#/definitions/accessToken"
