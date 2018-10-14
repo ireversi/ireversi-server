@@ -1,11 +1,15 @@
+const StandbyStore = require('./StandbyStore.js');
+const calcScore = require('../../routes/api/v2/board/calcScore.js');
+
 const board = {
   pieces: [],
   candidates: [],
   standbys: [],
-  score: Number,
+  score: 0,
   size: {},
 };
-const waitTime = 3000; // remainingに設定する待ち時間
+
+const waitTime = StandbyStore.getWaitTime();
 
 module.exports = {
   addPiece(piece) { // 盤面にコマを追加する
@@ -18,14 +22,14 @@ module.exports = {
     board.standbys.push(standby);
   },
   addScore(score) {
-    board.score = score;
+    board.score += score;
   },
   addSize(boardSize) {
     board.size = boardSize;
   },
   deletePieces() {
     board.pieces.length = 0;
-    this.initPieces();
+    this.initPieces(); // 初期値を置く
   },
   deleteStandbys() {
     board.standbys.length = 0;
@@ -33,20 +37,41 @@ module.exports = {
   deleteCandidates() {
     board.candidates.length = 0;
   },
-  getBoard() {
-    return board;
+  getBoard(userId) {
+    const sendStandbys = this.getStandbys();
+    const sendScore = calcScore.calc(userId, board.pieces);
+    const sendBoard = {
+      pieces: board.pieces,
+      candidates: board.candidates,
+      standbys: sendStandbys,
+      score: sendScore,
+      size: board.size,
+    };
+    return sendBoard;
   },
   getPieces() {
     return board.pieces;
   },
   getStandbys() {
+    const stbs = board.standbys;
+    if (stbs.length >= 1) {
+      for (let i = 0; i < stbs.length; i += 1) {
+        const remaining = StandbyStore.getRemaining(stbs[i].created);
+        if (remaining <= 0) {
+          board.standbys.splice(i, 1);
+        } else {
+          board.standbys[i].remaining = remaining;
+        }
+      }
+    }
     return board.standbys;
   },
   getCandidates() {
     return board.candidates;
   },
-  getScore() {
-    return board.score;
+  getScore(userId) {
+    const sendScore = calcScore.calc(userId, board.pieces);
+    return sendScore;
   },
   getSize() {
     return board.size;
@@ -61,107 +86,8 @@ module.exports = {
     );
     return board;
   },
-  array2Pieces(source) {
-    const array = []; // 返す配列
-    const sqrt = Math.sqrt(source.length); // 平方根
-    const sourceExist = [];
-    for (let i = 0; i < source.length; i += 1) {
-      const f = source[i];
-      if (Array.isArray(f)) {
-        for (let j = 0; j < f.length; j += 1) {
-          const g = [i, f[j]];
-          sourceExist.push(g);
-        }
-      } else if (f !== 0) {
-        const g = [i, f];
-        sourceExist.push(g);
-      }
-    }
-    const playOrder = sourceExist.sort((a, b) => (parseInt(a[1].slice(a[1].indexOf(':') + 1), 10)) - (parseInt(b[1].slice(b[1].indexOf(':') + 1), 10)));
-    let n = 0;
-    let elm = {};
-    for (let i = 0; i < playOrder.length; i += 1) { // x, y, userIdを生成する
-      const order = playOrder[i][0];
-      const x = order % sqrt;
-      const y = Math.floor(((source.length - 1) - order) / sqrt);
-      const userId = parseInt(playOrder[n][1].slice(playOrder[n][1].indexOf(':') - 1), 10);
-      elm = { x, y, userId };
-      n += 1;
-      array.push(elm);
-    }
-    return array;
-  },
-  array2Matchers(source) {
-    const array = []; // 返す配列
-    const sqrt = Math.sqrt(source.length); // 平方根
-    const sourceExist = [];
-    // 送られた配列から0をスキップ、要素が配列になっているものをばらした配列を生成
-    for (let i = 0; i < source.length; i += 1) {
-      const element = source[i];
-      if (Array.isArray(element)) { // 要素が配列の場合
-        for (let j = 0; j < element.length; j += 1) {
-          const h = [i, element[j]];
-          sourceExist.push(h);
-        }
-      } else if (element !== 0) {
-        const h = [i, element];
-        sourceExist.push(h);
-      }
-    }
-
-    // 要素にfがあるかないかでtrueかfalseを決定
-    for (let i = 0; i < sourceExist.length; i += 1) {
-      const el = sourceExist[i];
-      const order = el[0];
-      if (el[1].match(/f/)) { // fがついていたらfalseを付与、なければtrueを付与
-        const piece = el[1].replace(/:f/, ''); // :fの文字を削除
-        sourceExist[i] = [order, piece, false];
-      } else {
-        sourceExist[i] = [order, el[1], true];
-      }
-    }
-
-    // プレイ順に並び替え
-    const playOrder = sourceExist.sort((a, b) => (parseInt(a[1].slice(a[1].indexOf(':') + 1), 10)) - (parseInt(b[1].slice(b[1].indexOf(':') + 1), 10)));
-
-    let n = 0;
-    let elm = {};
-    for (let i = 0; i < playOrder.length; i += 1) { // x, y, userIdを生成する
-      const order = playOrder[i][0];
-      const x = order % sqrt;
-      const y = Math.floor(((source.length - 1) - order) / sqrt);
-      const userId = parseInt(playOrder[n][1].slice(playOrder[n][1].indexOf(':') - 1), 10);
-      const status = playOrder[i][2];
-      elm = {
-        status,
-        piece: {
-          x,
-          y,
-          userId,
-        },
-      };
-      n += 1;
-      array.push(elm);
-    }
-    return array;
-  },
   seeNext(array, nextPieceX, nextPieceY) {
     return array.find(p => p.x === nextPieceX && p.y === nextPieceY);
-  },
-  array2Standbys(array) {
-    const results = [];
-    const matchArray = this.array2Matchers(array);
-    for (let i = 0; i < matchArray.length; i += 1) {
-      const match = matchArray[i];
-      const result = {
-        status: match.status,
-        standby: {
-          piece: match.piece,
-        },
-      };
-      results.push(result);
-    }
-    return results;
   },
   getWaitTime() {
     return waitTime;

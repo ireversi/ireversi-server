@@ -1,11 +1,13 @@
-const PieceStore = require('./PieceStore.js');
+const config = require('../../config.js'); // remainingに設定する待ち時間
 
-const waitTime = PieceStore.getWaitTime();
+const { waitTime } = config;
 
 module.exports = {
+  getWaitTime() {
+    return waitTime;
+  },
   getRemaining(created) {
-    const dateNow = Date.now(); // チェックする時刻
-    const timeLog = dateNow - created; // テストを投げた時刻とチェックする時刻との時間差
+    const timeLog = Date.now() - created; // テストを投げた時刻とチェックする時刻との時間差
     const remaining = waitTime - timeLog; // 待機時間3000ミリ秒からの残り時間
     return remaining;
   },

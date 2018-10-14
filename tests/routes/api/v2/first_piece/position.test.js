@@ -1,26 +1,28 @@
 const chai = require('chai');
 const PieceStore = require('../../../../../src/models/v2/PieceStore.js');
+const array2Pieces = require('../../../../../src/utils/array2Pieces.js');
+const array2Standbys = require('../../../../../src/utils/array2Standbys.js');
 const app = require('../../../../../src/routes/app.js');
 
-const waitTime = PieceStore.getWaitTime();
-
 const basePath = '/api/v2/first_piece';
+const waitTime = PieceStore.getWaitTime();
+const sleep = msec => new Promise(resolve => setTimeout(resolve, msec));
 
 describe('piece', () => {
-  // テスト①-A 1つのposition置いて、返り値との比較
+  // テスト：positionが置けるか。
   it('is stoodby in a board array', async () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
+    const pieces = array2Pieces.array2Pieces(
       [
         '4:1', '5:2',
         '5:3', 0,
       ],
     );
 
-    const matches = PieceStore.array2Standbys(
+    const matches = array2Standbys.array2Standbys(
       [
         '4:1', '5:2:f',
         '5:3:f', 0,
@@ -42,28 +44,24 @@ describe('piece', () => {
         });
 
       const res = response.body; // 返り値を１つずつ
-      console.log(res);
-
       const match = matches[i]; // 期待値を１つずつ
-      const dateNow = Date.now(); // チェックする時刻
-      const timeLog = dateNow - res.standby.remaining; // テストを投げた時刻とチェックする時刻との時間差
-      const remaining = waitTime - timeLog; // 待機時間3000ミリ秒からの残り時間
 
       // Then
       expect(res.status).toEqual(match.status); // 置けたかの判定が合っているか
-      expect(remaining).toBeLessThanOrEqual(waitTime); // 時間が経過して3000ミリ秒から時間が減っているか
+      expect(res.standby.remaining).toBeLessThanOrEqual(waitTime); // 時間が経過し、待機時間から時間が減っているか
       expect(res.standby.piece).toMatchObject(match.standby.piece); // pieceの値が合っているか
     }
   });
 
-  // テスト①-B 1つのposition置いて、Board内のStandbyに格納されているかの確認
-  // 入っていないことを確認するテストも同時に行う。
+  // テスト：置いたpositionが、Board内のStandbyに格納されているかの確認
+  // 入っていたら、createdの情報からgetRemainingを再度叩いてremainingを確認する
+  // 置けないコマの場合、Boardに入っていないことを確認するテストも同時に行う。
   it('is confirmed to be in standbys of board array', async () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
+    const pieces = array2Pieces.array2Pieces(
       [
         '4:1', '5:2',
         '5:3', 0,
@@ -72,30 +70,27 @@ describe('piece', () => {
 
     // When
     for (let i = 0; i < pieces.length; i += 1) {
-      const piece = pieces[i];
+      const p = pieces[i];
       response = await chai.request(app)
         .post(`${basePath}/position`)
-        .query({ userId: piece.userId })
+        .query({ userId: p.userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send({
-          x: piece.x,
-          y: piece.y,
+          x: p.x,
+          y: p.y,
         });
 
-      const standbys = PieceStore.getStandbys();
+      const { standbys } = PieceStore.getBoard();
       const res = response.body; // 返り値を１つずつ
-      const dateNow = Date.now(); // チェックする時刻
-      const timeLog = dateNow - res.standby.remaining; // テストを投げた時刻とチェックする時刻との時間差
-      const remaining = waitTime - timeLog; // 待機時間3000ミリ秒からの残り時間
 
       // Then
       // 返り値のstatusがtrueのときはstandbysに入ってるか確認
-      if (res.status === true) {
+      if (res.status) {
         for (let j = 0; j < standbys.length; j += 1) {
-          const standby = standbys[j];
-          const stbPiece = standby.piece;
-          expect(remaining).toBeLessThanOrEqual(waitTime); // 時間が経過して3000ミリ秒から時間が減っているか
-          expect(res.standby.piece).toMatchObject(stbPiece); // pieceの値が合っているか
+          const standby = standbys[j]; // board内のstandby情報
+          const { piece, remaining } = standby; // standbyのpieceとremainingの情報
+          expect(remaining).toBeLessThanOrEqual(waitTime); // 時間が経過して待機時間から時間が減っているか
+          expect(res.standby.piece).toMatchObject(piece); // pieceの値が合っているか
         }
       } else { // falseのときは、stanbdysに入っていないことを確認
         for (let j = 0; j < standbys.length; j += 1) {
@@ -107,14 +102,13 @@ describe('piece', () => {
     }
   });
 
-  // テスト②-A 返り値との比較
-  // 他コマ（デフォルトコマ）の上には置けない。それ以外は置ける。
+  // テスト：他コマ（デフォルトコマ）の上には置けない。それ以外は置ける。
   it('is stoodby in a board array', async () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
+    const pieces = array2Pieces.array2Pieces(
       [
         '1:1', 0, '4:4',
         '3:3', '2:2', '5:5',
@@ -122,7 +116,7 @@ describe('piece', () => {
       ],
     );
 
-    const matches = PieceStore.array2Standbys(
+    const matches = array2Standbys.array2Standbys(
       [
         '1:1:f', 0, '4:4:f',
         '3:3', '2:2:f', '5:5:f',
@@ -146,107 +140,69 @@ describe('piece', () => {
 
       const res = response.body; // 返り値を１つずつ
       const match = matches[i]; // 期待値を１つずつ
-      const dateNow = Date.now(); // チェックする時刻
-      const timeLog = dateNow - res.standby.remaining; // テストを投げた時刻とチェックする時刻との時間差
-      const remaining = waitTime - timeLog; // 待機時間3000ミリ秒からの残り時間
 
       // Then
       expect(res.status).toEqual(match.status); // 置けたかの判定が合っているか
-      expect(remaining).toBeLessThanOrEqual(waitTime); // 時間が経過して3000ミリ秒から時間が減っているか
+      expect(res.standby.remaining).toBeLessThanOrEqual(waitTime); // 時間が経過して3000ミリ秒から時間が減っているか
       expect(res.standby.piece).toMatchObject(match.standby.piece); // pieceの値が合っているか
     }
   });
 
-  // テスト②-B Board内のStandbysに格納されているかの確認
-  // 送った値がBoard内のstandbysに入っているかのテスト
-  // 他コマ（デフォルトコマ）の上には置けない。それ以外は置ける。
+  // テスト：waitTimeを過ぎると、Board内のStandbysが消えているかのテスト
+  // 送った値がBoard内のstandbysに入っているか、waitTimeで待機したあとに消えているかで比較
   it('is confirmed to be in standbys of board array', async () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
+    const pieces = array2Pieces.array2Pieces(
       [
-        '4:1', '5:2',
-        '5:3', 0,
+        '4:1', 0,
+        0, 0,
       ],
     );
 
     // When
     for (let i = 0; i < pieces.length; i += 1) {
-      const piece = pieces[i];
+      const p = pieces[i];
       response = await chai.request(app)
         .post(`${basePath}/position`)
-        .query({ userId: piece.userId })
+        .query({ userId: p.userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send({
-          x: piece.x,
-          y: piece.y,
+          x: p.x,
+          y: p.y,
         });
 
-      const standbys = PieceStore.getStandbys();
       const res = response.body; // 返り値を１つずつ
-      const dateNow = Date.now(); // チェックする時刻
-      const timeLog = dateNow - res.standby.remaining; // テストを投げた時刻とチェックする時刻との時間差
-      const remaining = waitTime - timeLog; // 待機時間3000ミリ秒からの残り時間
 
       // Then
-      // 返り値のstatusがtrueのときはstandbysに入ってるか確認
-      if (res.status === true) {
+      // waitTimeを待たずにStandbyを確認したら格納されている
+      if (res.status) {
+        const standbys = PieceStore.getStandbys();
         for (let j = 0; j < standbys.length; j += 1) {
-          const standby = standbys[j];
-          const stbPiece = standby.piece;
+          const standby = standbys[j]; // board内のstandby情報
+          const { piece, remaining } = standby;
           expect(remaining).toBeLessThanOrEqual(waitTime); // 時間が経過して3000ミリ秒から時間が減っているか
-          expect(res.standby.piece).toMatchObject(stbPiece); // pieceの値が合っているか
+          expect(res.standby.piece).toMatchObject(piece); // pieceの値が合っているか
         }
-      } else { // falseのときは、stanbdysに入っていないことを確認
+      } else { // falseのときは、stanbdysに入っていないことを念のために確認
         for (let j = 0; j < standbys.length; j += 1) {
           const standby = standbys[j];
-          const stbPiece = standby.piece;
-          expect(res.standby.piece).not.toMatchObject(stbPiece); // notして、入っていないことを確認
+          const { piece } = standby;
+          expect(res.standby.piece).not.toMatchObject(piece); // notして、入っていないことを確認
         }
       }
-    }
-  });
-
-  // テスト③ remainingの待機時間が動作するかのテスト
-  // expectを3000ミリ秒後に起動して、現在時刻との時差が3000ミリ秒以上あることを確認する
-  it('remain 3000 ms after waiting 3000 ms', async () => {
-    // Reset
-    const sleep = msec => new Promise(resolve => setTimeout(resolve, msec));
-
-    await chai.request(app).delete(`${basePath}`);
-    jest.useRealTimers();
-
-    // Given
-    const pieces = PieceStore.array2Pieces(
-      [
-        0, 0,
-        0, '2:1',
-      ],
-    );
-
-    // When
-
-    let response;
-
-    for (let i = 0; i < pieces.length; i += 1) {
-      const piece = pieces[i];
-      response = await chai.request(app)
-        .post(`${basePath}/position`)
-        .query({ userId: piece.userId })
-        .set('content-type', 'application/x-www-form-urlencoded')
-        .send({
-          x: piece.x,
-          y: piece.y,
-        });
-
-      const res = response.body; // 返り値を１つずつ
-      await sleep(3000); // 3000ミリ秒待機
-      const dateNow = Date.now(); // チェックする時刻
-      const timeLog = dateNow - res.standby.remaining; // テストを投げた時刻とチェックする時刻との時間差
-      const remaining = waitTime - timeLog; // 待機時間3000ミリ秒からの残り時間
-      expect(remaining).toBeLessThanOrEqual(0); // 3000ミリ秒が経った結果、remainingが0よりも小さいか
+      // Then
+      // waitTimeが経ったあとにstandbyが空になっているかの確認
+      if (res.status) {
+        await sleep(waitTime); // 3500ミリ秒待機
+        const standbys = PieceStore.getStandbys();
+        for (let j = 0; j < standbys.length; j += 1) {
+          const standby = standbys[j]; // board内のstandby情報
+          expect(standby).toBe(undefined); // waitTimeが経過して、undefinedになっている
+        }
+      }
     }
   });
 });

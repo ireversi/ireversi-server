@@ -23,17 +23,18 @@ router.route('/')
     const dateNow = Date.now(); // 受け取った時刻
     const pcs = PieceStore.getPieces(); // 盤面のコマ。テスト時はデフォルトのx:0, y:0, userId:1がいる
     const stb = PieceStore.getStandbys(); // スタンバイ中のマス
-    const play = StandbyStore.getPlayInfo(req); // 送られてきた置きコマ
-    const score = calcScore.calc(play.userId, pcs); // 置いてある自コマの数
+    const { x, y, userId } = StandbyStore.getPlayInfo(req); // 送られてきた置きコマ
+
+    const score = calcScore.calc(userId, pcs); // 置いてある自コマの数
     let status; // 置けたかどうか
 
     // 自コマがスタンバイを置ける状態かを調べる
     if (score > 0) { // 自コマが他マスにあればfalse
       status = false;
-    } else if (stb.find(s => s.piece.x === play.x && s.piece.y === play.y)) {
+    } else if (stb.find(s => s.piece.x === x && s.piece.y === y)) {
       // 置こうとするマスに他コマがスタンバイであればfalse
       status = false;
-    } else if (pcs.find(pc => pc.x === play.x && pc.y === play.y)) {
+    } else if (pcs.find(pc => pc.x === x && pc.y === y)) {
       // 置こうとするマスに他コマがあればfalse
       status = false;
     } else {
@@ -42,8 +43,8 @@ router.route('/')
       for (let i = 0; i < dirXY.length; i += 1) {
         const dirX = dirXY[i][0];
         const dirY = dirXY[i][1];
-        const aroundX = play.x + dirX;
-        const aroundY = play.y + dirY;
+        const aroundX = x + dirX;
+        const aroundY = y + dirY;
         if (pcs.find(pc => pc.x === aroundX && pc.y === aroundY)) {
           status = true;
           break;
@@ -53,32 +54,24 @@ router.route('/')
       }
     }
 
-    const piece = {
-      x: play.x,
-      y: play.y,
-      userId: play.userId,
-    };
-
-    const playResult = { // boardに格納する形式
-      created: dateNow, // サーバーに届いた時刻
+    const remaining = status ? StandbyStore.getRemaining(dateNow) : 0;
+    const piece = { x, y, userId };
+    const playResult = { // piecesに格納する値
+      created: dateNow,
+      remaining,
       piece,
     };
-
     const playReturn = { // positionとして返す値
       status,
       standby: {
-        remaining: StandbyStore.getRemaining(dateNow),
+        remaining,
         piece,
       },
     };
-    console.log(playReturn);
 
-
-    if (status === true) {
+    if (status) {
       PieceStore.addStandby(playResult); // boardに追加
-      await res.send(playReturn); // 1プレイの結果を返す
-    } else {
-      await res.send(playReturn); // 1プレイの結果を返す
     }
+    await res.send(playReturn); // 1プレイの結果を返す
   });
 module.exports = router;

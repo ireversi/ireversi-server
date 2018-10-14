@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const PieceStore = require('../../../../models/v2/PieceStore.js');
-
+const StandbyStore = require('../../../../models/v2/StandbyStore.js');
 
 // for CORS
 router.use((req, res, next) => {
@@ -12,29 +12,11 @@ router.use((req, res, next) => {
 router.route('/position')
   .post((req, res) => {
     const pieces = PieceStore.getPieces();
-    const piece = {
-      x: +req.body.x,
-      y: +req.body.y,
-      userId: +req.query.userId,
-    };
-
-    // // 置ける状態であればtrueを返す
-    // if (pieces.find(p => p.standby.piece.x === piece.x && p.standby.piece.y === piece.y)) {
-    //   status = false;
-    //   res.json(PieceStore.getPieces());
-    // } else {
-    //   status = true;
-    // }
-
+    const { x, y, userId } = StandbyStore.getPlayInfo(req); // 送られてきた置きコマ
     const pieceResult = {
       // status,
       standby: {
-        // remaining: dateNow, // サーバーに届いた時刻
-        piece: {
-          x: piece.x,
-          y: piece.y,
-          userId: piece.userId,
-        },
+        piece: { x, y, userId },
       },
     };
 

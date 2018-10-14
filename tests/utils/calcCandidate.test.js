@@ -133,3 +133,41 @@ describe('calcCandidate', () => {
     expect(response).toEqual(expect.arrayContaining(matchers));
   });
 });
+
+describe('calcCandidate', () => {
+  it('calcs candidates to resolve Ando-san issue', async () => {
+  // Given
+    userId = 2;
+
+    const testCase = convertComparisonResult(
+      [
+        0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 2, 0,
+        0, 1, 1, 1, 2, 0, 0,
+        0, 0, 0, 2, 3, 0, 0,
+        0, 0, 0, 0, 2, 0, 0,
+        0, 0, 0, 0, 0, 0, 0,
+      ],
+    );
+
+    const matchers = convertCandidateList(
+      [
+        0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0,
+        0, userId, 0, userId, 0, 0, 0,
+        userId, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, userId, 0,
+        0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0,
+      ],
+    );
+
+    // await Promise.all(matchers.map(m => PieceModel(m).save()));
+    // When
+    const response = calcCandidate.calc(userId, testCase);
+    // Then
+    expect(response).toHaveLength(matchers.length);
+    expect(response).toEqual(expect.arrayContaining(matchers));
+  });
+});

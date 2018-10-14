@@ -1,5 +1,7 @@
 const chai = require('chai');
 const PieceStore = require('../../../../../src/models/v2/PieceStore.js');
+const array2Pieces = require('../../../../../src/utils/array2Pieces.js');
+const array2Standbys = require('../../../../../src/utils/array2Standbys.js');
 const app = require('../../../../../src/routes/app.js');
 
 const waitTime = PieceStore.getWaitTime();
@@ -23,14 +25,14 @@ describe('position', () => {
       await chai.request(app).delete(`${basePath}`);
 
       // Given
-      const pieces = PieceStore.array2Pieces(
+      const pieces = array2Pieces.array2Pieces(
         [
           '1:1', '2:2',
           '3:3', 0,
         ],
       );
 
-      const matches = PieceStore.array2Standbys(
+      const matches = array2Standbys.array2Standbys(
         [
           '1:1', '2:2',
           '3:3', 0,
@@ -72,14 +74,14 @@ describe('position', () => {
       await chai.request(app).delete(`${basePath}`);
 
       // Given
-      const pieces = PieceStore.array2Pieces(
+      const pieces = array2Pieces.array2Pieces(
         [
           '1:1', ['2:2', '4:4'],
           '3:3', 0,
         ],
       );
 
-      const matches = PieceStore.array2Standbys(
+      const matches = array2Standbys.array2Standbys(
         [
           '1:1', ['2:2', '4:4'],
           '3:3', 0,
@@ -120,7 +122,7 @@ describe('position', () => {
 
       // Given
       // 作っておく盤面
-      const pieces = PieceStore.array2Pieces(
+      const pieces = array2Pieces.array2Pieces(
         [
           '1:1', '2:2', 0,
           0, 0, 0,
@@ -128,7 +130,7 @@ describe('position', () => {
         ],
       );
 
-      const matches = PieceStore.array2Standbys(
+      const matches = array2Standbys.array2Standbys(
         [
           '1:1', '2:2', 0,
           0, 0, 0,
@@ -177,10 +179,3 @@ describe('position', () => {
     });
   });
 });
-
-
-// 1つの値を送る
-// response
-// swagger:
-// postで送ったらstatusとpiece(自分の結果だけ表示)
-// direction: piece, directionだけ返す
