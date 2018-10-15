@@ -21,8 +21,6 @@
   "dependencies": {
     "dotenv": "6.0.0",
     "express": "4.16.3",
-    "jsonwebtoken": "8.3.0",
-    "jwt-decode": "2.2.0",
     "klaw-sync": "4.0.0",
     "mongodb-memory-server": "2.0.1",
     "mongoose": "5.2.9",

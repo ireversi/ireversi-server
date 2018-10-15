@@ -1,7 +1,7 @@
 const chai = require('chai');
 const app = require('../../../../../src/routes/app.js');
 // const boardStore = require('../../../../../src/models/v2/BoardStore.js');
-const pieceStore = require('../../../../../src/models/v2/PieceStore.js');
+const PieceStore = require('../../../../../src/models/v2/PieceStore.js');
 
 const basePath = '/api/v2/board';
 
@@ -76,7 +76,7 @@ describe('board', () => {
           y: Math.floor(index / size),
           userId: elm,
         };
-        pieceStore.addPiece(ans);
+        PieceStore.addPiece(ans);
       }
     });
     // await Promise.all(matchers.map(m => PieceStore(m).save()));
@@ -113,7 +113,7 @@ describe('board after turnover', () => {
           y: Math.floor(index / sizePre),
           userId: elm,
         };
-        pieceStore.addPiece(ans);
+        PieceStore.addPiece(ans);
       }
     });
     // 2nd piece set
@@ -132,7 +132,7 @@ describe('board after turnover', () => {
           y: Math.floor(index / sizeFol),
           userId: elm,
         };
-        pieceStore.addPiece(ans);
+        PieceStore.addPiece(ans);
       }
     });
     const userId = 3;

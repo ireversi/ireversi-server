@@ -1,4 +1,4 @@
-exports.calc = function calcSize(userId, pieces) {
+exports.calc = function calcSize(pieces) {
   let xMin = 0;
   let xMax = 0;
   let yMin = 0;
