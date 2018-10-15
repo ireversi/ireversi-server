@@ -1,5 +1,7 @@
 const chai = require('chai');
 const PieceStore = require('../../../../../src/models/v2/PieceStore.js');
+const array2Pieces = require('../../../../../src/utils/array2Pieces.js');
+const array2Matchers = require('../../../../../src/utils/array2Matchers.js');
 const app = require('../../../../../src/routes/app.js');
 
 const basePath = '/api/v2/piece/';
@@ -16,7 +18,7 @@ describe('piece', () => {
     /* -----------------------*/
     await chai.request(app).delete(`${basePath}`);
 
-    const matches = PieceStore.array2Matchers(
+    const matches = array2Matchers.array2Matchers(
       [
         0, 0, 0,
         0, 0, 0,
@@ -38,7 +40,7 @@ describe('piece', () => {
 
     // Given
     // デフォルトで { x: 0, y: 0, userId: 1 } があります
-    const pieces = PieceStore.array2Pieces(
+    const pieces = array2Pieces.array2Pieces(
       [
         0, 0,
         ['2:1'], 0,
@@ -46,7 +48,7 @@ describe('piece', () => {
     );
 
     // 置けないコマは'1:3:f'と、最後にfを付ける
-    const matches = PieceStore.array2Matchers(
+    const matches = array2Matchers.array2Matchers(
       [
         0, 0,
         ['2:1:f'], 0,
@@ -84,7 +86,7 @@ describe('piece', () => {
 
     // Given
     // デフォルトで { x: 0, y: 0, userId: 1 } があります
-    const pieces = PieceStore.array2Pieces(
+    const pieces = array2Pieces.array2Pieces(
       [
         0, 0, 0,
         0, ['3:2', '5:3'], 0,
@@ -93,7 +95,7 @@ describe('piece', () => {
     );
 
     // 置けないコマは'1:3:f'と、最後にfを付ける
-    const matches = PieceStore.array2Matchers(
+    const matches = array2Matchers.array2Matchers(
       [
         0, 0, 0,
         0, ['3:2', '5:3:f'], 0,
@@ -131,7 +133,7 @@ describe('piece', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
+    const pieces = array2Pieces.array2Pieces(
       [
         0, 0, 0,
         '3:1', ['4:2', '2:3'], '3:4',
@@ -139,7 +141,7 @@ describe('piece', () => {
       ],
     );
 
-    const matches = PieceStore.array2Matchers(
+    const matches = array2Matchers.array2Matchers(
       [
         0, 0, 0,
         '3:1', ['4:2', '2:3:f'], '3:4',
@@ -177,14 +179,14 @@ describe('piece', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
+    const pieces = array2Pieces.array2Pieces(
       [
         '1:1', '2:2',
         0, '1:3',
       ],
     );
 
-    const matches = PieceStore.array2Matchers(
+    const matches = array2Matchers.array2Matchers(
       [
         '1:1:f', '2:2:f',
         0, '1:3:f',
@@ -195,7 +197,6 @@ describe('piece', () => {
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
       const match = matches[i];
-
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
@@ -221,7 +222,7 @@ describe('piece', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
+    const pieces = array2Pieces.array2Pieces(
       [
         '1:1', 0, 0,
         0, 0, '2:4',
@@ -229,7 +230,7 @@ describe('piece', () => {
       ],
     );
 
-    const matches = PieceStore.array2Matchers(
+    const matches = array2Matchers.array2Matchers(
       [
         '1:1:f', 0, 0,
         0, 0, '2:4:f',
@@ -241,13 +242,11 @@ describe('piece', () => {
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
       const match = matches[i];
-
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
-
       // Then
       expect(response.body).toEqual(match);
       expect(response.body).toEqual(expect.objectContaining({
@@ -267,7 +266,7 @@ describe('piece', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
+    const pieces = array2Pieces.array2Pieces(
       [
         '1:1', 0, '2:2',
         0, 0, 0,
@@ -275,7 +274,7 @@ describe('piece', () => {
       ],
     );
 
-    const matches = PieceStore.array2Matchers(
+    const matches = array2Matchers.array2Matchers(
       [
         '1:1:f', 0, '2:2:f',
         0, 0, 0,
@@ -287,7 +286,6 @@ describe('piece', () => {
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
       const match = matches[i];
-
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
@@ -313,7 +311,7 @@ describe('piece', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
+    const pieces = array2Pieces.array2Pieces(
       [
         '2:5', 0, ['2:4', '7:7'],
         '4:3', '5:2', 0,
@@ -321,7 +319,7 @@ describe('piece', () => {
       ],
     );
 
-    const matches = PieceStore.array2Matchers(
+    const matches = array2Matchers.array2Matchers(
       [
         '2:5', 0, ['2:4:f', '7:7:f'],
         '4:3', '5:2', 0,
@@ -333,7 +331,6 @@ describe('piece', () => {
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
       const match = matches[i];
-
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
@@ -359,7 +356,7 @@ describe('piece', () => {
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
+    const pieces = array2Pieces.array2Pieces(
       [
         '1:1', '2:4', 0,
         0, ['3:3', '3:5'], 0,
@@ -367,7 +364,7 @@ describe('piece', () => {
       ],
     );
 
-    const matches = PieceStore.array2Matchers(
+    const matches = array2Matchers.array2Matchers(
       [
         '1:1:f', '2:4:f', 0,
         0, ['3:3:f', '3:5:f'], 0,
@@ -379,13 +376,11 @@ describe('piece', () => {
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
       const match = matches[i];
-
       response = await chai.request(app)
         .post(`${basePath}`)
         .query({ userId: pieces[i].userId })
         .set('content-type', 'application/x-www-form-urlencoded')
         .send(pieces[i]);
-
       // Then
       expect(response.body).toEqual(match);
       expect(response.body).toEqual(expect.objectContaining({
@@ -399,13 +394,12 @@ describe('piece', () => {
     }
   });
 
-  //
   it('can flip with defalut piece', async () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
 
     // Given
-    const pieces = PieceStore.array2Pieces(
+    const pieces = array2Pieces.array2Pieces(
       [
         0, 0, '1:5',
         0, '3:2', '4:3',
@@ -413,7 +407,7 @@ describe('piece', () => {
       ],
     );
 
-    const matches = PieceStore.array2Matchers(
+    const matches = array2Matchers.array2Matchers(
       [
         0, 0, '1:5',
         0, '3:2', '4:3',

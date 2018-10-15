@@ -48,7 +48,7 @@ describe('calcSize', () => {
     };
 
     // When
-    const response = calcScore.calc(userId, testCase);
+    const response = calcScore.calc(testCase);
     // Then
     expect(response).toEqual(answer);
   });

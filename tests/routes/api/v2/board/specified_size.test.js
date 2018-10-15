@@ -1,7 +1,6 @@
 const chai = require('chai');
 const app = require('../../../../../src/routes/app.js');
-// const boardStore = require('../../../../../src/models/v2/BoardStore.js');
-const pieceStore = require('../../../../../src/models/v2/PieceStore.js');
+const PieceStore = require('../../../../../src/models/v2/PieceStore.js');
 const calcCandidates = require('../../../../../src/routes/api/v2/board/calcCandidate');
 const calcScore = require('../../../../../src/routes/api/v2/board/calcScore');
 
@@ -53,7 +52,7 @@ describe('board/specified_size', () => {
           y: Math.floor(index / size),
           userId: elm,
         };
-        pieceStore.addPiece(ans);
+        PieceStore.addPiece(ans);
       }
     });
 
@@ -63,7 +62,7 @@ describe('board/specified_size', () => {
       9, 0, 2,
     ];
     const ansResult = convertResult(result, xMin, yMin);
-    const entireBoard = pieceStore.getPieces();
+    const entireBoard = PieceStore.getPieces();
     const ansCandidates = calcCandidates.calc(userId, entireBoard);
 
     const score = calcScore.calc(userId, entireBoard);
