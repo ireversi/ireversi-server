@@ -1,5 +1,6 @@
 const chai = require('chai');
 const PieceStore = require('../../../../../src/models/v2/PieceStore.js');
+const BoardStore = require('../../../../../src/models/v2/BoardStore.js');
 const array2Pieces = require('../../../../../src/utils/array2Pieces.js');
 const array2Standbys = require('../../../../../src/utils/array2Standbys.js');
 const app = require('../../../../../src/routes/app.js');
@@ -80,7 +81,7 @@ describe('piece', () => {
           y: p.y,
         });
 
-      const { standbys } = PieceStore.getBoard();
+      const { standbys } = BoardStore.getBoard();
       const res = response.body; // 返り値を１つずつ
 
       // Then
