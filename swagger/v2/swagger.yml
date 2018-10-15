@@ -314,7 +314,7 @@ definitions:
         required: true
 
 
-/userIdGenerate:
+/user_id_generate:
   post:
     tags:
       - "userId"
@@ -328,22 +328,26 @@ definitions:
           properties:
             userId:
               $ref: "#/definitions/userId"
-/accessTest:
+securityDefinitions:
+  tokenAuth:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+/access_auth:
   post:
+    x-swagger-router-controller: test
+    operationId: test_post
+    security:
+    - tokenAuth: []
     tags:
-      - access test
-    summary: "set a piece on board"
-    description: |
-      - accessToken
-        - accessTokenを返す
-    parameters:
-      - name: "accessToken"
-        in: "header"
+    - accessAuth
+    description: Post message to test
     responses:
-      200:
-        description: "post accessToken with JWT"
+      '200':
+        description: Success
         schema:
-          type: "string"
-          properties:
-            accessToken:
-              $ref: "#/definitions/accessToken"
+          $ref: '#/definitions/SimpleResponse'
+      default:
+        description: Error
+        schema:
+          $ref: "#/definitions/ErrorResponse"
