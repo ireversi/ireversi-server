@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const PieceStore = require('../../../../models/v2/PieceStore.js');
+const BoardStore = require('../../../../models/v2/BoardStore.js');
 const calcCandidate = require('./calcCandidate.js');
 const calcScore = require('./calcScore.js');
 router.use('/specified_range', require('./specified_size.js'));
@@ -21,7 +22,7 @@ router.route('/')
     const score = calcScore.calc(userId, entireBoard);
     PieceStore.addScore(score);
     // sizeはpiece/index.jsで送っている
-    res.json(PieceStore.getBoard(userId));
+    res.json(BoardStore.getBoard(userId));
   })
   .delete((req, res) => {
     PieceStore.deletePieces();
