@@ -32,16 +32,12 @@ config.swaggerSecurityHandlers = {
   },
 };
 
-
-router.use('/access_auth', (req, res, next) => {
+router.use((req, res, next) => {
   try {
-    const headerValue = req.headers.accesstoken;
+    const headerValue = req.headers.authorization;
     const accessToken = jwt.decode(headerValue);
     const isUserId = (Object.keys(accessToken).indexOf('userId') !== -1);
     if (isUserId) {
-      const userIdParse = accessToken.userId;
-      console.log(userIdParse);
-      console.log(req.headers);
       next();
     } else {
       res.status(401).end();
