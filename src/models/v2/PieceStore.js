@@ -28,7 +28,7 @@ const waitTime = StandbyStore.getWaitTime();
 
 module.exports = {
   judgePiece(x, y, userId) {
-    let status;
+    let status = false;
     const piece = { x, y, userId };
     const { pieces } = board;
 
@@ -124,23 +124,13 @@ module.exports = {
 
     // コマを置いたときに一緒にサイズを確認し、送る
     if (status) {
-      const valueX = pieces.map(m => m.x);
-      const valueY = pieces.map(m => m.y);
-
-      const xMin = Math.min(...valueX);
-      const xMax = Math.max(...valueX);
-      const yMin = Math.min(...valueY);
-      const yMax = Math.max(...valueY);
-      this.addSize(
-        {
-          xMin, xMax, yMin, yMax,
-        },
-      );
+      this.addSize();
     }
     return status;
   },
   addPiece(piece) { // 盤面にコマを追加する
     board.pieces.push(piece);
+    this.addSize();
   },
   addCandidate(candidate) {
     board.candidates.push(candidate);
@@ -151,8 +141,22 @@ module.exports = {
   addScore(score) {
     board.score += score;
   },
-  addSize(boardSize) {
-    board.size = boardSize;
+  addSize() {
+    const valueX = board.pieces.map(m => m.x);
+    const valueY = board.pieces.map(m => m.y);
+
+    const xMin = Math.min(...valueX);
+    const xMax = Math.max(...valueX);
+    const yMin = Math.min(...valueY);
+    const yMax = Math.max(...valueY);
+    board.size = {
+      xMin,
+      xMax,
+      yMin,
+      yMax,
+    };
+
+    return board.size;
   },
   deletePieces() {
     board.pieces.length = 0;

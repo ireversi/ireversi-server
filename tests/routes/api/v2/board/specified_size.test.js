@@ -47,12 +47,10 @@ describe('board/specified_size', () => {
 
     testCase.forEach((elm, index) => {
       if (elm !== 0) {
-        const ans = {
-          x: Math.floor(index % size),
-          y: Math.floor(index / size),
-          userId: elm,
-        };
-        PieceStore.addPiece(ans);
+        const x = Math.floor(index % size);
+        const y = Math.floor(index / size);
+        const addUserId = elm;
+        PieceStore.addPiece({ x, y, addUserId });
       }
     });
 
@@ -64,7 +62,6 @@ describe('board/specified_size', () => {
     const ansResult = convertResult(result, xMin, yMin);
     const entireBoard = PieceStore.getPieces();
     const ansCandidates = calcCandidates.calc(userId, entireBoard);
-
     const score = calcScore.calc(userId, entireBoard);
 
     // const result = boardStore.getBoard().pieces;
@@ -74,10 +71,10 @@ describe('board/specified_size', () => {
       standbys: [],
       score,
       size: {
-        x_min: xMin,
-        x_max: xMax,
-        y_min: yMin,
-        y_max: yMax,
+        xMin: 0,
+        xMax: 4,
+        yMin: 1,
+        yMax: 3,
       },
     };
     // await Promise.all(matchers.map(m => PieceStore(m).save()));
