@@ -9,7 +9,7 @@ router.use((req, res, next) => {
   next();
 });
 
-router.route('/position')
+router.route('/')
   .post((req, res) => {
     const pieces = PieceStore.getPieces();
     const { x, y, userId } = StandbyStore.getPlayInfo(req); // 送られてきた置きコマ
@@ -19,7 +19,6 @@ router.route('/position')
         piece: { x, y, userId },
       },
     };
-
     PieceStore.addPiece(pieceResult); // コマを置く
     res.send(pieces);
   })

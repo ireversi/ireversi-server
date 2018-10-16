@@ -7,7 +7,7 @@ const app = require('../../../../../src/routes/app.js');
 const waitTime = PieceStore.getWaitTime();
 // const deletePieces = PieceStore.deletePieces();
 
-const basePath = '/api/v2/first_piece/direction';
+const basePath = '/api/v2/first_piece';
 
 describe('position', () => {
   // beforeAll(deletePieces);
@@ -19,6 +19,21 @@ describe('position', () => {
     //   userId: 1,
     //   direction: 'nw',
     // }
+    //
+    // standbyを置く
+    // ・userIdを送って、自コマがstandbyに入っているかを判定するテスト
+    // 方向を送る
+    // ・向かう方向の先端にstandbyやpieceがあると方向を送れないテスト
+    // ・
+    // {
+    //   "status": true,
+    //   "piece": {
+    //     "x": 1,
+    //     "y": 1,
+    //     "userId": 1
+    //   },
+    //   "direction": "nw"
+    // }
 
     it('start remaining timer', async () => {
       // Reset
@@ -27,24 +42,19 @@ describe('position', () => {
       // Given
       const pieces = array2Pieces.array2Pieces(
         [
-          '1:1', '2:2',
-          '3:3', 0,
+          '1:1', 0,
+          0, 0,
         ],
       );
 
-      const matches = array2Standbys.array2Standbys(
-        [
-          '1:1', '2:2',
-          '3:3', 0,
-        ],
-      );
+      // const user = 1;
 
       // When
       let response;
       for (let i = 0; i < pieces.length; i += 1) {
         const piece = pieces[i];
         response = await chai.request(app)
-          .post(`${basePath}`)
+          .post(`${basePath}/position`)
           .query({ userId: piece.userId })
           .set('content-type', 'application/x-www-form-urlencoded')
           .send({
@@ -57,6 +67,7 @@ describe('position', () => {
       // Then
       for (let i = 0; i < response.body.length; i += 1) {
         const res = response.body[i];
+
         const match = matches[i];
 
         const dateNow = Date.now(); // チェックする時刻
