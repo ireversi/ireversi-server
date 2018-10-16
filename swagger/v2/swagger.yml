@@ -22,13 +22,6 @@
         - 全フィールドにある自コマの合計
       - size
         - フィールド全体のうち、上下左右の終端の位置情報
-    parameters:
-      - name: userId
-        in: "query"
-        description: "userId"
-        type: number
-        example: 1
-        required: true
     responses:
       200:
         description: "all condition of pieces on board."
@@ -52,11 +45,6 @@
       - $ref: "#/definitions/Size/properties/right"
       - $ref: "#/definitions/Size/properties/bottom"
       - $ref: "#/definitions/Size/properties/top"
-      - name: "userId"
-        in: "query"
-        description: "your userId"
-        required: true
-        type: "number"
     responses:
       200:
         description: "pieces on specified board size"
@@ -80,7 +68,6 @@
     parameters:
       - $ref: "#/definitions/Piece/properties/x"
       - $ref: "#/definitions/Piece/properties/y"
-      - $ref: "#/definitions/Piece/properties/userId"
     responses:
       200:
         description: "show specified board size"

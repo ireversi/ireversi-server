@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const jwt = require('jsonwebtoken');
 const PieceStore = require('../../../../models/v2/PieceStore.js');
 const BoardStore = require('../../../../models/v2/BoardStore.js');
 const calcCandidate = require('./calcCandidate.js');
@@ -8,7 +9,8 @@ router.use('/specified_range', require('./specified_size.js'));
 router.route('/')
   .get(async (req, res) => {
     // userIdを取得
-    const userId = +req.query.userId;
+    const jwtId = req.headers.authorization;
+    const { userId } = jwt.decode(jwtId);
     // boardStoreより全体盤面を取得
     const entireBoard = PieceStore.getPieces();
     // candidatesの初期化

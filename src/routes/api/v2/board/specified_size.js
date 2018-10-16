@@ -1,14 +1,17 @@
 const router = require('express').Router();
 // const pieceStore = require('../../../../models/v2/PieceStore.js');
+const jwt = require('jsonwebtoken');
 const boardStore = require('../../../../models/v2/BoardStore.js');
 const calcCandidate = require('./calcCandidate');
 // const calcCandidate = require('./calcCandidate.js');
 const calcScore = require('./calcScore.js');
+
 // const calcSize = require('./calcSize.js');
 
 router.route('/').get(async (req, res) => {
   // query数値を取得
-  const userId = +req.query.userId;
+  const jwtId = req.headers.authorization;
+  const { userId } = jwt.decode(jwtId);
   const xMin = +req.query.x_min;
   const xMax = +req.query.x_max;
   const yMin = +req.query.y_min;
