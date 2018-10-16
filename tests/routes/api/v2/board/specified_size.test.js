@@ -33,7 +33,7 @@ describe('board/specified_size', () => {
     const xMax = 3;
     const yMin = 1;
     const yMax = 3;
-    const userId = 1;
+    let userId = 1;
 
     const testCase = [
       0, 0, 0, 0, 0,
@@ -49,8 +49,8 @@ describe('board/specified_size', () => {
       if (elm !== 0) {
         const x = Math.floor(index % size);
         const y = Math.floor(index / size);
-        const addUserId = elm;
-        PieceStore.addPiece({ x, y, addUserId });
+        userId = elm;
+        PieceStore.addPiece({ x, y, userId });
       }
     });
 
