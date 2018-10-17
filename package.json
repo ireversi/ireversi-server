@@ -51,6 +51,9 @@
     ]
   },
   "now": {
-    "alias": "ireversi-server.now.sh"
+    "alias": "ireversi-server.now.sh",
+    "engines": {
+      "node": ">=10"
+    }
   }
 }
