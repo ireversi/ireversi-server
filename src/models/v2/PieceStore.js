@@ -2,7 +2,7 @@ const StandbyStore = require('./StandbyStore.js');
 const calcScore = require('../../routes/api/v2/board/calcScore.js');
 
 const board = {
-  pieces: [],
+  pieces: new Map(),
   candidates: [],
   standbys: [],
   score: 0,
@@ -26,110 +26,53 @@ const dirAll = [
 
 const waitTime = StandbyStore.getWaitTime();
 
+function judgeDirection(x, y, userId, nexts, results = []) {
+  const nextCoordinate = [x + nexts[0], y + nexts[1]];
+  const nextCoordinateUserId = board.pieces.get(nextCoordinate.join());
+  if (nextCoordinateUserId === userId && results.length > 0) {
+    return results;
+  }
+  if (nextCoordinateUserId && nextCoordinateUserId !== userId) {
+    results.push([...nextCoordinate]);
+    return judgeDirection(...nextCoordinate, userId, nexts, results);
+  }
+  return [];
+}
+
 module.exports = {
   judgePiece(x, y, userId) {
+    const coordinate = [x, y].join();
     let status = false;
-    const piece = { x, y, userId };
-    const { pieces } = board;
 
-    // ８方向に当たる値をコピー格納する配列
-    const elected = [];
-    for (let i = 0, e = pieces.length; i < e; i += 1) {
-      const elPiece = pieces[i];
-      const vectorX = Math.abs(elPiece.x - x);
-      const vectorY = Math.abs(elPiece.y - y);
-      if (elPiece.x === x && elPiece.y === y) { // 同じところ
-        status = false;
-        return status;
-      }
-      if (elPiece.x === x || elPiece.y === y) { // elPieceが送った値の縦横にある場合
-        elected.push(elPiece);
-      } else if (vectorX === vectorY) {
-        elected.push(elPiece);
-      }
-    }
+    // 置きたい座標のマスにすでにコマが存在するか判定
+    if (board.pieces.has(coordinate)) return false;
 
-    const flip = [];
-    // 盤面に自コマがある場合
-    if (elected.find(p => p.userId === userId)) {
-      let around = 0; // 周回した回数。最大8回。
-      for (let i = 0; i < dirAll.length; i += 1) {
-        const rslt = []; // 通って来たコマを一時保存する。めくれる条件のときはflipに移す。
-        const dirX = dirAll[i][0];
-        const dirY = dirAll[i][1];
-        const aroundX = x + dirX;
-        const aroundY = y + dirY;
-
-        let n = 1;
-        let dirPiece = this.seeNext(elected, aroundX, aroundY);
-
-        if (dirPiece) {
-          if (dirPiece.userId !== userId) {
-            while (dirPiece) {
-              if (dirPiece.userId !== userId) {
-                rslt.push(dirPiece);
-                n += 1;
-                const nextPieceX = x + dirX * n;
-                const nextPieceY = y + dirY * n;
-                dirPiece = this.seeNext(elected, nextPieceX, nextPieceY);
-              } else if (dirPiece.userId === userId) {
-                this.addPiece(piece);
-                status = true;
-                for (let j = 0; j < rslt.length; j += 1) {
-                  if (rslt[j] !== undefined) {
-                    rslt[j].userId = userId;
-                    flip.push(rslt[j]);
-                  }
-                }
-                break;
-              }
-            }
-          } else {
-            status = false;
-          }
-        } else {
-          around += 1;
-          if (around === 8) {
-            status = false;
-          }
-        }
-      }
-    // 他コマばかりで自コマがない場合、
+    // 盤面に自分と同じ ID のコマが存在するか判定
+    if ([...board.pieces.values()].indexOf(userId) < 0) {
+      // 存在しない場合 : 置きたいマスの上下左右にコマが存在するか判定
+      status = (dirXY.reduce((acc, cv) => {
+        const result = board.pieces.has([x + cv[0], y + cv[1]].join()) ? acc + 1 : acc;
+        return result;
+      }, 0) > 0);
+      if (status) board.pieces.set(coordinate, userId);
     } else {
-      // 上下左右を検索
-      for (let i = 0; i < dirXY.length; i += 1) {
-        const dirX = dirXY[i][0];
-        const dirY = dirXY[i][1];
-        const aroundX = x + dirX;
-        const aroundY = y + dirY;
-        const dirPiece = elected.find(p => p.x === aroundX && p.y === aroundY);
-        if (dirPiece !== undefined) { // 上下左右いずれかのとなりに他コマがある場合
-          status = true;
-          this.addPiece(piece);
-          break;
-        } else {
-          status = false;
+      // 存在する場合 : 置きたいマスの周囲 8 方向に自分のコマにできるコマが存在するか判定
+      const coordinates = dirAll.reduce((acc, cv) => {
+        const result = acc.concat(judgeDirection(x, y, userId, cv));
+        return result;
+      }, [[x, y]]);
+      if (coordinates.length > 1) {
+        for (let i = 0; i < coordinates.length; i += 1) {
+          board.pieces.set([coordinates[i][0], coordinates[i][1]].join(), userId);
         }
+        status = true;
       }
-    }
-    for (let i = 0; i < pieces.length; i += 1) {
-      const p = pieces[i];
-      for (let j = 0; j < flip.length; j += 1) {
-        const f = flip[j];
-        if (f.x === p.x && f.y === p.y) {
-          p.userId = f.userId;
-        }
-      }
-    }
-
-    // コマを置いたときに一緒にサイズを確認し、送る
-    if (status) {
-      this.addSize();
     }
     return status;
   },
-  addPiece(piece) { // 盤面にコマを追加する
-    board.pieces.push(piece);
+  addPiece(piece) {
+    // 盤面にコマを追加する
+    board.pieces.set([piece.x, piece.y].join(), piece.userId);
     this.addSize();
   },
   addCandidate(candidate) {
@@ -142,24 +85,26 @@ module.exports = {
     board.score += score;
   },
   addSize() {
-    const valueX = board.pieces.map(m => m.x);
-    const valueY = board.pieces.map(m => m.y);
-
-    const xMin = Math.min(...valueX);
-    const xMax = Math.max(...valueX);
-    const yMin = Math.min(...valueY);
-    const yMax = Math.max(...valueY);
-    board.size = {
-      xMin,
-      xMax,
-      yMin,
-      yMax,
-    };
-
+    const coordinate = [...board.pieces.keys()].pop().split(',');
+    const x = +coordinate[0];
+    const y = +coordinate[1];
+    board.size = Object.keys(board.size).length === 0
+      ? {
+        xMin: x,
+        xMax: x,
+        yMin: y,
+        yMax: y,
+      }
+      : {
+        xMin: Math.min(board.size.xMin, x),
+        xMax: Math.max(board.size.xMax, x),
+        yMin: Math.min(board.size.yMin, y),
+        yMax: Math.max(board.size.yMax, y),
+      };
     return board.size;
   },
   deletePieces() {
-    board.pieces.length = 0;
+    board.pieces.clear();
     this.initPieces(); // 初期値を置く
   },
   deleteStandbys() {
@@ -169,7 +114,16 @@ module.exports = {
     board.candidates.length = 0;
   },
   getPieces() {
-    return board.pieces;
+    const pieces = [...board.pieces];
+    for (let i = 0; i < pieces.length; i += 1) {
+      const coordinate = pieces[i][0].split(',');
+      pieces[i] = {
+        x: +coordinate[0],
+        y: +coordinate[1],
+        userId: pieces[i][1],
+      };
+    }
+    return pieces;
   },
   getStandbys() {
     const stbs = board.standbys;
@@ -196,13 +150,11 @@ module.exports = {
     return board.size;
   },
   initPieces() {
-    this.addPiece(
-      {
-        x: 0,
-        y: 0,
-        userId: 1,
-      },
-    );
+    this.addPiece({
+      x: 0,
+      y: 0,
+      userId: 1,
+    });
     return board;
   },
   seeNext(array, nextPieceX, nextPieceY) {
