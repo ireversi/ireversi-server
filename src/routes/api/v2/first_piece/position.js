@@ -73,5 +73,9 @@ router.route('/')
       PieceStore.addStandby(playResult); // boardに追加
     }
     await res.send(playReturn); // 1プレイの結果を返す
+  })
+  .delete((req, res) => {
+    PieceStore.deletePieces();
+    res.sendStatus(204);
   });
 module.exports = router;

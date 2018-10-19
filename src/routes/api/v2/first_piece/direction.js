@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const PieceStore = require('../../../../models/v2/PieceStore.js');
+const BoardStore = require('../../../../models/v2/BoardStore.js');
 const StandbyStore = require('../../../../models/v2/StandbyStore.js');
 
 // for CORS
@@ -10,17 +11,17 @@ router.use((req, res, next) => {
 });
 
 router.route('/')
-  .post((req, res) => {
-    const pieces = PieceStore.getPieces();
+  .post(async (req, res) => {
     const { x, y, userId } = StandbyStore.getPlayInfo(req); // 送られてきた置きコマ
-    const pieceResult = {
-      // status,
-      standby: {
-        piece: { x, y, userId },
-      },
-    };
+    const pieceResult = { x, y, userId };
+
+    // 下記は仮
+    // 以下、指定されたdirectionを基にして、めくる・置く動作が必要。
     PieceStore.addPiece(pieceResult); // コマを置く
-    res.send(pieces);
+    const board = BoardStore.getBoard();
+    // const pieces = PieceStore.getPieces();
+
+    await res.json(board);
   })
   .delete((req, res) => {
     PieceStore.deletePieces();
