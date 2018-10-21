@@ -1,24 +1,8 @@
 const router = require('express').Router();
-const jwt = require('jsonwebtoken');
-const getHash = require('random-hash');
-
-function generateToken() {
-  const userId = getHash.generateHash({ length: 6 });
-  const token = jwt.sign(
-    {
-      userId,
-    },
-    'secret',
-    {
-      algorithm: 'HS256',
-      noTimestamp: true,
-    },
-  );
-  return token;
-}
+const generateToken = require('./generateToken');
 
 router.route('/').post((req, res) => {
-  const accessToken = generateToken();
+  const accessToken = generateToken.generate();
   res.json({ accessToken });
 });
 

@@ -1,9 +1,23 @@
 const chai = require('chai');
+const jwt = require('jsonwebtoken');
 const app = require('../../../../../src/routes/app.js');
 // const boardStore = require('../../../../../src/models/v2/BoardStore.js');
 const PieceStore = require('../../../../../src/models/v2/PieceStore.js');
+// const userIdGenerate = require('../../../../../src/routes/api/v2/userIdGenerate/index.js');
+const generateToken = require('../../../../../src/routes/api/v2/userIdGenerate/generateToken');
 
 const basePath = '/api/v2/board';
+const zero = 0;
+
+function userIdGenerate() {
+  const token = generateToken.generate();
+  return token;
+}
+
+function jwtDecode(token) {
+  decoded = jwt.decode(token);
+  return decoded;
+}
 
 function convertComparisonResult(result) {
   const fPieces = [];
@@ -18,7 +32,6 @@ function convertComparisonResult(result) {
       } else {
         userId = result[i];
       }
-
       const piece = {
         x,
         y,
@@ -30,13 +43,13 @@ function convertComparisonResult(result) {
   return fPieces;
 }
 
-function convertComparisonMatchers(result) {
+function convertComparisonMatchers(result, idSl) {
   // 他のテストと違って原点を中心にずらしている。
   const fPieces = [];
   const size = Math.sqrt(result.length);
   const half = Math.floor(size / 2);
   for (let i = 0; i < result.length; i += 1) {
-    if (result[i] !== 0 && typeof (result[i]) === 'number') {
+    if (result[i] === idSl) {
       const piece = {
         x: Math.floor(i % size) - half,
         y: Math.floor(i / size) - half,
@@ -47,7 +60,6 @@ function convertComparisonMatchers(result) {
   return fPieces;
 }
 
-
 describe('board', () => {
   // beforeAll(prepareDB);
   // afterEach(deleteAllDataFromDB);
@@ -55,15 +67,25 @@ describe('board', () => {
   // 一つ駒を置く
   it('gets all', async () => {
     await chai.request(app).delete(`${basePath}`);
+    PieceStore.initPieces();
+
     // Given
+    const idSelectedJwt = userIdGenerate();
+    const idSl = jwtDecode(idSelectedJwt).userId;
+    const id1 = jwtDecode(userIdGenerate()).userId;
+    const id2 = jwtDecode(userIdGenerate()).userId;
+    const id3 = jwtDecode(userIdGenerate()).userId;
+    const id4 = jwtDecode(userIdGenerate()).userId;
+    const id5 = jwtDecode(userIdGenerate()).userId;
+    const id6 = jwtDecode(userIdGenerate()).userId;
+
     // "I"は初期化した時の最初のピース
-    const userId = 1;
     const result = [
-      'I', 1, 0, 0, 0,
-      0, 1, 2, 1, 0,
-      4, 5, 6, 7, 1,
-      0, 9, 0, 2, 0,
-      0, 0, 0, 0, 0,
+      'I', idSl, zero, zero, zero,
+      zero, idSl, id1, idSl, zero,
+      id2, id3, id4, id5, idSl,
+      zero, id6, zero, id1, zero,
+      zero, zero, zero, zero, zero,
     ];
     // const result = boardStore.getBoard().pieces;
     const matchers = convertComparisonResult(result);
@@ -82,7 +104,11 @@ describe('board', () => {
     // await Promise.all(matchers.map(m => PieceStore(m).save()));
 
     // When
-    const response = await chai.request(app).get(`${basePath}/?userId=${userId}`);
+    // const response = await chai.request(app).get(`${basePath}/?userId=${idSl}`);
+    const response = await chai.request(app)
+      .get(`${basePath}`)
+      .set('Authorization', idSelectedJwt);
+
     // Then
     expect(response.body.pieces).toHaveLength(matchers.length);
     expect(response.body.pieces).toEqual(expect.arrayContaining(matchers));
@@ -90,38 +116,21 @@ describe('board', () => {
 });
 
 describe('board after turnover', () => {
-  // beforeAll(prepareDB);
-  // afterEach(deleteAllDataFromDB);
-
   // 一つ駒を置く
   it('gets pieces after turnover some pieces', async () => {
     await chai.request(app).delete(`${basePath}`);
+    PieceStore.deletePieces();
+
     // Given
-    // 'I'はイニシャルピース
-    const resultPre = [
-      'I', 0, 0, 0,
-      0, 0, 0, 0,
-      0, 0, 0, 0,
-      0, 0, 0, 0,
-    ];
-    // first_pieceを取り込み
-    const sizePre = Math.sqrt(resultPre.length);
-    resultPre.forEach((elm, index) => {
-      if (elm !== 0) {
-        const ans = {
-          x: Math.floor(index % sizePre),
-          y: Math.floor(index / sizePre),
-          userId: elm,
-        };
-        PieceStore.addPiece(ans);
-      }
-    });
+
     // 2nd piece set
+    const id1Jwt = userIdGenerate();
+    const id1 = jwtDecode(id1Jwt).userId;
     const resultFol = [
-      0, 0, 0, 0,
-      2, 0, 0, 0,
-      0, 0, 0, 0,
-      0, 0, 0, 0,
+      zero, zero, zero, zero,
+      id1, zero, zero, zero,
+      zero, zero, zero, zero,
+      zero, zero, zero, zero,
     ];
     // second_pieceを取り込み
     const sizeFol = Math.sqrt(resultFol.length);
@@ -135,18 +144,22 @@ describe('board after turnover', () => {
         PieceStore.addPiece(ans);
       }
     });
-    const userId = 3;
+    const idSelectedJwt = userIdGenerate();
+    const idSl = jwtDecode(idSelectedJwt).userId;
     const matchers = convertComparisonMatchers([
-      0, 0, 0, 0, 0,
-      0, 0, userId, 0, 0,
-      0, userId, '1', userId, 0,
-      0, userId, '2', userId, 0,
-      0, 0, userId, 0, 0,
-    ]);
+      zero, zero, zero, zero, zero,
+      zero, zero, idSl, zero, zero,
+      zero, idSl, 'I', idSl, zero,
+      zero, idSl, id1, idSl, zero,
+      zero, zero, idSl, zero, zero,
+    ], idSl);
+
     // await Promise.all(matchers.map(m => PieceStore(m).save()));
 
     // When
-    const response = await chai.request(app).get(`${basePath}/?userId=${userId}`);
+    const response = await chai.request(app)
+      .get(`${basePath}`)
+      .set('Authorization', idSelectedJwt);
     // Then
     expect(response.body.candidates).toHaveLength(matchers.length);
     expect(response.body.candidates).toEqual(expect.arrayContaining(matchers));
