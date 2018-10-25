@@ -24,7 +24,7 @@ router.route('/')
     let status = false;
     // 送られてきたuserIdのある座標を返す
     const standbys = PieceStore.getStandbys(); // スタンバイの配列
-    const mapPieces = PieceStore.getPiecesMap(); // piecesをMapオブジェクトで取得
+    const mapPieces = PieceStore.getPiecesMap(); // piecesのMapオブジェクトを取得
     const userId = +req.query.userId; // 送られてきたuserId
     const { direction } = req.query; // 送られてきたdirection
     const dir = dirList[direction]; // 送られてきたdirectionから向かう座標を取得
@@ -58,7 +58,7 @@ router.route('/')
     }
     // standbyを削除
     standbys.splice(standbys.findIndex(standby => standby.piece.userId === userId), 1);
-
+    PieceStore.addSize();
     await res.json({
       status,
       piece,

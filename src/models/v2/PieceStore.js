@@ -68,6 +68,7 @@ module.exports = {
         status = true;
       }
     }
+    this.addSize();
     return status;
   },
   judgeDirection(x, y, userId, nexts, results = []) {
@@ -113,7 +114,7 @@ module.exports = {
         yMin: Math.min(board.size.yMin, y),
         yMax: Math.max(board.size.yMax, y),
       };
-    return board.size;
+    // return board.size;
   },
   deletePieces() {
     board.pieces.clear();
