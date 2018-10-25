@@ -24,7 +24,6 @@ router.route('/')
     const pcs = PieceStore.getPieces(); // 盤面のコマ。テスト時はデフォルトのx:0, y:0, userId:1がいる
     const stb = PieceStore.getStandbys(); // スタンバイ中のマス
     const { x, y, userId } = StandbyStore.getPlayInfo(req); // 送られてきた置きコマ
-
     const score = calcScore.calc(userId, pcs); // 置いてある自コマの数
     let status; // 置けたかどうか
 
@@ -73,9 +72,5 @@ router.route('/')
       PieceStore.addStandby(playResult); // boardに追加
     }
     await res.send(playReturn); // 1プレイの結果を返す
-  })
-  .delete((req, res) => {
-    PieceStore.deletePieces();
-    res.sendStatus(204);
   });
 module.exports = router;
