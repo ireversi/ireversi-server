@@ -1,9 +1,7 @@
 const chai = require('chai');
 const jwt = require('jsonwebtoken');
 const app = require('../../../../../src/routes/app.js');
-// const boardStore = require('../../../../../src/models/v2/BoardStore.js');
 const PieceStore = require('../../../../../src/models/v2/PieceStore.js');
-// const userIdGenerate = require('../../../../../src/routes/api/v2/userIdGenerate/index.js');
 const generateToken = require('../../../../../src/routes/api/v2/userIdGenerate/generateToken');
 
 const basePath = '/api/v2/board';
