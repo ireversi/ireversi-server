@@ -169,17 +169,17 @@
       - first_piece
     summary: "direction from first piece"
     parameters:
-    - in: "number"
+    - in: "query"
       required: true
       name: "userId"
       description: "userId"
       type: "number"
       schema:
         $ref: "#/definitions/Piece/properties/userId"
-    - in: "string"
+    - in: "query"
       required: true
       name: "direction"
-      type: "body"
+      type: "string"
       description: "type one of following direction"
       enum: ["n", "ne", "e", "se", "s", "sw", "w", "nw"]
     responses:

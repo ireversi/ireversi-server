@@ -66,6 +66,7 @@ module.exports = {
         status = true;
       }
     }
+    this.addSize();
     return status;
   },
   addPiece(piece) {
@@ -99,7 +100,6 @@ module.exports = {
         yMin: Math.min(board.size.yMin, y),
         yMax: Math.max(board.size.yMax, y),
       };
-    return board.size;
   },
   deletePieces() {
     board.pieces.clear();
@@ -122,6 +122,9 @@ module.exports = {
       };
     }
     return pieces;
+  },
+  getPiecesMap() {
+    return board.pieces;
   },
   getStandbys() {
     const stbs = board.standbys;
