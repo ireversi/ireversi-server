@@ -26,18 +26,18 @@ const dirAll = [
 
 const waitTime = StandbyStore.getWaitTime();
 
-// function judgeDirection(x, y, userId, nexts, results = []) {
-//   const nextCoordinate = [x + nexts[0], y + nexts[1]];
-//   const nextCoordinateUserId = board.pieces.get(nextCoordinate.join());
-//   if (nextCoordinateUserId === userId && results.length > 0) {
-//     return results;
-//   }
-//   if (nextCoordinateUserId && nextCoordinateUserId !== userId) {
-//     results.push([...nextCoordinate]);
-//     return judgeDirection(...nextCoordinate, userId, nexts, results);
-//   }
-//   return [];
-// }
+function judgeDirection(x, y, userId, nexts, results = []) {
+  const nextCoordinate = [x + nexts[0], y + nexts[1]];
+  const nextCoordinateUserId = board.pieces.get(nextCoordinate.join());
+  if (nextCoordinateUserId === userId && results.length > 0) {
+    return results;
+  }
+  if (nextCoordinateUserId && nextCoordinateUserId !== userId) {
+    results.push([...nextCoordinate]);
+    return judgeDirection(...nextCoordinate, userId, nexts, results);
+  }
+  return [];
+}
 
 module.exports = {
   judgePiece(x, y, userId) {
@@ -58,7 +58,7 @@ module.exports = {
     } else {
       // 存在する場合 : 置きたいマスの周囲 8 方向に自分のコマにできるコマが存在するか判定
       const coordinates = dirAll.reduce((acc, cv) => {
-        const result = acc.concat(this.judgeDirection(x, y, userId, cv));
+        const result = acc.concat(judgeDirection(x, y, userId, cv));
         return result;
       }, [[x, y]]);
       if (coordinates.length > 1) {
@@ -70,18 +70,6 @@ module.exports = {
     }
     this.addSize();
     return status;
-  },
-  judgeDirection(x, y, userId, nexts, results = []) {
-    const nextCoordinate = [x + nexts[0], y + nexts[1]];
-    const nextCoordinateUserId = board.pieces.get(nextCoordinate.join());
-    if (nextCoordinateUserId === userId && results.length > 0) {
-      return results;
-    }
-    if (nextCoordinateUserId && nextCoordinateUserId !== userId) {
-      results.push([...nextCoordinate]);
-      return this.judgeDirection(...nextCoordinate, userId, nexts, results);
-    }
-    return [];
   },
   addPiece(piece) {
     // 盤面にコマを追加する
@@ -114,7 +102,6 @@ module.exports = {
         yMin: Math.min(board.size.yMin, y),
         yMax: Math.max(board.size.yMax, y),
       };
-    // return board.size;
   },
   deletePieces() {
     board.pieces.clear();

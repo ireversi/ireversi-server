@@ -20,7 +20,7 @@ router.use((req, res, next) => {
 });
 
 router.route('/')
-  .post(async (req, res) => {
+  .post((req, res) => {
     let status = false;
     // 送られてきたuserIdのある座標を返す
     const standbys = PieceStore.getStandbys(); // スタンバイの配列
@@ -35,7 +35,7 @@ router.route('/')
 
     // 残り時間がなければfalseで返す
     if (standbys.find(standby => standby.remaining <= 0)) {
-      await res.json({
+      res.json({
         status,
         piece,
         direction,
@@ -59,7 +59,7 @@ router.route('/')
     // standbyを削除
     standbys.splice(standbys.findIndex(standby => standby.piece.userId === userId), 1);
     PieceStore.addSize();
-    await res.json({
+    res.json({
       status,
       piece,
       direction,
