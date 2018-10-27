@@ -66,6 +66,9 @@ jobs:
       - run: now -t ${NOW_TOKEN} scale ireversi-server.now.sh 1
 
   deploy:
+    docker:
+      - image: circleci/classic:latest
+
     working_directory: ~/repo
 
     steps:
