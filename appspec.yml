@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: ~/ireversi
+    destination: /home/ec2-user/ireversi
 hooks:
   ValidateService:
     - location: deploy.sh

@@ -9,7 +9,8 @@
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon --watch src --watch swagger -e js,yml src/server.js",
-    "start": "cross-env NODE_ENV=production pm2 start src/server.js",
+    "start": "cross-env NODE_ENV=production node src/server.js",
+    "deploy": "cross-env NODE_ENV=production pm2 start src/server.js",
     "restart": "pm2 restart src/server.js",
     "stop": "pm2 stop src/server.js",
     "delete": "pm2 delete src/server.js",
