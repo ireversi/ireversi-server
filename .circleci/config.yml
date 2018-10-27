@@ -67,14 +67,13 @@ jobs:
 
   deploy:
     docker:
-      - image: circleci/classic:latest
+      - image: circleci/python:3.6.4
 
     working_directory: ~/repo
 
     steps:
-      - run: sudo apt-get update
-      - run: sudo apt-get install -y awscli
-      - run: aws deploy create-deployment --application-name $AWS_APP_NAME --deployment-group-name $AWS_GROUP_NAME --github-location repository="$CIRCLE_PROJECT_REPONAME",commitId="$CIRCLE_SHA1"
+      - run: sudo pip install awscli
+      - run: aws deploy create-deployment --application-name $AWS_APP_NAME --deployment-group-name $AWS_GROUP_NAME --github-location repository="$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME",commitId="$CIRCLE_SHA1"
 
 workflows:
   version: 2
