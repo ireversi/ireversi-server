@@ -73,7 +73,7 @@ jobs:
 
     steps:
       - run: sudo pip install awscli
-      - run: aws deploy create-deployment --application-name $AWS_APP_NAME --deployment-group-name $AWS_GROUP_NAME --github-location repository="$CIRCLE_PROJECT_REPONAME",commitId="$CIRCLE_SHA1"
+      - run: aws deploy create-deployment --application-name $AWS_APP_NAME --deployment-group-name $AWS_GROUP_NAME --github-location repository="$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME",commitId="$CIRCLE_SHA1"
 
 workflows:
   version: 2
