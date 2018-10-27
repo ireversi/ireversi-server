@@ -1,0 +1,28 @@
+tags:
+  - name: Kohski-Playing
+    description: Kohski's Board API
+
+/kohski/board:
+  get:
+    tags:
+      - Kohski-board
+    responses:
+      200:
+        description: "success"
+        schema:
+          type: "array"
+          items:
+            type: object
+            properties:
+              x:
+                type: "integer"
+                format: "int64"
+                example: 1
+              y:
+                type: "integer"
+                format: "int64"
+                example: 1
+              userId:
+                type: "integer"
+                format: "int64"
+                example: 1

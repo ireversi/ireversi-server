@@ -1,0 +1,29 @@
+tags:
+  - name: Ando-playing
+    description: Ando's Playing API
+
+/ando/board:
+  get:
+    tags:
+      - Ando-playing
+    summary: "Return all pieces on the board"
+    responses:
+      200:
+        description: "Board data"
+        schema:
+          type: array
+          items:
+            type: "object"
+            properties:
+              x:
+                type: "integer"
+                format: "int64"
+                example: 1
+              y:
+                type: "integer"
+                format: "int64"
+                example: 1
+              userId:
+                type: "integer"
+                format: "int64"
+                example: 1

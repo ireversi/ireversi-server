@@ -1,0 +1,90 @@
+tags:
+  - name: Ando-playing
+    description: Ando's Playing API
+
+/ando/piece:
+  post:
+    tags:
+      - Ando-playing
+    summary: "Set a piece on the board"
+    parameters:
+      - name: "x"
+        in: "formData"
+        description: "X position"
+        required: true
+        type: "integer"
+      - name: "y"
+        in: "formData"
+        description: "Y position"
+        required: true
+        type: "integer"
+      - name: "userId"
+        in: "formData"
+        description: "User ID (>= 1)"
+        required: true
+        type: "integer"
+    responses:
+      200:
+        description: "Piece data"
+        schema:
+          type: array
+          items:
+            type: "object"
+            properties:
+              x:
+                type: "integer"
+                format: "int64"
+                example: 1
+              y:
+                type: "integer"
+                format: "int64"
+                example: 1
+              userId:
+                type: "integer"
+                format: "int64"
+                example: 1
+  delete:
+    tags:
+      - Ando-playing
+    summary: "Delete a piece or all pieces"
+    parameters:
+      - name: "x"
+        in: "formData"
+        description: "X position"
+        required: false
+        type: "integer"
+      - name: "y"
+        in: "formData"
+        description: "Y position"
+        required: false
+        type: "integer"
+      - name: "userId"
+        in: "formData"
+        description: "User ID (>= 1)"
+        required: false
+        type: "integer"
+      - name: "keyword"
+        in: "formData"
+        description: "Please enter keyword 'deleteAll' if you want to delete all pieces."
+        required: false
+        type: "string"
+    responses:
+      200:
+        description: "Board data"
+        schema:
+          type: array
+          items:
+            type: "object"
+            properties:
+              x:
+                type: "integer"
+                format: "int64"
+                example: 1
+              y:
+                type: "integer"
+                format: "int64"
+                example: 1
+              userId:
+                type: "integer"
+                format: "int64"
+                example: 1

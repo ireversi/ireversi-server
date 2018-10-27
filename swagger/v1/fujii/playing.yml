@@ -1,0 +1,75 @@
+tags: #:(コロン)は{}の 配列
+  - name: Fujii-Playing #-(ハイフン)は[]の配列
+    description: Fujii Reversi API #:(コロン)のあとは文字列
+
+/fujii/playing: #api/viの後に付いているルート（/users）
+  post:
+    tags:
+      - Fujii-Playing
+    summary: "Set pieces on the board"
+    parameters:
+      - name: "x"
+        in: "formData"
+        description: "x position"
+        required: true
+        type: "number"
+      - name: "y"
+        in: "formData"
+        description: "y position"
+        required: true
+        type: "number"
+      - name: "userId"
+        in: "formData"
+        description: "User ID"
+        required: true
+        type: "number"
+    responses:
+      200:
+        description: "playing data"
+        schema:
+          type: "array"
+          properties:
+            x: 
+              type: "integer"
+              format: "int64"
+              example: 1
+            y: 
+              type: "integer"
+              format: "int64"
+              example: 1
+            userId: 
+              type: "number"
+              example: 1
+  delete:
+      tags:
+        - Fujii-Playing
+      summary: "Delete a piece or all pieces"
+      parameters:
+      - name: "x"
+        in: "formData"
+        description: "X position"
+        required: false
+        type: "integer"
+      - name: "y"
+        in: "formData"
+        description: "Y position"
+        required: false
+        type: "integer"
+      - name: "userId"
+        in: "formData"
+        description: "User ID"
+        required: false
+        type: "integer"
+      - name: "keyword"
+        in: "formData"
+        description: "Enter 'deleteAll' if you want to delete all pieces. Otherwise, enter 'deleteOne' to delete only one piece"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "delete data"
+          schema:
+            type: array
+            items:
+              type: "object"
+            

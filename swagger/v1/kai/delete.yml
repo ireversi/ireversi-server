@@ -1,0 +1,32 @@
+tags:
+  - name: kai-board
+    description: Kai's Board API
+
+/kai/delete:
+  delete:
+    tags:
+      - kai-playing
+    externalDocs:
+      description: "Jump directly to JSON"
+      url: "https://ireversi-server.now.sh/api/v1/kai/delete"
+    description: "delete all pieces"
+    responses:
+      200:
+        description: "delete success"
+        schema:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              x:
+                type: "integer"
+                format: "int64"
+                example: 1
+              y:
+                type: "integer"
+                format: "int64"
+                example: 1
+              userId:
+                type: "integer"
+                format: "int64"
+                example: 1

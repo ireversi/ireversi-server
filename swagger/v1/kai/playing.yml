@@ -1,0 +1,47 @@
+tags:
+  - name: kai-playing
+    description: Kai's Playing API
+
+/kai/playing:
+  post:
+      tags:
+        - kai-playing
+      externalDocs:
+        description: "Jump directly to JSON"
+        url: "https://ireversi-server.now.sh/api/v1/kai/playing"
+      parameters:
+        - name: "x"
+          in: "formData"
+          description: "x info"
+          required: true
+          type: "number"
+        - name: "y"
+          in: "formData"
+          description: "y info"
+          required: true
+          type: "number"
+        - name: "userId"
+          in: "formData"
+          description: "your userId"
+          required: true
+          type: "number"
+      responses:
+        200: # 404的なやつ
+          description: "Playing data"
+          schema:
+            type: "array"
+            items:
+              type: object
+              properties:
+                x:
+                  type: "integer"
+                  format: "int64"
+                  example: 1
+                y:
+                  type: "integer"
+                  format: "int64"
+                  example: 1
+                userId:
+                  type: "integer"
+                  format: "int64"
+                  example: 1

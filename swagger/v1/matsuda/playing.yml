@@ -1,0 +1,98 @@
+tags:
+  - name: matsuda-playing
+    description: Matsuda's Playing API
+
+definitions:
+  Pieces:
+    type: array
+    items:
+      type: object
+      properties:
+        x:
+          type: number
+          example: 0
+        y:
+          type: number
+          example: 0
+        userId:
+          type: number
+          example: 1
+  Ranges:
+    left:
+      name: "l"
+      in: "query"
+      description: "Min of X axis (left)"
+      required: false
+      type: "number"
+    right:
+      name: "r"
+      in: "query"
+      description: "Max of X axis (right)"
+      required: false
+      type: "number"
+    bottom:
+      name: "b"
+      in: "query"
+      description: "Min of Y axis (bottom)"
+      required: false
+      type: "number"
+    top:
+      name: "t"
+      in: "query"
+      description: "Max of X axis (top)"
+      required: false
+      type: "number"
+
+/matsuda/playing/graph:
+  get:
+    tags:
+      - matsuda-playing
+    parameters:
+      - $ref: "#/definitions/Ranges/left"
+      - $ref: "#/definitions/Ranges/right"
+      - $ref: "#/definitions/Ranges/bottom"
+      - $ref: "#/definitions/Ranges/top"
+    responses:
+      200:
+        description: "pieces on board"
+        schema:
+          type: "string"
+
+/matsuda/playing:
+  get:
+    tags:
+      - matsuda-playing
+    parameters:
+      - $ref: "#/definitions/Ranges/left"
+      - $ref: "#/definitions/Ranges/right"
+      - $ref: "#/definitions/Ranges/bottom"
+      - $ref: "#/definitions/Ranges/top"
+    responses:
+      200:
+        description: "json of pieces"
+        schema:
+          $ref: "#/definitions/Pieces"
+  post:
+    tags:
+      - matsuda-playing
+    parameters:
+      - name: "x"
+        in: "formData"
+        description: "x-coordinate"
+        required: true
+        type: "number"
+      - name: "y"
+        in: "formData"
+        description: "y-coordinate"
+        required: true
+        type: "number"
+      - name: "userId"
+        in: "formData"
+        description: "User ID"
+        required: true
+        type: "number"
+    responses:
+      200:
+        description: "all pieces"
+        schema:
+          $ref: "#/definitions/Pieces"

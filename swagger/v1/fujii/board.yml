@@ -1,0 +1,26 @@
+tags:
+  - name: Fujii-Playing
+    description: Fujii Reversi API
+
+/fujii/board:
+  get:
+    tags:
+      - Fujii-Playing
+    summary: "Get all pieces on the board"
+    responses:
+      200:
+        description: "all pieces"
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              x:
+                type: number
+                example: 0
+              y:
+                type: number
+                example: 0
+              userId:
+                type: number
+                example: 1
