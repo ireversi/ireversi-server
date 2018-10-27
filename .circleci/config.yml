@@ -67,7 +67,7 @@ jobs:
 
   deploy:
     docker:
-      - image: buildpack-deps:trusty
+      - image: circleci/python:3.6.4
 
     working_directory: ~/repo
 
