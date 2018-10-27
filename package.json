@@ -9,7 +9,13 @@
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon --watch src --watch swagger -e js,yml src/server.js",
-    "start": "cross-env NODE_ENV=production node src/server.js",
+    "start": "cross-env NODE_ENV=production pm2 start src/server.js",
+    "restart": "pm2 restart src/server.js",
+    "stop": "pm2 stop src/server.js",
+    "delete": "pm2 delete src/server.js",
+    "update": "pm2 update",
+    "logs": "pm2 logs",
+    "monit": "pm2 monit",
     "lint": "eslint src tests -f codeframe",
     "lint:fix": "eslint src tests --fix",
     "test": "jest --coverage",
@@ -24,6 +30,7 @@
     "klaw-sync": "4.0.0",
     "mongodb-memory-server": "2.0.1",
     "mongoose": "5.2.9",
+    "pm2": "3.2.2",
     "swagger-jsdoc": "3.0.2",
     "swagger-ui-express": "3.0.10"
   },
