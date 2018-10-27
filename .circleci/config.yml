@@ -67,7 +67,7 @@ jobs:
 
   deploy:
     docker:
-      - image: circleci/classic:latest
+      - image: buildpack-deps:trusty
 
     working_directory: ~/repo
 
