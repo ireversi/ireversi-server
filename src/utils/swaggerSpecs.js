@@ -19,4 +19,7 @@ module.exports = ['v1', 'v2'].map(version => ({
     // ymlファイルを全部登録する必要がある
     // mapで全部見てる
   })),
+  option: {
+    explorer: true,
+  },
 }));

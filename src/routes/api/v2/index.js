@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const jwt = require('jsonwebtoken');
 
 // for CORS
 router.use((req, res, next) => {
@@ -8,6 +9,43 @@ router.use((req, res, next) => {
   next();
 });
 
+// userIdの取得はいつでもできるようにする。
+router.use('/user_id_generate', require('./userIdGenerate/index.js'));
+
+// authorizationに対応するコード
+const config = {
+  appRoot: __dirname, // required config
+};
+config.swaggerSecurityHandlers = {
+  tokenAuth(req, authOrSecDef, scopesOrApiKey) {
+    try {
+      const decoded = jwt.decode(scopesOrApiKey);
+      req.requestContext = {
+        authorizer: {
+          userId: decoded,
+        },
+      };
+      // cb();
+    } catch (error) {
+      // cb(error);
+    }
+  },
+};
+
+router.use((req, res, next) => {
+  try {
+    const headerValue = req.headers.authorization;
+    const accessToken = jwt.decode(headerValue);
+    const isUserId = (Object.keys(accessToken).indexOf('userId') !== -1);
+    if (isUserId) {
+      next();
+    } else {
+      res.status(401).end();
+    }
+  } catch (e) {
+    res.status(401).end();
+  }
+});
 router.use('/board', require('./board/index.js'));
 router.use('/board/specified_size', require('./board/specified_size.js'));
 router.use('/piece', require('./piece/index.js'));

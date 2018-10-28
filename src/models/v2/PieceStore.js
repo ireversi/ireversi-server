@@ -43,10 +43,8 @@ module.exports = {
   judgePiece(x, y, userId) {
     const coordinate = [x, y].join();
     let status = false;
-
     // 置きたい座標のマスにすでにコマが存在するか判定
     if (board.pieces.has(coordinate)) return false;
-
     // 盤面に自分と同じ ID のコマが存在するか判定
     if ([...board.pieces.values()].indexOf(userId) < 0) {
       // 存在しない場合 : 置きたいマスの上下左右にコマが存在するか判定

@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const jwt = require('jsonwebtoken');
 const PieceStore = require('../../../../models/v2/PieceStore.js');
 
 const dirList = {
@@ -25,8 +26,8 @@ router.route('/')
     // 送られてきたuserIdのある座標を返す
     const standbys = PieceStore.getStandbys(); // スタンバイの配列
     const mapPieces = PieceStore.getPiecesMap(); // piecesのMapオブジェクトを取得
-    const userId = +req.query.userId; // 送られてきたuserId
-    const { direction } = req.query; // 送られてきたdirection
+    const { userId } = jwt.decode(req.headers.authorization); // 送られてきたuserId
+    const { direction } = req.body; // 送られてきたdirection
     const dir = dirList[direction]; // 送られてきたdirectionから向かう座標を取得
     // userIdのある座標を返す
     const userPosition = standbys.find(standby => standby.piece.userId === userId);

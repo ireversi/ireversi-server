@@ -1,5 +1,9 @@
 /board:
   get:
+    x-swagger-router-controller: test
+    operationId: test_post
+    security:
+    - tokenAuth: []
     tags:
       - "board"
     summary: "show all board conditon. 全ての盤面情報"
@@ -18,21 +22,20 @@
         - 全フィールドにある自コマの合計
       - size
         - フィールド全体のうち、上下左右の終端の位置情報
-    parameters:
-      - name: userId
-        in: "query"
-        description: "userId"
-        type: number
-        example: 1
-        required: true
     responses:
       200:
         description: "all condition of pieces on board."
         schema:
           type: "object"
           $ref: "#/definitions/Board"
+      401:
+        description: "Unauthorized"
 /board/specified_size:
   get:
+    x-swagger-router-controller: test
+    operationId: test_post
+    security:
+    - tokenAuth: []
     tags:
       - "board"
     summary: "show specified board size"
@@ -42,18 +45,19 @@
       - $ref: "#/definitions/Size/properties/right"
       - $ref: "#/definitions/Size/properties/bottom"
       - $ref: "#/definitions/Size/properties/top"
-      - name: "userId"
-        in: "query"
-        description: "your userId"
-        required: true
-        type: "number"
     responses:
       200:
         description: "pieces on specified board size"
         schema:
           $ref: "#/definitions/Board"
+      401:
+        description: "Unauthorized"
 /piece:
   post:
+    x-swagger-router-controller: test
+    operationId: test_post
+    security:
+    - tokenAuth: []
     tags:
       - piece
     summary: "set a piece on board"
@@ -64,7 +68,6 @@
     parameters:
       - $ref: "#/definitions/Piece/properties/x"
       - $ref: "#/definitions/Piece/properties/y"
-      - $ref: "#/definitions/Piece/properties/userId"
     responses:
       200:
         description: "show specified board size"
@@ -75,7 +78,13 @@
               $ref: "#/definitions/Status"
             piece:
               $ref: "#/definitions/Piece"
+      401:
+        description: "Unauthorized"
   delete:
+    x-swagger-router-controller: test
+    operationId: test_post
+    security:
+    - tokenAuth: []
     tags:
       - piece
     summary: "delete a piece or all pieces"
@@ -100,6 +109,10 @@
               $ref: "#/definitions/Status"
 /first_piece/position:
   post:
+    x-swagger-router-controller: test
+    operationId: test_post
+    security:
+    - tokenAuth: []
     tags:
       - first_piece
     summary: "set the first piece"
@@ -117,7 +130,13 @@
               $ref: "#/definitions/Status"
             standby:
               $ref: "#/definitions/Standby"
+      401:
+        description: "Unauthorized"
   delete:
+    x-swagger-router-controller: test
+    operationId: test_post
+    security:
+    - tokenAuth: []
     tags:
       - first_piece
     summary: "cancel the first piece"
@@ -138,8 +157,14 @@
               $ref: "#/definitions/Status"
             standby:
               $ref: "#/definitions/Standby"
+      401:
+        description: "Unauthorized"
 /first_piece/direction:
   post:
+    x-swagger-router-controller: test
+    operationId: test_post
+    security:
+    - tokenAuth: []
     tags:
       - first_piece
     summary: "direction from first piece"
@@ -170,7 +195,8 @@
             direction:
               type: "string"
               example: "nw"
-
+      401:
+        description: "Unauthorized"
 definitions:
   Standbys:
     type: array
@@ -290,3 +316,62 @@ definitions:
         description: "Max of X axis (top)"
         required: true
         type: "number"
+  userId:
+    type: "string"
+    description: "generate new userId"
+    properties:
+      userId:        
+        name: "userId"
+        type: "string"
+        description: "userId"
+        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        in: "formData"
+        required: true
+  accessToken:
+    type: "string"
+    description: "post accessToken"
+    properties:
+      accessToken:
+        name: "accessToken"
+        type: "string"
+        description: "post accessToken"
+        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        in: "formData"
+        required: true
+/user_id_generate:
+  post:
+    tags:
+      - "userId"
+    summary: "generate new userId by JWT"
+    description: "userIdの新規生成"
+    responses:
+      200:
+        description: "return a new userId"
+        schema:
+          type: "object"
+          properties:
+            userId:
+              $ref: "#/definitions/userId"
+securityDefinitions:
+  tokenAuth:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+/access_auth:
+  post:
+    x-swagger-router-controller: test
+    operationId: test_post
+    security:
+    - tokenAuth: []
+    tags:
+    - accessAuth
+    description: Post message to test
+    responses:
+      '200':
+        description: Success
+        schema:
+          $ref: '#/definitions/SimpleResponse'
+      default:
+        description: Error
+        schema:
+          $ref: "#/definitions/ErrorResponse"
