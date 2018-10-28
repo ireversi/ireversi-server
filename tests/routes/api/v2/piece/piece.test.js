@@ -3,10 +3,20 @@ const PieceStore = require('../../../../../src/models/v2/PieceStore.js');
 const array2Pieces = require('../../../../../src/utils/array2Pieces.js');
 const array2Matchers = require('../../../../../src/utils/array2Matchers.js');
 const app = require('../../../../../src/routes/app.js');
+const BoardHistoryModel = require('../../../../../src/models/v2/BoardHistoryModel.js');
+
+const {
+  prepareDB,
+  deleteAllDataFromDB,
+} = require('../../../../../src/utils/db.js');
 
 const basePath = '/api/v2/piece/';
+const propFilter = '-_id -__v';
 
 describe('piece', () => {
+  beforeAll(prepareDB);
+  afterEach(deleteAllDataFromDB);
+
   // piecesで何も渡さないが、返り値には初期値が入っているのを確認するテスト
   it('exist on 0:0 as default', async () => {
     // Reset
@@ -149,6 +159,9 @@ describe('piece', () => {
       ],
     );
 
+    // MongoDB確認のため、matchesからstatus: falseのオブジェクトを抜いた配列
+    const matchesDB = matches.filter(m => m.status === true);
+
     // When
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
@@ -170,6 +183,14 @@ describe('piece', () => {
           userId: match.piece.userId,
         },
       }));
+    }
+    const pieceData = JSON.parse(JSON.stringify(await BoardHistoryModel.find({}, propFilter)));
+    expect(pieceData).toHaveLength(matchesDB.length);
+
+    // matchesから
+    for (let i = 0; i < pieceData.length; i += 1) {
+      const pc = pieceData[i];
+      expect(pc.piece).toEqual(expect.objectContaining(matchesDB[i].piece));
     }
   });
 

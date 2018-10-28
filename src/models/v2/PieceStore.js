@@ -1,5 +1,6 @@
 const StandbyStore = require('./StandbyStore.js');
 const calcScore = require('../../routes/api/v2/board/calcScore.js');
+const BoardHistoryModel = require('../../models/v2/BoardHistoryModel.js');
 
 const board = {
   pieces: new Map(),
@@ -39,6 +40,24 @@ function judgeDirection(x, y, userId, nexts, results = []) {
   return [];
 }
 
+function addMongo(x, y, userId) {
+  const playHistory = new BoardHistoryModel({
+    method: 'post',
+    path: 'piece',
+    piece: {
+      x,
+      y,
+      userId,
+    },
+    date: Date.now(),
+    // position: {},
+    // direction: {},
+  });
+  // console.log(playHistory);
+
+  new BoardHistoryModel(playHistory).save();
+}
+
 module.exports = {
   judgePiece(x, y, userId) {
     const coordinate = [x, y].join();
@@ -67,6 +86,9 @@ module.exports = {
         }
         status = true;
       }
+    }
+    if (status) {
+      addMongo(x, y, userId);
     }
     this.addSize();
     return status;
