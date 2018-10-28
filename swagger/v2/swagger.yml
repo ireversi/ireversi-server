@@ -375,3 +375,27 @@ securityDefinitions:
         description: Error
         schema:
           $ref: "#/definitions/ErrorResponse"
+/score:
+  post:
+    x-swagger-router-controller: test
+    operationId: test_post
+    security:
+    - tokenAuth: []
+    tags:
+      - piece
+    summary: "show userId of top 5 score"
+    description: |
+      - scores
+        - top5のスコアを{userId,score}の配列で返す。
+    responses:
+      200:
+        description: "show userIds and scores of top5"
+        schema:
+          type: "array"
+          properties:
+            status:
+              $ref: "#/definitions/Status"
+            piece:
+              $ref: "#/definitions/Piece"
+      401:
+        description: "Unauthorized"
