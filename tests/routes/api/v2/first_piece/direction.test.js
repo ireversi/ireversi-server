@@ -1,8 +1,11 @@
 const chai = require('chai');
+const jwt = require('jsonwebtoken');
 const PieceStore = require('../../../../../src/models/v2/PieceStore.js');
 const array2Pieces = require('../../../../../src/utils/array2Pieces.js');
 const array2Standbys = require('../../../../../src/utils/array2Standbys.js');
 const app = require('../../../../../src/routes/app.js');
+const generateToken = require('../../../../../src/routes/api/v2/userIdGenerate/generateToken');
+
 
 const waitTime = PieceStore.getWaitTime();
 
@@ -22,18 +25,44 @@ const array2Matchers = (field) => {
   return array;
 };
 
+function genJwtArr(number) {
+  const jwtIds = [];
+  for (i = 0; i < number; i += 1) {
+    const jwtElm = {};
+    tempJwt = generateToken.generate();
+    jwtElm.jwtId = tempJwt;
+    jwtElm.decode = jwt.decode(tempJwt).userId;
+    jwtIds.push(jwtElm);
+  }
+  return jwtIds;
+}
+
+function searchIndex(jwtIds, jwtId) {
+  let ans = -1;
+  jwtIds.forEach((elm, index) => {
+    if (elm.decode === jwtId) {
+      ans = index;
+    }
+  });
+  return ans;
+}
+
 describe('position', () => {
   // 前提条件を揃えるテスト
   // positionに値を投げて、返り値のstandbyと期待値が合うか
   // positionと同様のテスト
-  it('start remaining timer', async () => {
+  it('start remaining timer1', async () => {
     await chai.request(app).delete(`${basePath}`);
+    PieceStore.deletePieces();
+
+    // userIdのtokenを生成
+    const jwtIds = genJwtArr(1);
 
     // Given
     // position.jsに送って、Standbyを作る
     const pieces = array2Pieces.array2Pieces(
       [
-        '2:1', '2:2',
+        `${jwtIds[0].decode}:1`, `${jwtIds[0].decode}:2`,
         0, 0,
       ],
     );
@@ -41,7 +70,7 @@ describe('position', () => {
     // 期待値
     const matches = array2Standbys.array2Standbys(
       [
-        '2:1', '2:2:f',
+        `${jwtIds[0].decode}:1`, `${jwtIds[0].decode}:2:f`,
         0, 0,
       ],
     );
@@ -50,10 +79,12 @@ describe('position', () => {
     // 返り値として期待するmatchesと、返り値との比較テスト
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
-      const piece = pieces[i];
+      const { piece } = pieces[i];
+      const index = searchIndex(jwtIds, pieces[i].piece.userId);
+
       response = await chai.request(app)
         .post(`${basePath}/position`)
-        .query({ userId: piece.userId })
+        .set('Authorization', jwtIds[index].jwtId)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send({
           x: piece.x,
@@ -71,14 +102,18 @@ describe('position', () => {
   });
 
   // userIdと方角を与えて、レーザービーム打てるかのテスト
-  it('start remaining timer', async () => {
+  it('start remaining timer2', async () => {
     await chai.request(app).delete(`${basePath}`);
+    PieceStore.deletePieces();
 
-    // Given
+    // userIdのtokenを生成
+    const jwtIds = genJwtArr(5);
+
+    // // Given
     // addPieceで直接piecesの前提条件を用意する
     const prepare = [
-      { x: 0, y: 1, userId: 4 },
-      { x: 1, y: 1, userId: 3 },
+      { x: 0, y: 1, userId: jwtIds[3].decode },
+      { x: 1, y: 1, userId: jwtIds[2].decode },
     ];
     for (let i = 0; i < prepare.length; i += 1) {
       PieceStore.addPiece(prepare[i]);
@@ -89,21 +124,21 @@ describe('position', () => {
       [
         0, 0, 0,
         0, 0, 0,
-        0, '2:1', 0,
+        0, `${jwtIds[1].decode}:1`, 0,
       ],
     );
 
     // directionに投げるデータ
-    const user = 2;
+    const user = jwtIds[1].decode;
     const direction = 'n';
     const status = true;
 
     // 期待値
     const matches = array2Matchers(
       [
-        0, 2, 0,
-        4, 2, 0,
-        1, 2, 0,
+        0, jwtIds[1].decode, 0,
+        jwtIds[3].decode, jwtIds[1].decode, 0,
+        1, jwtIds[1].decode, 0,
       ],
     );
 
@@ -113,12 +148,13 @@ describe('position', () => {
     let standbyRes;
 
     for (let i = 0; i < pieces.length; i += 1) {
-      const piece = pieces[i];
+      const { piece } = pieces[i];
+      const index = searchIndex(jwtIds, pieces[i].piece.userId);
 
       // piecesのuserIdを送る。standby状態を作る。
       positionRes = await chai.request(app)
         .post(`${basePath}/position`)
-        .query({ userId: piece.userId })
+        .set('Authorization', jwtIds[index].jwtId)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send({
           x: piece.x,
@@ -128,9 +164,10 @@ describe('position', () => {
       if (positionRes.body.status) {
         // 別途定義した確認したいuserIdとdirectionを送る。
         // 結果がpiecesに入っているかを確認する。
+
         standbyRes = await chai.request(app)
           .post(`${basePath}/direction`)
-          .query({ userId: user, direction })
+          .set('Authorization', jwtIds[index].jwtId)
           .set('content-type', 'application/x-www-form-urlencoded')
           .send({
             userId: user,
@@ -153,14 +190,18 @@ describe('position', () => {
   });
 
   // userIdと方角を与えるが、レーザービーム打てないテスト
-  it('start remaining timer', async () => {
+  it('start remaining timer3', async () => {
     await chai.request(app).delete(`${basePath}`);
+    PieceStore.deletePieces();
+
+    // userIdのtokenを生成
+    const jwtIds = genJwtArr(5);
 
     // Given
     // addPieceで直接piecesの前提条件を用意する
     const prepare = [
-      { x: 0, y: 1, userId: 4 },
-      { x: 1, y: 1, userId: 3 },
+      { x: 0, y: 1, userId: jwtIds[3].decode },
+      { x: 1, y: 1, userId: jwtIds[2].decode },
     ];
     for (let i = 0; i < prepare.length; i += 1) {
       PieceStore.addPiece(prepare[i]);
@@ -171,12 +212,12 @@ describe('position', () => {
       [
         0, 0, 0,
         0, 0, 0,
-        0, '2:1', 0,
+        0, `${jwtIds[1].decode}:1`, 0,
       ],
     );
 
     // directionに投げるデータ
-    const user = 2;
+    const user = jwtIds[1].decode;
     const direction = 'e';
     const status = false;
 
@@ -184,7 +225,7 @@ describe('position', () => {
     const matches = array2Matchers(
       [
         0, 0, 0,
-        4, 3, 0,
+        jwtIds[3].decode, jwtIds[2].decode, 0,
         1, 0, 0,
       ],
     );
@@ -195,12 +236,13 @@ describe('position', () => {
     let standbyRes;
 
     for (let i = 0; i < pieces.length; i += 1) {
-      const piece = pieces[i];
+      const { piece } = pieces[i];
+      const index = searchIndex(jwtIds, pieces[i].piece.userId);
 
       // piecesのuserIdを送る。standby状態を作る。
       positionRes = await chai.request(app)
         .post(`${basePath}/position`)
-        .query({ userId: piece.userId })
+        .set('Authorization', jwtIds[index].jwtId)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send({
           x: piece.x,
@@ -212,7 +254,7 @@ describe('position', () => {
         // 結果がpiecesに入っているかを確認する。
         standbyRes = await chai.request(app)
           .post(`${basePath}/direction`)
-          .query({ userId: user, direction })
+          .set('Authorization', jwtIds[index].jwtId)
           .set('content-type', 'application/x-www-form-urlencoded')
           .send({
             userId: user,

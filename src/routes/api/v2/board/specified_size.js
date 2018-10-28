@@ -24,7 +24,7 @@ router.route('/').get(async (req, res) => {
     for (let i = xMin; i < xMax + 1; i += 1) {
       for (let k = yMin; k < yMax + 1; k += 1) {
         if (elm.x === i && elm.y === k) {
-          ansPieces.push(elm);
+          ansPieces.push(elm.userId);
         }
       }
     }
