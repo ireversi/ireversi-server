@@ -9,6 +9,10 @@ router.use((req, res, next) => {
   next();
 });
 
+router.options('*', (req, res) => {
+  res.sendStatus(200);
+});
+
 // userIdの取得はいつでもできるようにする。
 router.use('/user_id_generate', require('./userIdGenerate/index.js'));
 
