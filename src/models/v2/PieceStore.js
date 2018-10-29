@@ -1,6 +1,6 @@
 const StandbyStore = require('./StandbyStore.js');
 const calcScore = require('../../routes/api/v2/board/calcScore.js');
-const BoardHistoryModel = require('../../models/v2/BoardHistoryModel.js');
+const sendHistory = require('../../utils/sendPlayHistory');
 
 const board = {
   pieces: new Map(),
@@ -40,32 +40,12 @@ function judgeDirection(x, y, userId, nexts, results = []) {
   return [];
 }
 
-function addMongo(x, y, userId) {
-  const playHistory = new BoardHistoryModel({
-    method: 'post',
-    path: 'piece',
-    piece: {
-      x,
-      y,
-      userId,
-    },
-    date: Date.now(),
-    // position: {},
-    // direction: {},
-  });
-  // console.log(playHistory);
-
-  new BoardHistoryModel(playHistory).save();
-}
-
 module.exports = {
   judgePiece(x, y, userId) {
     const coordinate = [x, y].join();
     let status = false;
-
     // 置きたい座標のマスにすでにコマが存在するか判定
     if (board.pieces.has(coordinate)) return false;
-
     // 盤面に自分と同じ ID のコマが存在するか判定
     if ([...board.pieces.values()].indexOf(userId) < 0) {
       // 存在しない場合 : 置きたいマスの上下左右にコマが存在するか判定
@@ -87,10 +67,10 @@ module.exports = {
         status = true;
       }
     }
-    if (status) {
-      addMongo(x, y, userId);
-    }
     this.addSize();
+    if (status) {
+      sendHistory.addMongo(x, y, userId);
+    }
     return status;
   },
   addPiece(piece) {

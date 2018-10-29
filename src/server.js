@@ -11,11 +11,11 @@ const PieceStore = require('./models/v2/PieceStore.js');
 (async () => {
   await connectDB(); // DBに接続
   PieceStore.initPieces();
-  specs.forEach(({ version, spec }) => {
+  specs.forEach(({ version, spec, option }) => {
     const docsPath = `/api-docs/${version}`; // ドキュメントのURL決める
     app.use(docsPath, swaggerUi.serve, (...args) => {
       // 最後にsetupしたspecが返されるっぽいから複数ページ管理するにはこうするしかないかも
-      swaggerUi.setup(spec)(...args);
+      swaggerUi.setup(spec, option)(...args);
     });
     console.log(`API ${version} docs path: ${docsPath}`); // 接続できるよ、ってのを書いている
   });

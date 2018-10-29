@@ -9,7 +9,7 @@ const BoardHistorySchema = new Schema({
   piece: {
     x: Number,
     y: Number,
-    userId: Number,
+    userId: String,
   },
   date: {
     type: Date,

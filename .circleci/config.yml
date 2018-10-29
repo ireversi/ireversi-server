@@ -65,6 +65,16 @@ jobs:
       - run: now -t ${NOW_TOKEN} alias
       - run: now -t ${NOW_TOKEN} scale ireversi-server.now.sh 1
 
+  deploy:
+    docker:
+      - image: circleci/python:3.6.4
+
+    working_directory: ~/repo
+
+    steps:
+      - run: sudo pip install awscli
+      - run: aws deploy create-deployment --application-name $AWS_APP_NAME --deployment-group-name $AWS_GROUP_NAME --github-location repository="$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME",commitId="$CIRCLE_SHA1"
+
 workflows:
   version: 2
   test_and_staging:
@@ -76,3 +86,9 @@ workflows:
           filters:
             branches:
               only: develop
+      - deploy:
+          requires:
+            - test
+          filters:
+            branches:
+              only: master

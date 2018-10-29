@@ -1,32 +1,62 @@
 const chai = require('chai');
+const jwt = require('jsonwebtoken');
 const PieceStore = require('../../../../../src/models/v2/PieceStore.js');
 const BoardStore = require('../../../../../src/models/v2/BoardStore.js');
 const array2Pieces = require('../../../../../src/utils/array2Pieces.js');
 const array2Standbys = require('../../../../../src/utils/array2Standbys.js');
 const app = require('../../../../../src/routes/app.js');
+const generateToken = require('../../../../../src/routes/api/v2/userIdGenerate/generateToken');
 
 const basePath = '/api/v2/first_piece';
 const waitTime = PieceStore.getWaitTime();
+
 const sleep = msec => new Promise(resolve => setTimeout(resolve, msec));
+
+function genJwtArr(number) {
+  const jwtIds = [];
+  for (i = 0; i < number; i += 1) {
+    const jwtElm = {};
+    tempJwt = generateToken.generate();
+    jwtElm.jwtId = tempJwt;
+    jwtElm.decode = jwt.decode(tempJwt).userId;
+    jwtIds.push(jwtElm);
+  }
+  return jwtIds;
+}
+
+function searchIndex(jwtIds, jwtId) {
+  let ans = -1;
+  jwtIds.forEach((elm, index) => {
+    if (elm.decode === jwtId) {
+      ans = index;
+    }
+  });
+  return ans;
+}
 
 describe('piece', () => {
   // テスト：positionが置けるか。
   it('is stoodby in a board array', async () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
+    PieceStore.deletePieces();
+    PieceStore.deleteStandbys();
+
+    // userIdのtokenを生成
+    const jwtIds = genJwtArr(2);
 
     // Given
     const pieces = array2Pieces.array2Pieces(
       [
-        '4:1', '5:2',
-        '5:3', 0,
+        `${jwtIds[0].decode}:1`, `${jwtIds[1].decode}:2`,
+        `${jwtIds[1].decode}:3`, 0,
       ],
     );
 
     const matches = array2Standbys.array2Standbys(
       [
-        '4:1', '5:2:f',
-        '5:3:f', 0,
+        `${jwtIds[0].decode}:1`, `${jwtIds[1].decode}:2:f`,
+        `${jwtIds[1].decode}:3:f`, 0,
       ],
     );
 
@@ -34,10 +64,11 @@ describe('piece', () => {
     // 返り値として期待するmatchesと、返り値との比較テスト
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
-      const piece = pieces[i];
+      const { piece } = pieces[i];
+      const index = searchIndex(jwtIds, pieces[i].piece.userId);
       response = await chai.request(app)
         .post(`${basePath}/position`)
-        .query({ userId: piece.userId })
+        .set('Authorization', jwtIds[index].jwtId)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send({
           x: piece.x,
@@ -60,28 +91,34 @@ describe('piece', () => {
   it('is confirmed to be in standbys of board array', async () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
+    PieceStore.deletePieces();
+    PieceStore.deleteStandbys();
+
+    // userIdのtokenを生成
+    const jwtIds = genJwtArr(2);
 
     // Given
     const pieces = array2Pieces.array2Pieces(
       [
-        '4:1', '5:2',
-        '5:3', 0,
+        `${jwtIds[0].decode}:1`, `${jwtIds[1].decode}:2`,
+        `${jwtIds[0].decode}:3`, 0,
       ],
     );
 
     // When
     for (let i = 0; i < pieces.length; i += 1) {
-      const p = pieces[i];
+      const p = pieces[i].piece;
+      const index = searchIndex(jwtIds, pieces[i].piece.userId);
       response = await chai.request(app)
         .post(`${basePath}/position`)
-        .query({ userId: p.userId })
+        .set('Authorization', jwtIds[index].jwtId)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send({
           x: p.x,
           y: p.y,
         });
 
-      const { standbys } = BoardStore.getBoard();
+      const { standbys } = BoardStore.getBoard(pieces[i].piece.userId);
       const res = response.body; // 返り値を１つずつ
 
       // Then
@@ -107,21 +144,26 @@ describe('piece', () => {
   it('is stoodby in a board array', async () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
+    PieceStore.deletePieces();
+    PieceStore.deleteStandbys();
+
+    // userIdのtokenを生成
+    const jwtIds = genJwtArr(9);
 
     // Given
     const pieces = array2Pieces.array2Pieces(
       [
-        '1:1', 0, '4:4',
-        '3:3', '2:2', '5:5',
-        ['6:6', '9:9'], '7:7', '8:8',
+        `${jwtIds[0].decode}:1`, 0, `${jwtIds[3].decode}:4`,
+        `${jwtIds[2].decode}:3`, `${jwtIds[1].decode}:2`, `${jwtIds[4].decode}:5`,
+        [`${jwtIds[5].decode}:6`, `${jwtIds[8].decode}:9`], `${jwtIds[6].decode}:7`, `${jwtIds[7].decode}:8`,
       ],
     );
 
     const matches = array2Standbys.array2Standbys(
       [
-        '1:1:f', 0, '4:4:f',
-        '3:3', '2:2:f', '5:5:f',
-        ['6:6:f', '9:9:f'], '7:7', '8:8:f',
+        `${jwtIds[0].decode}:1:f`, 0, `${jwtIds[3].decode}:4:f`,
+        `${jwtIds[2].decode}:3`, `${jwtIds[1].decode}:2:f`, `${jwtIds[4].decode}:5:f`,
+        [`${jwtIds[5].decode}:6:f`, `${jwtIds[8].decode}:9:f`], `${jwtIds[6].decode}:7`, `${jwtIds[7].decode}:8:f`,
       ],
     );
 
@@ -129,10 +171,11 @@ describe('piece', () => {
     // 返り値として期待するmatchesと、返り値との比較テスト
     let response;
     for (let i = 0; i < pieces.length; i += 1) {
-      const piece = pieces[i];
+      const { piece } = pieces[i];
+      const index = searchIndex(jwtIds, pieces[i].piece.userId);
       response = await chai.request(app)
         .post(`${basePath}/position`)
-        .query({ userId: piece.userId })
+        .set('Authorization', jwtIds[index].jwtId)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send({
           x: piece.x,
@@ -154,21 +197,28 @@ describe('piece', () => {
   it('is confirmed to be in standbys of board array', async () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
+    PieceStore.deletePieces();
+    PieceStore.deleteStandbys();
+
+    // userIdのtokenを生成
+    const jwtIds = genJwtArr(1);
 
     // Given
     const pieces = array2Pieces.array2Pieces(
       [
-        '4:1', 0,
+        `${jwtIds[0].decode}:1`, 0,
         0, 0,
       ],
     );
 
     // When
     for (let i = 0; i < pieces.length; i += 1) {
-      const p = pieces[i];
+      const p = pieces[i].piece;
+
+      const index = searchIndex(jwtIds, pieces[i].piece.userId);
       response = await chai.request(app)
         .post(`${basePath}/position`)
-        .query({ userId: p.userId })
+        .set('Authorization', jwtIds[index].jwtId)
         .set('content-type', 'application/x-www-form-urlencoded')
         .send({
           x: p.x,
@@ -179,8 +229,8 @@ describe('piece', () => {
 
       // Then
       // waitTimeを待たずにStandbyを確認したら格納されている
+      const standbys = PieceStore.getStandbys();
       if (res.status) {
-        const standbys = PieceStore.getStandbys();
         for (let j = 0; j < standbys.length; j += 1) {
           const standby = standbys[j]; // board内のstandby情報
           const { piece, remaining } = standby;
@@ -198,11 +248,8 @@ describe('piece', () => {
       // waitTimeが経ったあとにstandbyが空になっているかの確認
       if (res.status) {
         await sleep(waitTime); // 3500ミリ秒待機
-        const standbys = PieceStore.getStandbys();
-        for (let j = 0; j < standbys.length; j += 1) {
-          const standby = standbys[j]; // board内のstandby情報
-          expect(standby).toBe(undefined); // waitTimeが経過して、undefinedになっている
-        }
+        standbysConfirm = PieceStore.getStandbys();
+        expect(standbysConfirm).toHaveLength(0); // waitTimeが経過して、配列が空になっている
       }
     }
   });

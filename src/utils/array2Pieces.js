@@ -22,8 +22,20 @@ module.exports = {
       const order = playOrder[i][0];
       const x = order % sqrt;
       const y = Math.floor(((source.length - 1) - order) / sqrt);
-      const userId = parseInt(playOrder[n][1].slice(playOrder[n][1].indexOf(':') - 1), 10);
-      elm = { x, y, userId };
+      let userId = playOrder[n][1].slice(0, playOrder[n][1].indexOf(':'));
+      if (!Number.isNaN(Number(userId))) {
+        userId = Number(userId);
+      }
+
+      const status = playOrder[i][2];
+      elm = {
+        status,
+        piece: {
+          x,
+          y,
+          userId,
+        },
+      };
       n += 1;
       array.push(elm);
     }

@@ -1,5 +1,6 @@
-const config = require('../../config.js'); // remainingに設定する待ち時間
-
+const jwt = require('jsonwebtoken');
+const config = require('../../config.js');
+// remainingに設定する待ち時間
 const { waitTime } = config;
 
 module.exports = {
@@ -13,12 +14,14 @@ module.exports = {
   },
   getPlayInfo(req) {
     const dateNow = Date.now(); // 受け取った時刻
+    const { userId } = jwt.decode(req.headers.authorization);
     const play = {
       playNow: dateNow,
       x: +req.body.x,
       y: +req.body.y,
-      userId: +req.query.userId,
+      userId,
     };
+
     return play;
   },
 };

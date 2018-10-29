@@ -16,12 +16,11 @@ module.exports = {
         sourceExist.push(h);
       }
     }
-
     // 要素にfがあるかないかでtrueかfalseを決定
     for (let i = 0; i < sourceExist.length; i += 1) {
       const el = sourceExist[i];
       const order = el[0];
-      if (el[1].match(/f/)) { // fがついていたらfalseを付与、なければtrueを付与
+      if (el[1].match(/:f/)) { // fがついていたらfalseを付与、なければtrueを付与
         const piece = el[1].replace(/:f/, ''); // :fの文字を削除
         sourceExist[i] = [order, piece, false];
       } else {
@@ -38,7 +37,11 @@ module.exports = {
       const order = playOrder[i][0];
       const x = order % sqrt;
       const y = Math.floor(((source.length - 1) - order) / sqrt);
-      const userId = parseInt(playOrder[n][1].slice(playOrder[n][1].indexOf(':') - 1), 10);
+      let userId = playOrder[n][1].slice(0, playOrder[n][1].indexOf(':'));
+      if (!Number.isNaN(Number(userId))) {
+        userId = Number(userId);
+      }
+
       const status = playOrder[i][2];
       elm = {
         status,
