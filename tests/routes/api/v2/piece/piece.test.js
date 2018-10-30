@@ -38,7 +38,6 @@ function searchIndex(jwtIds, jwtId) {
   return ans;
 }
 
-
 describe('piece', () => {
   beforeAll(prepareDB);
   afterEach(deleteAllDataFromDB);
@@ -47,9 +46,10 @@ describe('piece', () => {
   it('exist on 0:0 as default', async () => {
     // Reset
     /* -----------------------*/
-    /* Reset後は
-     { x: 0, y: 0, userId: 1 }
-     がデフォルトで入ります
+    /*
+      Reset後は
+      { x: 0, y: 0, userId: 1 }
+      がデフォルトで入ります
      */
     /* -----------------------*/
     await chai.request(app).delete(`${basePath}`);

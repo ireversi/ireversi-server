@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const PieceStore = require('../../../../models/v2/PieceStore.js');
-// const BoardHistoryModel = require('../../../../models/v2/BoardHistoryModel.js');
 
 router.route('/')
   .post((req, res) => {
@@ -14,22 +13,6 @@ router.route('/')
     };
 
     const status = PieceStore.judgePiece(piece.x, piece.y, piece.userId);
-
-    // const playHistory = new BoardHistoryModel({
-    //   method: 'post',
-    //   path: 'piece',
-    //   piece,
-    //   date: Date.now(),
-    //   position: {},
-    //   direction: {},
-    // });
-    // console.log(playHistory);
-
-    // if (status) {
-    //   new BoardHistoryModel(playHistory).save();
-    // }
-    // console.log({ status, piece });
-
     res.json({ status, piece });
   })
   .delete((req, res) => {

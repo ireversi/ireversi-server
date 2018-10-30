@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const PieceStore = require('../../../../models/v2/PieceStore.js');
 const StandbyStore = require('../../../../models/v2/StandbyStore.js');
+const sendHistory = require('../../../../utils/sendPlayHistory.js');
 
 const calcScore = require('../board/calcScore.js');
 
@@ -70,6 +71,7 @@ router.route('/')
 
     if (status) {
       PieceStore.addStandby(playResult); // boardに追加
+      sendHistory.addPositionMongo(x, y, userId);
     }
     await res.send(playReturn); // 1プレイの結果を返す
   });

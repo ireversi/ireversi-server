@@ -5,10 +5,15 @@ const array2Pieces = require('../../../../../src/utils/array2Pieces.js');
 const array2Standbys = require('../../../../../src/utils/array2Standbys.js');
 const app = require('../../../../../src/routes/app.js');
 const generateToken = require('../../../../../src/routes/api/v2/userIdGenerate/generateToken');
+const BoardHistoryModel = require('../../../../../src/models/v2/BoardHistoryModel.js');
 
+const { // テストのたびにDBをクリア
+  prepareDB,
+  deleteAllDataFromDB,
+} = require('../../../../../src/utils/db.js');
 
 const waitTime = PieceStore.getWaitTime();
-
+const propFilter = '-_id -__v';
 const basePath = '/api/v2/first_piece';
 
 const array2Matchers = (field) => {
@@ -47,11 +52,14 @@ function searchIndex(jwtIds, jwtId) {
   return ans;
 }
 
-describe('position', () => {
+describe('direction', () => {
+  beforeAll(prepareDB);
+  afterEach(deleteAllDataFromDB);
+
   // 前提条件を揃えるテスト
   // positionに値を投げて、返り値のstandbyと期待値が合うか
   // positionと同様のテスト
-  it('start remaining timer1', async () => {
+  it('needed a standbied position', async () => {
     await chai.request(app).delete(`${basePath}`);
     PieceStore.deletePieces();
 
@@ -102,7 +110,7 @@ describe('position', () => {
   });
 
   // userIdと方角を与えて、レーザービーム打てるかのテスト
-  it('start remaining timer2', async () => {
+  it('let player shoot lazer beem', async () => {
     await chai.request(app).delete(`${basePath}`);
     PieceStore.deletePieces();
 
@@ -273,6 +281,121 @@ describe('position', () => {
       }
       expect(piecesOnBoard).toHaveLength(matches.length); // pieceの数が合っているか
       expect(piecesOnBoard).toEqual(expect.arrayContaining(matches)); // piecesの中身が合っているか
+    }
+  });
+
+  // MongoDBに保存されているかのテスト
+  it('can be saved in MongoDB', async () => {
+    await chai.request(app).delete(`${basePath}`);
+    PieceStore.deletePieces();
+
+    // userIdのtokenを生成
+    const jwtIds = genJwtArr(5);
+
+    // // Given
+    // addPieceで直接piecesの前提条件を用意する
+    const prepare = [
+      { x: 0, y: 1, userId: jwtIds[3].decode },
+      { x: 1, y: 1, userId: jwtIds[2].decode },
+    ];
+    for (let i = 0; i < prepare.length; i += 1) {
+      PieceStore.addPiece(prepare[i]);
+    }
+
+    // position.jsに送って、Standbyのコマを作る
+    // すべておける前提
+    const pieces = array2Pieces.array2Pieces(
+      [
+        0, 0, 0,
+        0, 0, 0,
+        0, `${jwtIds[1].decode}:1`, 0,
+      ],
+    );
+
+    // directionに投げるデータ
+    const user = jwtIds[1].decode;
+    const direction = 'n';
+    const status = true;
+
+    // 期待値
+    const matches = array2Matchers(
+      [
+        0, jwtIds[1].decode, 0,
+        jwtIds[3].decode, jwtIds[1].decode, 0,
+        1, jwtIds[1].decode, 0,
+      ],
+    );
+
+    // 向かう方角のpieceを定義
+    const matchesDB = array2Matchers(
+      [
+        0, 0, 0,
+        0, jwtIds[1].decode, 0,
+        0, 0, 0,
+      ],
+    );
+
+    // When
+    // 返り値として期待するmatchesと、返り値との比較テスト
+    let positionRes;
+    let standbyRes;
+
+    for (let i = 0; i < pieces.length; i += 1) {
+      const { piece } = pieces[i];
+      const index = searchIndex(jwtIds, pieces[i].piece.userId);
+
+      // piecesのuserIdを送る。standby状態を作る。
+      positionRes = await chai.request(app)
+        .post(`${basePath}/position`)
+        .set('Authorization', jwtIds[index].jwtId)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send({
+          x: piece.x,
+          y: piece.y,
+        });
+
+      if (positionRes.body.status) {
+        // 別途定義した確認したいuserIdとdirectionを送る。
+        // 結果がpiecesに入っているかを確認する。
+
+        standbyRes = await chai.request(app)
+          .post(`${basePath}/direction`)
+          .set('Authorization', jwtIds[index].jwtId)
+          .set('content-type', 'application/x-www-form-urlencoded')
+          .send({
+            userId: user,
+            direction,
+          });
+      }
+
+      const piecesOnBoard = PieceStore.getPieces();
+      const standbysOnBoard = PieceStore.getStandbys();
+
+      // Then
+      expect(standbyRes.body.status).toEqual(status); // 送った結果、置けたかどうか
+      for (let j = 0; j < standbysOnBoard.length; j += 1) { // standbyが消えているか
+        const stb = standbysOnBoard[j];
+        expect(stb.piece).not.toMatchObject(piece);
+      }
+      expect(piecesOnBoard).toHaveLength(matches.length); // pieceの数が合っているか
+      expect(piecesOnBoard).toEqual(expect.arrayContaining(matches)); // piecesの中身が合っているか
+
+      // MongoDBに置けてるかどうかの確認
+      // Mongoからデータを取得
+      const directionData = JSON.parse(
+        JSON.stringify(
+          await BoardHistoryModel.find({}, propFilter),
+        ),
+      );
+      for (let j = 0; j < directionData.length; j += 1) {
+        if (directionData[j].path === 'first_piece/direction') { // Mongoからdirectionだけを検索
+          const dirEl = directionData[j].piece; // directionで向かう方角のpieceを取得
+          for (let k = 0; k < matchesDB.length; k += 1) {
+            const matchEl = matchesDB[k];
+            expect(dirEl).toEqual(matchEl);
+          }
+        }
+      }
     }
   });
 });

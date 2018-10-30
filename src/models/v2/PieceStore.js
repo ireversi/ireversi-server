@@ -67,9 +67,9 @@ module.exports = {
         status = true;
       }
     }
-    this.addSize();
+    this.addSize(); // コマを置くと同時にsizeを増やす
     if (status) {
-      sendHistory.addMongo(x, y, userId);
+      sendHistory.addPieceMongo(x, y, userId); // プレイ情報をMongoに送信
     }
     return status;
   },
