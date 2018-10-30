@@ -375,3 +375,21 @@ securityDefinitions:
         description: Error
         schema:
           $ref: "#/definitions/ErrorResponse"
+/top5score:
+  get:
+    x-swagger-router-controller: test
+    operationId: test_post
+    security:
+    - tokenAuth: []
+    tags:
+    - score
+    description: get top5 scores
+    responses:
+      '200':
+        description: Success
+        schema:
+          $ref: '#/definitions/SimpleResponse'
+      default:
+        description: Error
+        schema:
+          $ref: "#/definitions/ErrorResponse"

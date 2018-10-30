@@ -54,5 +54,6 @@ router.use('/board', require('./board/index.js'));
 router.use('/board/specified_size', require('./board/specified_size.js'));
 router.use('/piece', require('./piece/index.js'));
 router.use('/first_piece', require('./first_piece/index.js'));
+router.use('/top5score', require('./top5score/index.js'));
 
 module.exports = router;
