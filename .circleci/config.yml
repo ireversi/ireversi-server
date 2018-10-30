@@ -61,7 +61,7 @@ jobs:
           key: nowcli-11.4.1
 
       - run: now -t ${NOW_TOKEN} remove ireversi-server -y || true
-      - run: now -t ${NOW_TOKEN} --public -e MONGO_URI=@ireversi-mongo-uri -n ireversi-server
+      - run: now -t ${NOW_TOKEN} --public --no-verify -e MONGO_URI=@ireversi-mongo-uri -n ireversi-server
       - run: now -t ${NOW_TOKEN} alias
       - run: now -t ${NOW_TOKEN} scale ireversi-server.now.sh 1
 
