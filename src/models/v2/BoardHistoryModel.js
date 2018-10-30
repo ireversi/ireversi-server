@@ -9,7 +9,7 @@ const BoardHistorySchema = new Schema({
   piece: {
     x: Number,
     y: Number,
-    userId: Number,
+    userId: String,
   },
   date: {
     type: Date,
@@ -18,13 +18,15 @@ const BoardHistorySchema = new Schema({
   position: {
     x: Number,
     y: Number,
-    userId: Number,
+    userId: String,
   },
   direction: {
     x: Number,
     y: Number,
+    userId: String,
   },
-  // parameters: Schema.Types.Mixed, // any型っぽいやつ, deleteやpieceなど様々な型に対応
+  // any型っぽいやつ, deleteやpieceなど様々な型に対応
+  // parameters: Schema.Types.Mixed
 });
 
 module.exports = mongoose.model('BoardHistory', BoardHistorySchema);

@@ -1,5 +1,6 @@
 const StandbyStore = require('./StandbyStore.js');
 const calcScore = require('../../routes/api/v2/board/calcScore.js');
+const sendHistory = require('../../utils/sendPlayHistory');
 
 const board = {
   pieces: new Map(),
@@ -41,6 +42,7 @@ function judgeDirection(x, y, userId, nexts, results = []) {
 
 module.exports = {
   judgePiece(x, y, userId) {
+    const created = Date.now();
     const coordinate = [x, y].join();
     let status = false;
     // 置きたい座標のマスにすでにコマが存在するか判定
@@ -66,7 +68,10 @@ module.exports = {
         status = true;
       }
     }
-    this.addSize();
+    this.addSize(); // コマを置くと同時にsizeを増やす
+    if (status) {
+      sendHistory.addPieceMongo(x, y, userId, created); // プレイ情報をMongoに送信
+    }
     return status;
   },
   addPiece(piece) {

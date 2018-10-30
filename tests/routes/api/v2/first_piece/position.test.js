@@ -6,9 +6,17 @@ const array2Pieces = require('../../../../../src/utils/array2Pieces.js');
 const array2Standbys = require('../../../../../src/utils/array2Standbys.js');
 const app = require('../../../../../src/routes/app.js');
 const generateToken = require('../../../../../src/routes/api/v2/userIdGenerate/generateToken');
+const BoardHistoryModel = require('../../../../../src/models/v2/BoardHistoryModel.js');
+
+const { // テストのたびにDBをクリア
+  prepareDB,
+  deleteAllDataFromDB,
+} = require('../../../../../src/utils/db.js');
 
 const basePath = '/api/v2/first_piece';
+const propFilter = '-_id -__v';
 const waitTime = PieceStore.getWaitTime();
+
 const sleep = msec => new Promise(resolve => setTimeout(resolve, msec));
 
 function genJwtArr(number) {
@@ -34,11 +42,15 @@ function searchIndex(jwtIds, jwtId) {
 }
 
 describe('piece', () => {
+  beforeAll(prepareDB);
+  afterEach(deleteAllDataFromDB);
+
   // テスト：positionが置けるか。
   it('is stoodby in a board array', async () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
     PieceStore.deletePieces();
+    PieceStore.deleteStandbys();
 
     // userIdのtokenを生成
     const jwtIds = genJwtArr(2);
@@ -64,7 +76,6 @@ describe('piece', () => {
     for (let i = 0; i < pieces.length; i += 1) {
       const { piece } = pieces[i];
       const index = searchIndex(jwtIds, pieces[i].piece.userId);
-      // console.log(jwt.decode(jwtIds[index].jwtId).userId);
       response = await chai.request(app)
         .post(`${basePath}/position`)
         .set('Authorization', jwtIds[index].jwtId)
@@ -79,8 +90,8 @@ describe('piece', () => {
 
       // Then
       expect(res.status).toEqual(match.status); // 置けたかの判定が合っているか
-      // expect(res.standby.remaining).toBeLessThanOrEqual(waitTime); // 時間が経過し、待機時間から時間が減っているか
-      // expect(res.standby.piece).toMatchObject(match.standby.piece); // pieceの値が合っているか
+      expect(res.standby.remaining).toBeLessThanOrEqual(waitTime); // 時間が経過し、待機時間から時間が減っているか
+      expect(res.standby.piece).toMatchObject(match.standby.piece); // pieceの値が合っているか
     }
   });
 
@@ -91,6 +102,7 @@ describe('piece', () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
     PieceStore.deletePieces();
+    PieceStore.deleteStandbys();
 
     // userIdのtokenを生成
     const jwtIds = genJwtArr(2);
@@ -116,7 +128,7 @@ describe('piece', () => {
           y: p.y,
         });
 
-      const { standbys } = BoardStore.getBoard();
+      const { standbys } = BoardStore.getBoard(pieces[i].piece.userId);
       const res = response.body; // 返り値を１つずつ
 
       // Then
@@ -143,6 +155,7 @@ describe('piece', () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
     PieceStore.deletePieces();
+    PieceStore.deleteStandbys();
 
     // userIdのtokenを生成
     const jwtIds = genJwtArr(9);
@@ -159,7 +172,7 @@ describe('piece', () => {
     const matches = array2Standbys.array2Standbys(
       [
         `${jwtIds[0].decode}:1:f`, 0, `${jwtIds[3].decode}:4:f`,
-        `${jwtIds[2].decode}:3:f`, `${jwtIds[1].decode}:2:f`, `${jwtIds[4].decode}:5:f`,
+        `${jwtIds[2].decode}:3`, `${jwtIds[1].decode}:2:f`, `${jwtIds[4].decode}:5:f`,
         [`${jwtIds[5].decode}:6:f`, `${jwtIds[8].decode}:9:f`], `${jwtIds[6].decode}:7`, `${jwtIds[7].decode}:8:f`,
       ],
     );
@@ -195,6 +208,7 @@ describe('piece', () => {
     // Reset
     await chai.request(app).delete(`${basePath}`);
     PieceStore.deletePieces();
+    PieceStore.deleteStandbys();
 
     // userIdのtokenを生成
     const jwtIds = genJwtArr(1);
@@ -209,7 +223,8 @@ describe('piece', () => {
 
     // When
     for (let i = 0; i < pieces.length; i += 1) {
-      const p = pieces[i];
+      const p = pieces[i].piece;
+
       const index = searchIndex(jwtIds, pieces[i].piece.userId);
       response = await chai.request(app)
         .post(`${basePath}/position`)
@@ -226,7 +241,6 @@ describe('piece', () => {
       // waitTimeを待たずにStandbyを確認したら格納されている
       const standbys = PieceStore.getStandbys();
       if (res.status) {
-        PieceStore.getStandbys();
         for (let j = 0; j < standbys.length; j += 1) {
           const standby = standbys[j]; // board内のstandby情報
           const { piece, remaining } = standby;
@@ -244,12 +258,63 @@ describe('piece', () => {
       // waitTimeが経ったあとにstandbyが空になっているかの確認
       if (res.status) {
         await sleep(waitTime); // 3500ミリ秒待機
-        // standbys = PieceStore.getStandbys();
-        for (let j = 0; j < standbys.length; j += 1) {
-          const standby = standbys[j]; // board内のstandby情報
-          expect(standby).toBe(undefined); // waitTimeが経過して、undefinedになっている
-        }
+        standbysConfirm = PieceStore.getStandbys();
+        expect(standbysConfirm).toHaveLength(0); // waitTimeが経過して、配列が空になっている
       }
     }
+  });
+
+  it('is saved in MongoDB', async () => {
+    // Reset
+    await chai.request(app).delete(`${basePath}`);
+    PieceStore.deletePieces();
+    PieceStore.deleteStandbys();
+
+    // userIdのtokenを生成
+    const jwtIds = genJwtArr(2);
+
+    // Given
+    const pieces = array2Pieces.array2Pieces(
+      [
+        `${jwtIds[0].decode}:1`, `${jwtIds[1].decode}:2`,
+        `${jwtIds[1].decode}:3`, 0,
+      ],
+    );
+
+    const matches = array2Standbys.array2Standbys(
+      [
+        `${jwtIds[0].decode}:1`, `${jwtIds[1].decode}:2:f`,
+        `${jwtIds[1].decode}:3:f`, 0,
+      ],
+    );
+
+    // MongoDB確認のため、matchesからstatus: falseのオブジェクトを抜いた配列
+    const matchesDB = matches.filter(m => m.status === true);
+
+    // When
+    // 返り値として期待するmatchesと、返り値との比較テスト
+    let response;
+    for (let i = 0; i < pieces.length; i += 1) {
+      const { piece } = pieces[i];
+      const index = searchIndex(jwtIds, pieces[i].piece.userId);
+      response = await chai.request(app)
+        .post(`${basePath}/position`)
+        .set('Authorization', jwtIds[index].jwtId)
+        .set('content-type', 'application/x-www-form-urlencoded')
+        .send({
+          x: piece.x,
+          y: piece.y,
+        });
+
+      const res = response.body; // 返り値を１つずつ
+      const match = matches[i]; // 期待値を１つずつ
+
+      // Then
+      expect(res.status).toEqual(match.status); // 置けたかの判定が合っているか
+      expect(res.standby.remaining).toBeLessThanOrEqual(waitTime); // 時間が経過し、待機時間から時間が減っているか
+      expect(res.standby.piece).toMatchObject(match.standby.piece); // pieceの値が合っているか
+    }
+    const positionData = JSON.parse(JSON.stringify(await BoardHistoryModel.find({}, propFilter)));
+    expect(positionData).toHaveLength(matchesDB.length);
   });
 });
