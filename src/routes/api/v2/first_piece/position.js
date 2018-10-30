@@ -21,7 +21,7 @@ router.use((req, res, next) => {
 
 router.route('/')
   .post(async (req, res) => {
-    const dateNow = Date.now(); // 受け取った時刻
+    const created = Date.now(); // 受け取った時刻
     const pcs = PieceStore.getPieces(); // 盤面のコマ。テスト時はデフォルトのx:0, y:0, userId:1がいる
     const stb = PieceStore.getStandbys(); // スタンバイ中のマス
     const { x, y, userId } = StandbyStore.getPlayInfo(req); // 送られてきた置きコマ
@@ -54,10 +54,10 @@ router.route('/')
       }
     }
 
-    const remaining = status ? StandbyStore.getRemaining(dateNow) : 0;
+    const remaining = status ? StandbyStore.getRemaining(created) : 0;
     const piece = { x, y, userId };
     const playResult = { // piecesに格納する値
-      created: dateNow,
+      created,
       remaining,
       piece,
     };
@@ -71,7 +71,7 @@ router.route('/')
 
     if (status) {
       PieceStore.addStandby(playResult); // boardに追加
-      sendHistory.addPositionMongo(x, y, userId);
+      sendHistory.addPositionMongo(x, y, userId, created);
     }
     await res.send(playReturn); // 1プレイの結果を返す
   });
