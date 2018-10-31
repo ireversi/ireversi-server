@@ -1,5 +1,7 @@
 const BoardHistoryModel = require('../models/v2/BoardHistoryModel.js');
 
+const standbySendMongo = [];
+
 module.exports = {
   addPieceMongo(x, y, userId, created) {
     const playHistory = new BoardHistoryModel({
@@ -12,8 +14,8 @@ module.exports = {
       },
       date: created,
     });
-
-    new BoardHistoryModel(playHistory).save();
+    standbySendMongo.push(playHistory);
+    // new BoardHistoryModel(playHistory).save();
   },
   addPositionMongo(x, y, userId, created) {
     const positionHistory = new BoardHistoryModel({
@@ -26,8 +28,8 @@ module.exports = {
       },
       date: created,
     });
-
-    new BoardHistoryModel(positionHistory).save();
+    standbySendMongo.push(positionHistory);
+    // new BoardHistoryModel(positionHistory).save();
   },
   addDirectionMongo(x, y, userId, created) {
     const directionHistory = new BoardHistoryModel({
@@ -40,7 +42,15 @@ module.exports = {
       },
       date: created,
     });
+    standbySendMongo.push(directionHistory);
+    // new BoardHistoryModel(directionHistory).save();
+  },
+  getStandbySendMongo() {
+    console.log(standbySendMongo);
 
-    new BoardHistoryModel(directionHistory).save();
+    return standbySendMongo;
+  },
+  deleteStandbySendMongo() {
+    standbySendMongo.length = 0;
   },
 };

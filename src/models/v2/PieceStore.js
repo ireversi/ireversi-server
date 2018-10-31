@@ -1,6 +1,6 @@
 const StandbyStore = require('./StandbyStore.js');
 const calcScore = require('../../routes/api/v2/board/calcScore.js');
-const sendHistory = require('../../utils/sendPlayHistory');
+const storeHistory = require('../../utils/storePlayHistory');
 
 const board = {
   pieces: new Map(),
@@ -70,7 +70,7 @@ module.exports = {
     }
     this.addSize(); // コマを置くと同時にsizeを増やす
     if (status) {
-      sendHistory.addPieceMongo(x, y, userId, created); // プレイ情報をMongoに送信
+      storeHistory.addPieceMongo(x, y, userId, created); // プレイ情報をMongo準備に送信
     }
     return status;
   },
