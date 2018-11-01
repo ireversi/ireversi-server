@@ -59,9 +59,6 @@ function convertComparisonMatchers(result, idSl) {
 }
 
 describe('board', () => {
-  // beforeAll(prepareDB);
-  // afterEach(deleteAllDataFromDB);
-
   // 一つ駒を置く
   it('gets all', async () => {
     await chai.request(app).delete(`${basePath}`);
@@ -85,7 +82,6 @@ describe('board', () => {
       zero, id6, zero, id1, zero,
       zero, zero, zero, zero, zero,
     ];
-    // const result = boardStore.getBoard().pieces;
     const matchers = convertComparisonResult(result);
     const size = Math.sqrt(result.length);
 
@@ -99,10 +95,8 @@ describe('board', () => {
         PieceStore.addPiece(ans);
       }
     });
-    // await Promise.all(matchers.map(m => PieceStore(m).save()));
 
     // When
-    // const response = await chai.request(app).get(`${basePath}/?userId=${idSl}`);
     const response = await chai.request(app)
       .get(`${basePath}`)
       .set('Authorization', idSelectedJwt);
@@ -151,8 +145,6 @@ describe('board after turnover', () => {
       zero, idSl, id1, idSl, zero,
       zero, zero, idSl, zero, zero,
     ], idSl);
-
-    // await Promise.all(matchers.map(m => PieceStore(m).save()));
 
     // When
     const response = await chai.request(app)

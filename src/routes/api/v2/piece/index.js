@@ -11,6 +11,7 @@ router.route('/')
       y: +req.body.y,
       userId,
     };
+
     const status = PieceStore.judgePiece(piece.x, piece.y, piece.userId);
     res.json({ status, piece });
   })
