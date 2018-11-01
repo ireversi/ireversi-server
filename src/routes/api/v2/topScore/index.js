@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const PieceStore = require('../../../../../src/models/v2/PieceStore.js');
 
-function convertRanking(result) {
+function convertRanking(result, number) {
   const scores = [];
   // userIdの重複削除
   const ids = new Set(result);
@@ -31,8 +31,8 @@ function convertRanking(result) {
     if (a.score < b.score) return 1;
     return 0;
   });
-  const slicedScores = sortedScores.slice(0, 5);
-
+  const rank = number;
+  const slicedScores = sortedScores.slice(0, rank);
   return slicedScores;
 }
 
@@ -43,14 +43,15 @@ function genUserIdArr(pieces) {
   });
   return userIdArr;
 }
-
-router.route('/').get(async (req, res) => {
+router.get('/', async (req, res) => {
+  // reqestbodyからnumberを抽出
+  const { number } = req.query;
   // 全体盤面の取得
   const entireBoard = PieceStore.getPieces();
   // userIdをリスト化
   const userIdArr = genUserIdArr(entireBoard);
   // top5arrをリスト化
-  const top5arr = convertRanking(userIdArr);
-  res.json(top5arr);
+  const topArr = convertRanking(userIdArr, number);
+  res.json(topArr);
 });
 module.exports = router;

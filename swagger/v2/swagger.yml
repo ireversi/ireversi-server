@@ -375,7 +375,7 @@ securityDefinitions:
         description: Error
         schema:
           $ref: "#/definitions/ErrorResponse"
-/top5score:
+/topScore:
   get:
     x-swagger-router-controller: test
     operationId: test_post
@@ -384,6 +384,13 @@ securityDefinitions:
     tags:
     - score
     description: get top5 scores
+    parameters:
+      - name: number
+        in: "query"
+        description: "number"
+        type: number
+        example: 5
+        required: true
     responses:
       '200':
         description: Success
