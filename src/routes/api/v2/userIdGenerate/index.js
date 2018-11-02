@@ -6,7 +6,7 @@ router.route('/').post((req, res) => {
   const ans = {};
   const accessToken = generateToken.generate();
   const { userId } = jwt.decode(accessToken);
-  const { username } = req.headers;
+  const { username } = req.body;
 
   // 正規表現でusernameのvalidation
   // 数値、アルファベット、_以外が出たらtrueを返す正規表現
