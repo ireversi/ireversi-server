@@ -7,15 +7,10 @@ const restore = true;
 module.exports = {
   async restoreMongo() {
     const mg = await JSON.parse(JSON.stringify(await BoardHistoryModel.find({}, propFilter)));
-    // console.log('mongoData');
-    // console.log(mongoData);
 
     for (let i = 0; i < mg.length; i += 1) {
       const { x, y, userId } = mg[i].piece;
       await PieceStore.judgePiece(x, y, userId, restore);
-      // const pieces = PieceStore.getPieces();
-      // console.log('復元したよ⚪');
-      // console.log(pieces);
     }
   },
 };
