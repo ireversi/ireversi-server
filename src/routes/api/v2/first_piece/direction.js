@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const PieceStore = require('../../../../models/v2/PieceStore.js');
-const sendHistory = require('../../../../utils/sendPlayHistory.js');
+const storeHistory = require('../../../../utils/storePlayHistory.js');
 
 const dirList = {
   nw: [-1, 1],
@@ -57,7 +57,7 @@ router.route('/')
         mapPieces.set([coordinates[i][0], coordinates[i][1]].join(), userId);
       }
       status = true;
-      sendHistory.addDirectionMongo(x + dir[0], y + dir[1], userId);
+      storeHistory.addDirectionMongo(x + dir[0], y + dir[1], userId);
     }
     // standbyを削除
     standbys.splice(standbys.findIndex(standby => standby.piece.userId === userId), 1);
