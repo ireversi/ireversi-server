@@ -14,6 +14,7 @@ const restoreMongo = require('./utils/restoreMongo.js');
   await connectDB(); // DBに接続
   PieceStore.initPieces();
   sendMongo.startSendingMongo();
+
   // asyncでMongoのstateに接続して、復元してからlistenでサーバに接続する
   await restoreMongo.restoreMongo();
 
