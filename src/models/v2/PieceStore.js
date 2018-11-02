@@ -41,7 +41,7 @@ function judgeDirection(x, y, userId, nexts, results = []) {
 }
 
 module.exports = {
-  judgePiece(x, y, userId) {
+  judgePiece(x, y, userId, restore) {
     const created = Date.now();
     const coordinate = [x, y].join();
     let status = false;
@@ -69,7 +69,7 @@ module.exports = {
       }
     }
     this.addSize(); // コマを置くと同時にsizeを増やす
-    if (status) {
+    if (status && !restore) { // mongoで復元するときには追加しない
       storeHistory.addPieceMongo(x, y, userId, created); // プレイ情報をMongo準備に送信
     }
     return status;

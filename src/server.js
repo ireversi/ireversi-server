@@ -7,14 +7,15 @@ const { port } = require('./config.js'); // 環境変数
 const specs = require('./utils/swaggerSpecs.js'); // 連想配列の中身だけ取り出す
 const PieceStore = require('./models/v2/PieceStore.js');
 const sendMongo = require('./utils/sendMongo.js');
+const restoreMongo = require('./utils/restoreMongo.js');
 
 /* eslint-disable no-console */
 (async () => {
   await connectDB(); // DBに接続
   PieceStore.initPieces();
   sendMongo.startSendingMongo();
-
   // asyncでMongoのstateに接続して、復元してからlistenでサーバに接続する
+  await restoreMongo.restoreMongo();
 
   specs.forEach(({ version, spec, option }) => {
     const docsPath = `/api-docs/${version}`; // ドキュメントのURL決める

@@ -46,8 +46,6 @@ module.exports = {
     // new BoardHistoryModel(directionHistory).save();
   },
   getStandbySendMongo() {
-    console.log(standbySendMongo);
-
     return standbySendMongo;
   },
   deleteStandbySendMongo() {
