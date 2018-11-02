@@ -13,7 +13,7 @@ router.route('/').post((req, res) => {
   const reg = /^[a-z0-9]([_a-z0-9]){2,13}[a-z0-9]$/;
 
   // 禁止文字の検索、最短の検索、最長の検索
-  if (reg.test(username)) {
+  if (reg.test(username) && username !== 'null' && username !== 'undefined') {
     ans.accessToken = accessToken;
     ans.userId = userId;
     ans.username = username;
