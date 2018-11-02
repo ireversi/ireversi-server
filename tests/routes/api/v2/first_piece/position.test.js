@@ -7,6 +7,9 @@ const array2Standbys = require('../../../../../src/utils/array2Standbys.js');
 const app = require('../../../../../src/routes/app.js');
 const generateToken = require('../../../../../src/routes/api/v2/userIdGenerate/generateToken');
 const BoardHistoryModel = require('../../../../../src/models/v2/BoardHistoryModel.js');
+const storePlayHistory = require('../../../../../src/utils/storePlayHistory');
+
+const sendMongo = require('../../../../../src/utils/sendMongo.js');
 
 const { // テストのたびにDBをクリア
   prepareDB,
@@ -269,6 +272,8 @@ describe('piece', () => {
     await chai.request(app).delete(`${basePath}`);
     PieceStore.deletePieces();
     PieceStore.deleteStandbys();
+    storePlayHistory.deleteStandbySendMongo();
+    sendMongo.startSendingMongo();
 
     // userIdのtokenを生成
     const jwtIds = genJwtArr(2);
@@ -314,7 +319,15 @@ describe('piece', () => {
       expect(res.standby.remaining).toBeLessThanOrEqual(waitTime); // 時間が経過し、待機時間から時間が減っているか
       expect(res.standby.piece).toMatchObject(match.standby.piece); // pieceの値が合っているか
     }
-    const positionData = JSON.parse(JSON.stringify(await BoardHistoryModel.find({}, propFilter)));
-    expect(positionData).toHaveLength(matchesDB.length);
+    await sleep(2000); // 2000ミリ秒待機
+    const pieceData = JSON.parse(JSON.stringify(await BoardHistoryModel.find({}, propFilter)));
+    expect(pieceData).toHaveLength(matchesDB.length);
+
+    // matchesDBから
+    for (let i = 0; i < pieceData.length; i += 1) {
+      const pc = pieceData[i];
+      expect(pc.piece).toEqual(expect.objectContaining(matchesDB[i].standby.piece));
+    }
+    await sendMongo.stopSendingMongo();
   });
 });
