@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
+const BoardHistoryModel = require('../../src/models/v2/BoardHistoryModel.js');
 
 const {
   nodeEnv,
@@ -17,6 +18,11 @@ module.exports = {
       throw new Error(`MongoDB connection error: ${err}`);
     });
     await conn;
+  },
+  async deleteMongo() {
+    if (nodeEnv === 'test') throw new Error('You cannot connect db on test mode');
+
+    await BoardHistoryModel.remove();
   },
   async prepareDB() {
     if (nodeEnv !== 'test') throw new Error('You can drop db on test mode only');

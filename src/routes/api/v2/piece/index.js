@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const PieceStore = require('../../../../models/v2/PieceStore.js');
+const db = require('../../../../utils/db.js');
 
 router.route('/')
   .post((req, res) => {
@@ -15,8 +16,9 @@ router.route('/')
     const status = PieceStore.judgePiece(piece.x, piece.y, piece.userId);
     res.json({ status, piece });
   })
-  .delete((req, res) => {
+  .delete(async (req, res) => {
     const pieces = PieceStore.deletePieces();
+    await db.deleteMongo();
     res.json(pieces);
   });
 module.exports = router;
