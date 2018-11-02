@@ -16,12 +16,13 @@ describe('userId generate', () => {
   it('generates userId and request userName', async () => {
     // Given
     const userIdJwt = userIdGenerate();
-    const userName = 'test_kimkim';
+    const username = 'test_kimkim';
 
     // When
     const response = await chai.request(app)
       .post(`${basePath}/user_id_generate`)
-      .set('userName', userName);
+      .set('content-type', 'application/x-www-form-urlencoded')
+      .send({ username });
       // Then
     expect(response.body.accessToken.length).toEqual(userIdJwt.length);
   });
@@ -29,12 +30,13 @@ describe('userId generate', () => {
 
   it('generates userId and request invalid userName', async () => {
     // Given
-    const userName = 'test-kimkim';
+    const username = 'test-kimkim';
 
     // When
     const response = await chai.request(app)
       .post(`${basePath}/user_id_generate`)
-      .set('username', userName);
+      .set('content-type', 'application/x-www-form-urlencoded')
+      .send({ username });
       // Then
     expect(response.body.accessToken).toEqual(null);
     expect(response.body.userId).toEqual(null);
