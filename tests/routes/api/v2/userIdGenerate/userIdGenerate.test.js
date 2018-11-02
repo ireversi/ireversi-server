@@ -16,7 +16,7 @@ describe('userId generate', () => {
   it('generates userId and request userName', async () => {
     // Given
     const userIdJwt = userIdGenerate();
-    const username = 'test_kimkim';
+    const username = 'testuser';
 
     // When
     const response = await chai.request(app)

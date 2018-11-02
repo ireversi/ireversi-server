@@ -346,11 +346,11 @@ definitions:
     description: "userIdの新規生成"
     parameters:
       - name: username
-        in: "header"
-        description: "input user name "
+        in: "formData"
+        description: "input user name"
         type: string
-        example: 
-        required: true
+        example: 'testname'
+        required:
     responses:
       200:
         description: "return a new userId"
