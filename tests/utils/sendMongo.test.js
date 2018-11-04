@@ -111,11 +111,9 @@ describe('piece', () => {
 
       // When
       // 1ピースずつ確認
-      for (let i = 0; i < resPieces.length; i += 1) {
-        const resPiece = resPieces[i];
-        const match = matchesDB[i].piece;
+      for (let i = 0; i < matchesDB.length; i += 1) {
         // Then
-        expect(resPiece).toEqual(match);
+        expect(resPieces).toContainEqual(expect.objectContaining(matchesDB[i].piece));
       }
       expect(resPieces).toHaveLength(matchesDB.length); // x: 0, y: 0のデフォルト値を考慮
     });
