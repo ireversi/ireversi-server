@@ -103,9 +103,8 @@ describe('piece', () => {
       expect(pieceData).toHaveLength(matchesDB.length);
 
       // matchesから
-      for (let i = 0; i < pieceData.length; i += 1) {
-        const pc = pieceData[i];
-        expect(pc.piece).toEqual(expect.objectContaining(matchesDB[i].piece));
+      for (let i = 0; i < matchesDB.length; i += 1) {
+        expect(pieceData).toContainEqual(expect.objectContaining({ piece: matchesDB[i].piece }));
       }
       await sendMongo.stopSendingMongo();
     });
